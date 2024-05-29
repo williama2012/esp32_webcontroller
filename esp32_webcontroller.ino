@@ -52,6 +52,21 @@ String _lcd_row3_printed;
 String _lcd_row4_printed;
 
 void LcdUpdateRows() {
+
+  Serial.println(String(lcd != NULL));
+
+  if(lcd_row1 != _lcd_row1_printed 
+      || lcd_row2 != _lcd_row2_printed 
+      || lcd_row3 != _lcd_row3_printed 
+      || lcd_row4 != _lcd_row4_printed) {
+
+    lcd.clear();
+    _lcd_row1_printed = "";
+    _lcd_row2_printed = "";
+    _lcd_row3_printed = "";
+    _lcd_row4_printed = "";
+  }
+
   if(lcd_row1 != _lcd_row1_printed) {
     lcd.setCursor(0, 0);
     lcd.print(lcd_row1);
@@ -322,7 +337,8 @@ void handleToneWritePost() {
   response += jsonField("value", String(value), false);
   response += "}";
   doBlink = true;
-  
+  lcd_row2 = "                    ";
+  lcd_row3 = "                    ";
   lcd_row2 = "ToneWrite";
   lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
