@@ -53,8 +53,6 @@ String _lcd_row4_printed;
 
 void LcdUpdateRows() {
 
-  Serial.println(String(lcd != NULL));
-
   if(lcd_row1 != _lcd_row1_printed 
       || lcd_row2 != _lcd_row2_printed 
       || lcd_row3 != _lcd_row3_printed 
