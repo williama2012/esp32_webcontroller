@@ -1,16 +1,23 @@
+#include "esp32_timer.h"
+#include "Servo.h"
+#include "incbin.h"
+#include "Wire.h"
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
-#include "incbin.h"
-#include "Servo.h"
+
+#include <LiquidCrystal_I2C.h>
+
+#define SERIAL_BAUDRATE 115200
+
+const char *ssid = "BDS_HOME_24";
+const char *password = "bdsWins999";
 
 INCTXT(WebPage, "index.html");
 INCTXT(WebJavascript, "index.js");
 INCTXT(WebStylesheet, "index.css");
 
-const char *ssid = "BDS_HOME_24";
-const char *password = "bdsWins999";
 TaskHandle_t Task1;
 TaskHandle_t Task2;
 
@@ -30,7 +37,50 @@ typedef struct {
 
 servoPosDef servoPos;
 
-#pragma region Display
+LiquidCrystal_I2C lcd(0x27, 20, 2);
+
+#pragma region lcd
+
+String lcd_row1;
+String lcd_row2;
+String lcd_row3;
+String lcd_row4;
+
+String _lcd_row1_printed;
+String _lcd_row2_printed;
+String _lcd_row3_printed;
+String _lcd_row4_printed;
+
+void LcdUpdateRows() {
+  if(lcd_row1 != _lcd_row1_printed) {
+    lcd.setCursor(0, 0);
+    lcd.print(lcd_row1);
+    _lcd_row1_printed = lcd_row1;
+  }
+
+  if(lcd_row2 != _lcd_row2_printed) {
+    lcd.setCursor(0, 1);
+    lcd.print(lcd_row2);
+    _lcd_row2_printed = lcd_row2;
+  }
+
+  if(lcd_row3 != _lcd_row3_printed) {
+    lcd.setCursor(0, 2);
+    lcd.print(lcd_row3);
+    _lcd_row3_printed = lcd_row3;
+  }
+
+  if(lcd_row4 != _lcd_row4_printed) {
+    lcd.setCursor(0, 3);
+    lcd.print(lcd_row4);
+    _lcd_row4_printed = lcd_row4;
+  }
+
+}
+
+#pragma endregion lcd
+
+#pragma region led
 
 void Blink() {
   PrintCore("Blink");
@@ -51,7 +101,7 @@ void Blue(bool on) {
   digitalWrite(16, !on);
 }
 
-#pragma endregion Display
+#pragma endregion led
 
 #pragma region Printing
 
@@ -63,6 +113,7 @@ void Print(String msg) {
   if (Serial) {
     Serial.print(msg);
   }
+  lcd_row2 = msg;
 }
 
 void Print(const char *msg) {
@@ -87,6 +138,7 @@ void Println(String msg) {
   if (Serial) {
     Serial.println(msg);
   }
+  lcd_row2 = msg;
 }
 
 void Println(const char *msg) {
@@ -224,19 +276,18 @@ void handleAnalogReadPost() {
       i = pinStr.length();
     }
 
-    if(pin > 0) {
+    if (pin > 0) {
       ClearServo(pin);
       pinMode(pin, INPUT);
       int value = analogRead(pin);
-      response += "{" 
-        + jsonField("pin", String(pin), true) 
-        + jsonField("value", String(value), false) 
-        + "}";
-      if(i > 0) {
+      response += "{"
+                  + jsonField("pin", String(pin), true)
+                  + jsonField("value", String(value), false)
+                  + "}";
+      if (i > 0) {
         response += ",";
       }
     }
-
   }
   response += "]";
   server.send(200, "application/json", response);
@@ -255,7 +306,7 @@ void handleToneWritePost() {
 
   pinMode(pin, OUTPUT);
 
-  if(value == 0) {
+  if (value == 0) {
     noTone(pin);
   } else {
     noTone(pin);
@@ -273,7 +324,7 @@ void handleToneWritePost() {
 
 String makeStatusItem(int pin, String message, bool includeComma = true) {
   String msg = "{" + jsonField("pin", String(pin), true) + jsonField("status", message, false) + "}";
-  if(includeComma) {
+  if (includeComma) {
     msg += ",";
   }
   return msg;
@@ -284,8 +335,8 @@ void handleApiPost() {
   String cmd = server.arg("cmd");
   cmd.toLowerCase();
 
-  if(cmd == "reset") {
-    for(int i = 2; i <= 24; i++) {
+  if (cmd == "reset") {
+    for (int i = 2; i <= 24; i++) {
       servo_ctrl.detach(i);
       pinMode(i, OUTPUT);
       analogWrite(i, 0);
@@ -293,7 +344,6 @@ void handleApiPost() {
       analogRead(i);
       Println("reset pin - " + String(i));
     }
-
   }
 
   servo_pin = 0;
@@ -304,7 +354,43 @@ void handleApiPost() {
 
 #pragma endregion Post_Handlers
 
+#pragma region servo
+
+void MoveServo(int pin, int pos) {
+  PrintCore("MoveServo");
+
+  if (pin != servo_pin) {
+    if (servo_pin != 0) {
+      servo_ctrl.detach(servo_pin);
+    }
+    servo_ctrl.attach(pin);
+    servo_pin = pin;
+  }
+
+  servo_ctrl.write(pos);
+}
+
+void ClearServo(int pin) {
+  if (servo_pin == pin) {
+    servo_ctrl.detach(servo_pin);
+    servo_pin = 0;
+  }
+}
+
+#pragma endregion servo
+
 #pragma region Setup
+
+void SetupLCD() {
+  lcd.init();
+  lcd.backlight();
+  lcd.noBlink();
+  lcd.clear();  
+}
+
+void SetupTimers() {
+  AddTimer("LCD_DISPLAY", 1000); // Update LCD
+}
 
 void SetupWifi() {
   PrintCore("SetupWifi");
@@ -346,19 +432,22 @@ void SetupServer() {
 
 void setup(void) {
   Red(true);
-  analogReadResolution(12);
-  analogWriteResolution(12);
-  Serial.begin(115200);
-
+  Serial.begin(SERIAL_BAUDRATE);
   delay(1000);
 
   PrintCore("setup");
+  analogReadResolution(12);
+  analogWriteResolution(12);
 
   Red(false);
   Blue(true);
 
+  SetupLCD();
   SetupWifi();
   SetupServer();
+  SetupTimers();
+
+  lcd_row1 = url;
 
   Blue(false);
   Green(true);
@@ -375,27 +464,6 @@ void setup(void) {
 
 #pragma endregion Setup
 
-void MoveServo(int pin, int pos) {
-  PrintCore("MoveServo");
-
-  if (pin != servo_pin) {
-    if (servo_pin != 0) {
-      servo_ctrl.detach(servo_pin);
-    }
-    servo_ctrl.attach(pin);
-    servo_pin = pin;
-  }
-
-  servo_ctrl.write(pos);
-}
-
-void ClearServo(int pin) {
-  if (servo_pin == pin) {
-    servo_ctrl.detach(servo_pin);
-    servo_pin = 0;
-  }
-}
-
 #pragma region core loops
 
 void MonitorWebServer(void *parameter) {
@@ -405,6 +473,8 @@ void MonitorWebServer(void *parameter) {
     server.handleClient();
   }
 }
+
+bool lightOn = false;
 
 void loop(void) {
   if (servoPos.isNew == true) {
@@ -416,6 +486,11 @@ void loop(void) {
     Blink();
     doBlink = false;
   }
+
+  if (CheckTimer(0)) {
+    LcdUpdateRows();
+  }
+  
   delay(1);
 }
 
