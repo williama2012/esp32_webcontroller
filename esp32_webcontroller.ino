@@ -409,7 +409,7 @@ void SetupLCD() {
 }
 
 void SetupTimers() {
-  AddTimer("LCD_DISPLAY", 1000); // Update LCD
+  AddTimer("LCD_DISPLAY", 250);
 }
 
 void SetupWifi() {
@@ -467,11 +467,6 @@ void setup(void) {
   SetupServer();
   SetupTimers();
 
-  lcd_row1 = url;
-
-  Blue(false);
-  Green(true);
-
   xTaskCreatePinnedToCore(
     MonitorWebServer,   /* Function to implement the task */
     "MonitorWebServer", /* Name of the task */
@@ -480,6 +475,12 @@ void setup(void) {
     0,                  /* Priority of the task */
     &Task1,             /* Task handle. */
     0);                 /* Core where the task should run */
+
+  lcd_row1 = url;
+  
+  digitalWrite(LED_BUILTIN, HIGH);
+  Blue(false);
+  Green(true);
 }
 
 #pragma endregion Setup
@@ -494,8 +495,6 @@ void MonitorWebServer(void *parameter) {
   }
 }
 
-bool lightOn = false;
-
 void loop(void) {
   if (servoPos.isNew == true) {
     MoveServo(servoPos.pin, servoPos.pos);
@@ -507,11 +506,11 @@ void loop(void) {
     doBlink = false;
   }
 
-  // if (CheckTimer(0)) {
-  //   LcdUpdateRows();
-  // }
-  LcdUpdateRows();
-  delay(1);
+  if (CheckTimer(0)) {
+    LcdUpdateRows();
+  }
+
+  delayMicroseconds(10);
 }
 
 #pragma endregion core loops
