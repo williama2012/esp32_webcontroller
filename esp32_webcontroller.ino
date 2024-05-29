@@ -113,7 +113,6 @@ void Print(String msg) {
   if (Serial) {
     Serial.print(msg);
   }
-  lcd_row2 = msg;
 }
 
 void Print(const char *msg) {
@@ -138,7 +137,6 @@ void Println(String msg) {
   if (Serial) {
     Serial.println(msg);
   }
-  lcd_row2 = msg;
 }
 
 void Println(const char *msg) {
@@ -224,6 +222,9 @@ void handleAnalogWritePost() {
   response += jsonField("value", String(value), false);
   response += "}";
   doBlink = true;
+
+  lcd_row2 = "AnalogWrite";
+  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
 
@@ -249,6 +250,8 @@ void handleServoWritePost() {
   response += "}";
   doBlink = true;
 
+  lcd_row2 = "ServoWrite";
+  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
 
@@ -290,6 +293,7 @@ void handleAnalogReadPost() {
     }
   }
   response += "]";
+
   server.send(200, "application/json", response);
   return;
 }
@@ -318,7 +322,9 @@ void handleToneWritePost() {
   response += jsonField("value", String(value), false);
   response += "}";
   doBlink = true;
-
+  
+  lcd_row2 = "ToneWrite";
+  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
 
@@ -487,10 +493,10 @@ void loop(void) {
     doBlink = false;
   }
 
-  if (CheckTimer(0)) {
-    LcdUpdateRows();
-  }
-  
+  // if (CheckTimer(0)) {
+  //   LcdUpdateRows();
+  // }
+  LcdUpdateRows();
   delay(1);
 }
 
