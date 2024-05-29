@@ -477,7 +477,7 @@ void setup(void) {
     10000,              /* Stack size in words */
     NULL,               /* Task input parameter */
     0,                  /* Priority of the task */
-    &Task1,             /* Task handle. */
+    &Task2,             /* Task handle. */
     1);                 /* Core where the task should run */
 
   lcd_row1 = url;
