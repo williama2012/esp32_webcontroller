@@ -1,4 +1,5 @@
 #include "esp32_timer.h"
+#include "secrets.h"
 #include "Servo.h"
 #include "incbin.h"
 #include "Wire.h"
@@ -6,13 +7,9 @@
 #include <WiFiClient.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
-
 #include <LiquidCrystal_I2C.h>
 
 #define SERIAL_BAUDRATE 115200
-
-const char *ssid = "BDS_HOME_24";
-const char *password = "bdsWins999";
 
 INCTXT(WebPage, "index.html");
 INCTXT(WebJavascript, "index.js");
@@ -38,6 +35,14 @@ typedef struct {
 servoPosDef servoPos;
 
 LiquidCrystal_I2C lcd(0x27, 20, 2);
+
+String makeStatusItem(int pin, String message, bool includeComma = true) {
+  String msg = "{" + jsonField("pin", String(pin), true) + jsonField("status", message, false) + "}";
+  if (includeComma) {
+    msg += ",";
+  }
+  return msg;
+}
 
 #pragma region lcd
 
@@ -335,19 +340,9 @@ void handleToneWritePost() {
   response += jsonField("value", String(value), false);
   response += "}";
   doBlink = true;
-  lcd_row2 = "                    ";
-  lcd_row3 = "                    ";
   lcd_row2 = "ToneWrite";
   lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
-}
-
-String makeStatusItem(int pin, String message, bool includeComma = true) {
-  String msg = "{" + jsonField("pin", String(pin), true) + jsonField("status", message, false) + "}";
-  if (includeComma) {
-    msg += ",";
-  }
-  return msg;
 }
 
 void handleApiPost() {
@@ -468,17 +463,24 @@ void setup(void) {
   SetupTimers();
 
   xTaskCreatePinnedToCore(
-    MonitorWebServer,   /* Function to implement the task */
-    "MonitorWebServer", /* Name of the task */
+    Core0Processor,   /* Function to implement the task */
+    "Core0Processor", /* Name of the task */
     10000,              /* Stack size in words */
     NULL,               /* Task input parameter */
     0,                  /* Priority of the task */
     &Task1,             /* Task handle. */
     0);                 /* Core where the task should run */
 
+  xTaskCreatePinnedToCore(
+    Core1Processor,   /* Function to implement the task */
+    "Core1Processor", /* Name of the task */
+    10000,              /* Stack size in words */
+    NULL,               /* Task input parameter */
+    0,                  /* Priority of the task */
+    &Task1,             /* Task handle. */
+    1);                 /* Core where the task should run */
+
   lcd_row1 = url;
-  
-  digitalWrite(LED_BUILTIN, HIGH);
   Blue(false);
   Green(true);
 }
@@ -487,11 +489,20 @@ void setup(void) {
 
 #pragma region core loops
 
-void MonitorWebServer(void *parameter) {
-  PrintCore("MonitorWebServer");
+void Core0Processor(void *parameter) {
+  PrintCore("Core0Processor");
 
   for (;;) {
     server.handleClient();
+  }
+}
+
+void Core1Processor(void *parameter) {
+  PrintCore("Core1Processor");
+
+  for (;;) {
+
+    delayMicroseconds(1);
   }
 }
 
