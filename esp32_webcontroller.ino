@@ -101,9 +101,18 @@ void LcdUpdateRows() {
 #pragma region led
 
 void Blink() {
+  return;
+
   PrintCore("Blink");
+
+  Red(false);
+  Blue(true);
   Green(false);
+
   delay(25);
+
+  Red(false);
+  Blue(false);
   Green(true);
 }
 
@@ -112,7 +121,13 @@ void Red(bool on) {
 }
 
 void Green(bool on) {
-  digitalWrite(15, !on);
+  if(on) {
+    analogWrite(15, 3900);
+  } else {
+    digitalWrite(15, 0);
+  }
+
+  //digitalWrite(15, !on);
 }
 
 void Blue(bool on) {
@@ -521,7 +536,7 @@ void loop(void) {
     LcdUpdateRows();
   }
 
-  delayMicroseconds(10);
+  delayMicroseconds(1);
 }
 
 #pragma endregion core loops
