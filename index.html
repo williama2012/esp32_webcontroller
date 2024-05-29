@@ -1,0 +1,94 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>esp32 Controller</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="index.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.2/css/fontawesome.min.css" integrity="sha384-BY+fdrpOd3gfeRvTSMT+VUZmA728cfF9Z2G42xpaRkUGu2i3DyzpTURDo5A6CaLK" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" integrity="sha384-4LISF5TTJX/fLmGSxO53rV4miRxdg84mZsxmO8Rx5jGtp/LbrixFETvWa5a6sESd" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
+    <meta http-equiv="cache-control" content="max-age=0" />
+    <meta http-equiv="cache-control" content="no-cache" />
+</head>
+
+<body>
+    <div class="statusbar">
+
+    </div>
+
+    <div class="toolbar flex">
+        <div class="toolbar-one flex-grow">
+            <div class="">
+                <table id="activity" class="table table-borderless border-primary"></table>
+            </div>
+        </div>
+        <div class="toolbar-three">
+            <div class="btn-group" role="group" aria-label="Basic example">
+                <button id="addSliderBtn" class="btn btn-outline-primary" title="Add pin to list. Ctrl click adds the next number in order.">
+                    <i class="bi bi-node-plus"></i>
+                </button>
+                
+                <button id="refreshBtn" class="btn btn-outline-primary" title="Get values of all pins. Ctrl click start automatic refresh. Alt click reloads page.">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+                
+                <button id="resetBtn" class="btn btn-outline-primary" title="Reset All Pins">
+                    <i class="bi bi-radioactive"></i>
+                </button>
+
+                <button id="graphBtn" class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@getbootstrap">
+                    <i class="bi bi-graph-up"></i>
+                </button>
+
+                <button id="settingsBtn" class="btn btn-outline-primary" type="button">
+                    <i class="bi bi-gear"></i>
+                </button>
+            </div>
+            <div class="modeSelectDiv">
+                <select name="modeSelect" id="modeSelect" class="custom-select"
+                    title="Set mode to interact with pins">
+                    <option value="analogout">Analog Write</option>
+                    <option value="digitalout">Digital Write</option>
+                    <option value="servo">Servo</option>
+                    <option value="tone">Tone</option>
+                </select>
+            </div>
+            <div class="">
+                <input class="form-control stepsize" type="number"  id="stepsize" name="stepsize" min="1" max="1000000" title="Step Size">
+            </div>
+        </div>
+    </div>
+    <div class="slider-set"></div>
+</body>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">New message</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="recipient-name" class="col-form-label">Recipient:</label>
+              <input type="text" class="form-control" id="recipient-name">
+            </div>
+            <div class="mb-3">
+              <label for="message-text" class="col-form-label">Message:</label>
+              <textarea class="form-control" id="message-text"></textarea>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Send message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</html>
