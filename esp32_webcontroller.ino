@@ -1,3 +1,4 @@
+#include "esp32_webcontroller.h"
 #include "esp32_timer.h"
 #include "secrets.h"
 #include "Servo.h"
@@ -11,38 +12,19 @@
 
 #define SERIAL_BAUDRATE 115200
 
+TaskHandle_t Task1;
+WebServer server(80);
+Servo servo_ctrl;
+LiquidCrystal_I2C lcd(0x27, 20, 2);
+
 INCTXT(WebPage, "index.html");
 INCTXT(WebJavascript, "index.js");
 INCTXT(WebStylesheet, "index.css");
 
-TaskHandle_t Task1;
-TaskHandle_t Task2;
-
 String url;
 bool doBlink = false;
-
-WebServer server(80);
-
 int servo_pin = 0;
-Servo servo_ctrl;
-
-typedef struct {
-  int pin;
-  int pos;
-  bool isNew;
-} servoPosDef;
-
 servoPosDef servoPos;
-
-LiquidCrystal_I2C lcd(0x27, 20, 2);
-
-String makeStatusItem(int pin, String message, bool includeComma = true) {
-  String msg = "{" + jsonField("pin", String(pin), true) + jsonField("status", message, false) + "}";
-  if (includeComma) {
-    msg += ",";
-  }
-  return msg;
-}
 
 #pragma region lcd
 
@@ -136,11 +118,32 @@ void Blue(bool on) {
 
 #pragma endregion led
 
-#pragma region Printing
+#pragma region servo
 
-String jsonField(String field, String value, bool addMore) {
-  return "\"" + field + "\":" + "\"" + value + "\"" + (addMore ? "," : "");
+void MoveServo(int pin, int pos) {
+  PrintCore("MoveServo");
+
+  if (pin != servo_pin) {
+    if (servo_pin != 0) {
+      servo_ctrl.detach(servo_pin);
+    }
+    servo_ctrl.attach(pin);
+    servo_pin = pin;
+  }
+
+  servo_ctrl.write(pos);
 }
+
+void ClearServo(int pin) {
+  if (servo_pin == pin) {
+    servo_ctrl.detach(servo_pin);
+    servo_pin = 0;
+  }
+}
+
+#pragma endregion servo
+
+#pragma region Printing
 
 void Print(String msg) {
   if (Serial) {
@@ -374,6 +377,8 @@ void handleApiPost() {
       analogRead(i);
       Println("reset pin - " + String(i));
     }
+    lcd_row2 = "All reset";
+    lcd_row3 = "";
   }
 
   servo_pin = 0;
@@ -383,31 +388,6 @@ void handleApiPost() {
 }
 
 #pragma endregion Post_Handlers
-
-#pragma region servo
-
-void MoveServo(int pin, int pos) {
-  PrintCore("MoveServo");
-
-  if (pin != servo_pin) {
-    if (servo_pin != 0) {
-      servo_ctrl.detach(servo_pin);
-    }
-    servo_ctrl.attach(pin);
-    servo_pin = pin;
-  }
-
-  servo_ctrl.write(pos);
-}
-
-void ClearServo(int pin) {
-  if (servo_pin == pin) {
-    servo_ctrl.detach(servo_pin);
-    servo_pin = 0;
-  }
-}
-
-#pragma endregion servo
 
 #pragma region Setup
 
@@ -486,15 +466,6 @@ void setup(void) {
     &Task1,             /* Task handle. */
     0);                 /* Core where the task should run */
 
-  xTaskCreatePinnedToCore(
-    Core1Processor,   /* Function to implement the task */
-    "Core1Processor", /* Name of the task */
-    10000,              /* Stack size in words */
-    NULL,               /* Task input parameter */
-    0,                  /* Priority of the task */
-    &Task2,             /* Task handle. */
-    1);                 /* Core where the task should run */
-
   lcd_row1 = url;
   Blue(false);
   Green(true);
@@ -509,15 +480,6 @@ void Core0Processor(void *parameter) {
 
   for (;;) {
     server.handleClient();
-  }
-}
-
-void Core1Processor(void *parameter) {
-  PrintCore("Core1Processor");
-
-  for (;;) {
-
-    delayMicroseconds(1);
   }
 }
 
