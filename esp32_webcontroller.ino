@@ -26,6 +26,7 @@ bool doBlink = false;
 int servo_pin = 0;
 servoPosDef servoPos;
 
+
 #pragma region lcd
 
 String lcd_row1;
@@ -40,9 +41,9 @@ String _lcd_row4_printed;
 
 void LcdUpdateRows() {
 
-  if(lcd_row1 != _lcd_row1_printed 
-      || lcd_row2 != _lcd_row2_printed 
-      || lcd_row3 != _lcd_row3_printed 
+  if (lcd_row1 != _lcd_row1_printed
+      || lcd_row2 != _lcd_row2_printed
+      || lcd_row3 != _lcd_row3_printed
       || lcd_row4 != _lcd_row4_printed) {
 
     lcd.clear();
@@ -52,30 +53,29 @@ void LcdUpdateRows() {
     _lcd_row4_printed = "";
   }
 
-  if(lcd_row1 != _lcd_row1_printed) {
+  if (lcd_row1 != _lcd_row1_printed) {
     lcd.setCursor(0, 0);
     lcd.print(lcd_row1);
     _lcd_row1_printed = lcd_row1;
   }
 
-  if(lcd_row2 != _lcd_row2_printed) {
+  if (lcd_row2 != _lcd_row2_printed) {
     lcd.setCursor(0, 1);
     lcd.print(lcd_row2);
     _lcd_row2_printed = lcd_row2;
   }
 
-  if(lcd_row3 != _lcd_row3_printed) {
+  if (lcd_row3 != _lcd_row3_printed) {
     lcd.setCursor(0, 2);
     lcd.print(lcd_row3);
     _lcd_row3_printed = lcd_row3;
   }
 
-  if(lcd_row4 != _lcd_row4_printed) {
+  if (lcd_row4 != _lcd_row4_printed) {
     lcd.setCursor(0, 3);
     lcd.print(lcd_row4);
     _lcd_row4_printed = lcd_row4;
   }
-
 }
 
 #pragma endregion lcd
@@ -103,7 +103,7 @@ void Red(bool on) {
 }
 
 void Green(bool on) {
-  if(on) {
+  if (on) {
     analogWrite(15, 3900);
   } else {
     digitalWrite(15, 0);
@@ -395,7 +395,7 @@ void SetupLCD() {
   lcd.init();
   lcd.backlight();
   lcd.noBlink();
-  lcd.clear();  
+  lcd.clear();
 }
 
 void SetupTimers() {
@@ -460,11 +460,11 @@ void setup(void) {
   xTaskCreatePinnedToCore(
     Core0Processor,   /* Function to implement the task */
     "Core0Processor", /* Name of the task */
-    10000,              /* Stack size in words */
-    NULL,               /* Task input parameter */
-    0,                  /* Priority of the task */
-    &Task1,             /* Task handle. */
-    0);                 /* Core where the task should run */
+    10000,            /* Stack size in words */
+    NULL,             /* Task input parameter */
+    0,                /* Priority of the task */
+    &Task1,           /* Task handle. */
+    0);               /* Core where the task should run */
 
   lcd_row1 = url;
   Blue(false);

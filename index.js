@@ -420,6 +420,14 @@ function CreateSliderContainer(pin) {
         <div class="slider-details">
             <span class="slider-details-pin"></span>
             <span class="slider-details-val ${css_normal}" title="Click for manual set.">0</span>
+            <span>
+            <select name="modeSelectX" id="modeSelectX" class="custom-select" title="Set mode to interact with pins">
+                <option value="analogout">Analog Write</option>
+                <option value="digitalout">Digital Write</option>
+                <option value="servo">Servo</option>
+                <option value="tone">Tone</option>
+                </select>
+            </span>
         </div>
         <div class="slider-controls flex">
             <div class="">
