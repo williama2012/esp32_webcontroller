@@ -90,7 +90,12 @@ $(function () {
         })
     }
 
-    pins = JSON.parse(localStorage.getItem("pin_set") || [2])
+    var cached_pins = localStorage.getItem("pin_set");
+
+    if(cached_pins != null && cached_pins !== "") {
+        pins = JSON.parse(cached_pins);
+    }
+    
 
 //    mode = localStorage.getItem("mode") || "analogin";
 
