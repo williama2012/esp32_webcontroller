@@ -23,41 +23,52 @@ var chartData = {
     datasets: [
 
     ]
-
 };
 
+const AnalogWrite = "analogout";
+const AnalogRead = "analogin";
+const DigitalWrite = "digitalout";
+const DigitalRead = "digitalin";
+const Servo = "servo";
+const Tone = "tone";
+
+const PinMode = { AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone };
+
+class PinConfig {
+    constructor() {
+        this.pin = "";
+        this.value = "";
+        this.mode = "";
+    }
+}
+
 function addData(data) {
-
     var time = new Date();
-
     dataset.push(data.value);
-    
     localStorage.setItem("dataset", dataset);
-
 }
 
 $(function () {
 
-    const ctx = document.getElementById('myChart');
-
-    new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: [{
-          label: '# of Votes',
-          data: dataset,
-          borderWidth: 1
-        }]
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        }
-      }
-    });
+    //const ctx = document.getElementById('myChart');
+    // new Chart(ctx, {
+    //   type: 'bar',
+    //   data: {
+    //     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+    //     datasets: [{
+    //       label: '# of Votes',
+    //       data: dataset,
+    //       borderWidth: 1
+    //     }]
+    //   },
+    //   options: {
+    //     scales: {
+    //       y: {
+    //         beginAtZero: true
+    //       }
+    //     }
+    //   }
+    // });
 
     const exampleModal = document.getElementById('exampleModal');
 
@@ -80,7 +91,8 @@ $(function () {
     }
 
     pins = JSON.parse(localStorage.getItem("pin_set") || [2])
-    mode = localStorage.getItem("mode") || "analogin";
+
+//    mode = localStorage.getItem("mode") || "analogin";
 
     stepsize = localStorage.getItem("stepsize") || "1";
 
@@ -88,9 +100,9 @@ $(function () {
 
     activity = $("#activity");
 
-    if (mode != null && mode != "") {
-        $("#modeSelect").val(mode).change();
-    }
+    // if (mode != null && mode != "") {
+    //     $("#modeSelect").val(mode).change();
+    // }
 
     document
         .getElementById("refreshBtn")
@@ -99,10 +111,6 @@ $(function () {
     document
         .getElementById("addSliderBtn")
         .addEventListener("click", AddNewSlider_Click);
-
-    document
-        .getElementById("modeSelect")
-        .addEventListener("change", modeSelect_changed);
 
     document
         .getElementById("stepsize")
@@ -115,8 +123,6 @@ $(function () {
     document
         .getElementById("resetBtn")
         .addEventListener("click", HardResetAllPins);
-
-
 
     RebuildPins();
 });
@@ -155,13 +161,19 @@ function AddSliderContainer(pin) {
     $(".slider-set").append(slideContainer);
 }
 
+/**
+ * 
+ * @param {*} i 
+ * @param {*} obj 
+ */
 function BindContainer(i, obj) {
     var elem = $(obj);
     var pin = elem.attr("x-pin");
 
     elem.find("span.slider-details-pin").html(`PIN ${pin}`);
 
-    var slider = elem.find("input");
+    var mode = elem.find("select.slider-mode");
+    var slider = elem.find("input.slider-range");
     var valueSpan = elem.find("span.slider-details-val");
 
     slider.on("change", function (evt) {
@@ -173,7 +185,9 @@ function BindContainer(i, obj) {
             .removeClass(css_busy)
             .removeClass(css_bad);
 
-        UpdatePinValue(pin, this.value, valueSpan);
+        console.log("mode", mode.val());
+
+        UpdatePinValue(mode.val(), pin, this.value, valueSpan);
     });
 
     slider.on("input", function (evt) {
@@ -218,6 +232,7 @@ function BindContainer(i, obj) {
 
         slider.val(0).trigger("input").change();
     });
+
     elem.find("button.slider-controls-remove").on("click", function (evt) {
         var indx = pins.indexOf(Number(pin));
         pins.splice(indx, 1);
@@ -341,16 +356,10 @@ function HardResetAllPins(evt) {
 }
 
 var updatePending = false;
-function UpdatePinValue(pin, value, valueSpan) {
-    // if(updatePending) {
-    //     return;
-    // }
-
+function UpdatePinValue(mode, pin, value, valueSpan) {
     updatePending = true;
 
-    var mode = $("#modeSelect").val();
     var url = `/${mode}`;
-
     var data = { pin: pin, value: value };
 
     OutActivity({ url, ...data }, true);
@@ -421,7 +430,7 @@ function CreateSliderContainer(pin) {
             <span class="slider-details-pin"></span>
             <span class="slider-details-val ${css_normal}" title="Click for manual set.">0</span>
             <span>
-            <select name="modeSelectX" id="modeSelectX" class="custom-select" title="Set mode to interact with pins">
+            <select id="slider-mode-${pin}" name="slider-mode-${pin}" class="slider-mode" title="Set mode">
                 <option value="analogout">Analog Write</option>
                 <option value="digitalout">Digital Write</option>
                 <option value="servo">Servo</option>

@@ -94,7 +94,7 @@ body {
 
 .slider-controls-remove-icon {
     font-size: 2.5em;
-    
+
 }
 
 .slider-range {
@@ -131,22 +131,6 @@ body {
 }
 
 /* #endregion slider */
-
-
-#activity {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    border: none;
-}
-
-
-.statusbar {
-    display: flex;
-    flex-direction: row;
-    /* height: 10vh; */
-}
-
 
 /* #region toolbar */
 
@@ -256,18 +240,30 @@ input {
 
 /* #endregion Inputs */
 
+#activity {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
+.statusbar {
+    display: flex;
+    flex-direction: row;
+    /* height: 10vh; */
+}
+
 .bi-telephone-outbound {
-    color:green;
+    color: green;
 }
 
 .bi-telephone-inbound {
-    color:green;
+    color: green;
 }
 
 .bi-bug {
-    color:red;
+    color: red;
 }
-
 
 .flex {
     display: flex;
