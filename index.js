@@ -6,7 +6,8 @@ const css_busy = "btn btn-info";
 const css_warning = "btn btn-warning";
 const css_bad = "btn btn-danger";
 
-var pins = [2];
+var pin_set = [2];
+
 var activity;
 var mode;
 var stepsize = 1;
@@ -93,7 +94,7 @@ $(function () {
     var cached_pins = localStorage.getItem("pin_set");
 
     if(cached_pins != null && cached_pins !== "") {
-        pins = JSON.parse(cached_pins);
+        pin_set = JSON.parse(cached_pins);
     }
     
 
@@ -134,13 +135,13 @@ $(function () {
 
 function RebuildPins() {
     $(".slider-set").empty();
-    pins.forEach(AddSliderContainer);
+    pin_set.forEach(AddSliderContainer);
 }
 
 function AddNewSlider_Click(evt) {
     var max = 2;
-    if (pins.length > 0) {
-        max = Math.max(...pins) + 1;
+    if (pin_set.length > 0) {
+        max = Math.max(...pin_set) + 1;
     }
     if (evt.ctrlKey) {
         pin = max;
@@ -152,12 +153,12 @@ function AddNewSlider_Click(evt) {
         pin = Number(pin);
     }
 
-    if (isNaN(pin) || pins.includes(pin) || pin < 2 || pin > 24) {
+    if (isNaN(pin) || pin_set.includes(pin) || pin < 2 || pin > 24) {
         return;
     }
-    pins.push(pin);
+    pin_set.push(pin);
     AddSliderContainer(pin);
-    localStorage.setItem("pin_set", JSON.stringify(pins));
+    localStorage.setItem("pin_set", JSON.stringify(pin_set));
 }
 
 function AddSliderContainer(pin) {
@@ -239,10 +240,10 @@ function BindContainer(i, obj) {
     });
 
     elem.find("button.slider-controls-remove").on("click", function (evt) {
-        var indx = pins.indexOf(Number(pin));
-        pins.splice(indx, 1);
+        var indx = pin_set.indexOf(Number(pin));
+        pin_set.splice(indx, 1);
         RebuildPins();
-        localStorage.setItem("pin_set", JSON.stringify(pins));
+        localStorage.setItem("pin_set", JSON.stringify(pin_set));
     });
 }
 
@@ -395,7 +396,7 @@ function UpdatePinValue(mode, pin, value, valueSpan) {
 
 function RefreshPinValues() {
     var url = `/analogin`;
-    var data = { pins: JSON.stringify(pins) };
+    var data = { pins: JSON.stringify(pin_set) };
     $.post(url, data, function (response) {
         response.forEach(function (part) {
             addData(part);
