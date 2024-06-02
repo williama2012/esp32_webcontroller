@@ -1,5 +1,6 @@
 const MAX_PWM = 4095;
 const MAX_TONE = 40000; //4294967295;
+const MAX_SERVO = 180;
 
 const css_normal = "btn btn-light";
 const css_busy = "btn btn-info";
@@ -145,6 +146,21 @@ function BindContainer(i, obj) {
     var mode = elem.find("select.slider-mode");
     var slider = elem.find("input.slider-range");
     var valueSpan = elem.find("span.slider-details-val");
+
+    mode.on("change", function() {
+        console.log('mode', this.value);
+        var max = MAX_PWM;
+        switch (this.value) {
+            case "tone":
+                max = MAX_TONE;
+                break;
+            case "servo":
+                max = MAX_SERVO;
+                break;
+        }
+        
+        slider.attr("max", max);
+    });
 
     slider.on("change", function (evt) {
         console.log('slider', arguments);

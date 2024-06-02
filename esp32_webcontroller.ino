@@ -272,7 +272,9 @@ void handleServoWritePost() {
   valueStr = server.arg("value");
   int pin = pinStr.toInt();
   int value = valueStr.toInt();
-  int pos = map(value, 0, 4095, 0, 180);
+  
+  int pos = value;
+  //int pos = map(value, 0, 4095, 0, 180);
 
   MoveServo(pin, pos);
   // servoPos.pin = pin;
