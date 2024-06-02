@@ -35,14 +35,6 @@ const Tone = "tone";
 
 const PinMode = { AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone };
 
-class PinConfig {
-    constructor() {
-        this.pin = "";
-        this.value = "";
-        this.mode = "";
-    }
-}
-
 function addData(data) {
     var time = new Date();
     dataset.push(data.value);
@@ -50,27 +42,6 @@ function addData(data) {
 }
 
 $(function () {
-
-    //const ctx = document.getElementById('myChart');
-    // new Chart(ctx, {
-    //   type: 'bar',
-    //   data: {
-    //     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-    //     datasets: [{
-    //       label: '# of Votes',
-    //       data: dataset,
-    //       borderWidth: 1
-    //     }]
-    //   },
-    //   options: {
-    //     scales: {
-    //       y: {
-    //         beginAtZero: true
-    //       }
-    //     }
-    //   }
-    // });
-
     const exampleModal = document.getElementById('exampleModal');
 
     if (exampleModal) {
@@ -96,19 +67,12 @@ $(function () {
     if(cached_pins != null && cached_pins !== "") {
         pin_set = JSON.parse(cached_pins);
     }
-    
-
-//    mode = localStorage.getItem("mode") || "analogin";
 
     stepsize = localStorage.getItem("stepsize") || "1";
 
     $("#stepsize").val(stepsize).change();
 
     activity = $("#activity");
-
-    // if (mode != null && mode != "") {
-    //     $("#modeSelect").val(mode).change();
-    // }
 
     document
         .getElementById("refreshBtn")
