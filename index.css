@@ -48,7 +48,7 @@ body {
 .slider-controls {
     display: flex;
     flex-direction: row;
-    height: 10vh;
+    height: 15vh;
 }
 
 .slider-details-pin {
@@ -290,4 +290,9 @@ input {
     border: 1px solid black;
     width: 20px;
     height: 20px;
+}
+
+
+.pulse-input {
+    height:30px;
 }

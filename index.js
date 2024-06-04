@@ -65,7 +65,7 @@ $(function () {
 
     var cached_pins = localStorage.getItem("pin_set");
 
-    if(cached_pins != null && cached_pins !== "") {
+    if (cached_pins != null && cached_pins !== "") {
         pin_set = JSON.parse(cached_pins);
     }
 
@@ -133,7 +133,7 @@ function AddSliderContainer(pin) {
 }
 
 /**
- * 
+ * @description Bind UI fields for pin group
  * @param {*} i 
  * @param {*} obj 
  */
@@ -147,7 +147,7 @@ function BindContainer(i, obj) {
     var slider = elem.find("input.slider-range");
     var valueSpan = elem.find("span.slider-details-val");
 
-    mode.on("change", function() {
+    mode.on("change", function () {
         console.log('mode', this.value);
         var max = MAX_PWM;
         switch (this.value) {
@@ -158,7 +158,7 @@ function BindContainer(i, obj) {
                 max = MAX_SERVO;
                 break;
         }
-        
+
         slider.attr("max", max);
     });
 
@@ -225,6 +225,21 @@ function BindContainer(i, obj) {
         RebuildPins();
         localStorage.setItem("pin_set", JSON.stringify(pin_set));
     });
+
+
+    var pulseValue = elem.find("input.pulse-input-value");
+    var pulseTime = elem.find("input.pulse-input-time");
+    var pulseBtn = elem.find("button.pulse-btn");
+
+
+    pulseBtn.on("click", function(evt) {
+        console.log(`pulse: ${pin} | ${pulseValue.val()} | ${pulseTime.val()}`);
+        PulsePin(pin, pulseValue.val(), pulseTime.val(), valueSpan);
+
+    });
+
+
+
 }
 
 
@@ -373,6 +388,41 @@ function UpdatePinValue(mode, pin, value, valueSpan) {
     });
 }
 
+function PulsePin(pin, value, time, valueSpan) {
+    updatePending = true;
+
+    var url = `/pulse`;
+    var data = { pin, value, time };
+
+    OutActivity({ url, ...data }, true);
+
+    $.post(url, data, function (response) {
+
+        setSliderValue(pin, 0);
+
+        // if (valueSpan) {
+        //     $(valueSpan)
+        //         .addClass(css_normal)
+        //         .removeClass(css_warning)
+        //         .removeClass(css_bad)
+        //         .remove(css_busy);
+        // }
+        InActivity(response);
+    }).fail(function (jqxhr, textStatus, errorThrown) {
+        errActivity(jqxhr.statusCode());
+        if (valueSpan) {
+            $(valueSpan)
+                .removeClass(css_normal)
+                .removeClass(css_warning)
+                .removeClass(css_busy)
+                .addClass(css_bad);
+        }
+    }).always(function () {
+        updatePending = false;
+    });
+}
+
+
 
 function RefreshPinValues() {
     var url = `/analogin`;
@@ -389,7 +439,6 @@ function RefreshPinValues() {
 }
 
 //#endregion === API ===
-
 
 
 /**
@@ -416,20 +465,29 @@ function CreateSliderContainer(pin) {
             <span class="slider-details-pin"></span>
             <span class="slider-details-val ${css_normal}" title="Click for manual set.">0</span>
             <span>
-            <select id="slider-mode-${pin}" name="slider-mode-${pin}" class="slider-mode" title="Set mode">
-                <option value="analogout">Analog Write</option>
-                <option value="digitalout">Digital Write</option>
-                <option value="servo">Servo</option>
-                <option value="tone">Tone</option>
+                <select id="slider-mode-${pin}" name="slider-mode-${pin}" class="slider-mode" title="Set mode">
+                    <option value="analogout">Analog Write</option>
+                    <option value="digitalout">Digital Write</option>
+                    <option value="servo">Servo</option>
+                    <option value="tone">Tone</option>
                 </select>
             </span>
         </div>
         <div class="slider-controls flex">
             <div class="">
-                <button class="slider-controls-stop"><i class="bi bi-sign-stop slider-controls-stop-icon"></i></button>
+                <button class="slider-controls-stop">
+                    <i class="bi bi-sign-stop slider-controls-stop-icon"></i>
+                </button>
             </div>
             <div class="flex-grow">
                 <input type='range' step='${stepsize}' min='0' max='${currMax()}' value='0' class='slider-range' id='slider-${pin}'>
+            </div>
+            <div>
+                <input class="form-control pulse-input pulse-input-value" type="number" id="pulse-value-${pin}" min="1" max="1000000"
+                title="Pulse Value">
+                <input class="form-control pulse-input pulse-input-time" type="number" id="pulse-time-${pin}" min="1" max="1000000"
+                title="Pulse Time">
+                <button type="button" class="btn btn-warning pulse-btn" id="pulse-btn-${pin}">Pulse</button>
             </div>
             <div class="">
                 <button class="slider-controls-remove"><i class="bi bi-node-minus slider-controls-remove-icon"></i></button>
