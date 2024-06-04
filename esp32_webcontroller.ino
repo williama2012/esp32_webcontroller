@@ -239,6 +239,42 @@ void handleNotFound() {
 
 #pragma region Post_Handlers
 
+void handlePulsePost() {
+  PrintCore("handlePulsePost");
+  
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  int pin = pinStr.toInt();
+
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int value = valueStr.toInt();
+
+  String timeStr = "";
+  timeStr = server.arg("time");
+  int time = timeStr.toInt();
+
+  ClearServo(pin);
+
+  pinMode(pin, OUTPUT);
+
+  analogWrite(pin, value);
+  delayMicroseconds(time);
+  analogWrite(pin, 0);
+
+  String response = "{";
+  response += jsonField("pin", String(pin), true);
+  response += jsonField("value", String(value), true);
+  response += jsonField("time", String(time), false);
+  response += "}";
+
+  doBlink = true;
+
+  lcd_row2 = "AnalogWrite";
+  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
+  server.send(200, "application/json", response);
+}
+
 void handleAnalogWritePost() {
   PrintCore("handleAnalogWritePost");
   String pinStr = "";
@@ -256,6 +292,7 @@ void handleAnalogWritePost() {
   String response = "{";
   response += jsonField("pin", String(pin), true);
   response += jsonField("value", String(value), false);
+
   response += "}";
   doBlink = true;
 
@@ -389,9 +426,34 @@ void handleApiPost() {
   server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
 }
 
+
+
 #pragma endregion Post_Handlers
 
 #pragma region Setup
+
+void SetupServer() {
+  PrintCore("SetupServer");
+  if (MDNS.begin("esp32")) {
+    Println("MDNS responder started");
+  }
+
+  server.on("/", HTTP_GET, handleGetIndex);
+  server.on("/index.js", HTTP_GET, handleGetJavascript);
+  server.on("/index.css", HTTP_GET, handleGetStylesheet);
+
+  server.on("/analogout", HTTP_POST, handleAnalogWritePost);
+  server.on("/servo", HTTP_POST, handleServoWritePost);
+  server.on("/analogin", HTTP_POST, handleAnalogReadPost);
+  server.on("/tone", HTTP_POST, handleToneWritePost);
+  server.on("/api", HTTP_POST, handleApiPost);
+  server.on("/pulse", HTTP_POST, handlePulsePost);
+  
+  server.onNotFound(handleNotFound);
+  server.begin();
+
+  Println("HTTP server started");
+}
 
 void SetupLCD() {
   lcd.init();
@@ -418,28 +480,6 @@ void SetupWifi() {
   Println(ssid);
   url = "http://" + WiFi.localIP().toString();
   Println("URL: " + url);
-}
-
-void SetupServer() {
-  PrintCore("SetupServer");
-  if (MDNS.begin("esp32")) {
-    Println("MDNS responder started");
-  }
-
-  server.on("/", HTTP_GET, handleGetIndex);
-  server.on("/index.js", HTTP_GET, handleGetJavascript);
-  server.on("/index.css", HTTP_GET, handleGetStylesheet);
-
-  server.on("/analogout", HTTP_POST, handleAnalogWritePost);
-  server.on("/servo", HTTP_POST, handleServoWritePost);
-  server.on("/analogin", HTTP_POST, handleAnalogReadPost);
-  server.on("/tone", HTTP_POST, handleToneWritePost);
-  server.on("/api", HTTP_POST, handleApiPost);
-
-  server.onNotFound(handleNotFound);
-  server.begin();
-
-  Println("HTTP server started");
 }
 
 void setup(void) {
