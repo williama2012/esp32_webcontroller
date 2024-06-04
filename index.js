@@ -173,7 +173,7 @@ function BindContainer(i, obj) {
 
         console.log("mode", mode.val());
 
-        UpdatePinValue(mode.val(), pin, this.value, valueSpan);
+        PostPinValue(mode.val(), pin, this.value, valueSpan);
     });
 
     slider.on("input", function (evt) {
@@ -234,7 +234,7 @@ function BindContainer(i, obj) {
 
     pulseBtn.on("click", function(evt) {
         console.log(`pulse: ${pin} | ${pulseValue.val()} | ${pulseTime.val()}`);
-        PulsePin(pin, pulseValue.val(), pulseTime.val(), valueSpan);
+        PostPulsePin(pin, pulseValue.val(), pulseTime.val(), valueSpan);
 
     });
 
@@ -357,7 +357,7 @@ function HardResetAllPins(evt) {
 }
 
 var updatePending = false;
-function UpdatePinValue(mode, pin, value, valueSpan) {
+function PostPinValue(mode, pin, value, valueSpan) {
     updatePending = true;
 
     var url = `/${mode}`;
@@ -388,7 +388,7 @@ function UpdatePinValue(mode, pin, value, valueSpan) {
     });
 }
 
-function PulsePin(pin, value, time, valueSpan) {
+function PostPulsePin(pin, value, time, valueSpan) {
     updatePending = true;
 
     var url = `/pulse`;
