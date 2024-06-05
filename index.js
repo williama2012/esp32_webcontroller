@@ -231,17 +231,25 @@ function BindContainer(i, obj) {
     var pulseTime = elem.find("input.pulse-input-time");
     var pulseBtn = elem.find("button.pulse-btn");
 
-
     pulseBtn.on("click", function(evt) {
         console.log(`pulse: ${pin} | ${pulseValue.val()} | ${pulseTime.val()}`);
         PostPulsePin(pin, pulseValue.val(), pulseTime.val(), valueSpan);
 
     });
 
+    var incrementBtn = elem.find("button.slider-increment-plus");
+    incrementBtn.on("click", function(evt) {
+        console.log("add one");
+        slider.val(Number(slider.val()) + 1).trigger("input").change();
+    });
 
+    var decrementBtn = elem.find("button.slider-increment-minus");
+    decrementBtn.on("click", function(evt) {
+        console.log("add one");
+        slider.val(Number(slider.val()) - 1).trigger("input").change();
+    });
 
 }
-
 
 var refreshInterval;
 
@@ -278,8 +286,6 @@ function GetPinValues_click(evt) {
 
     RefreshPinValues();
 }
-
-
 
 function GetPinValues_rclick() {
     alert("right click");
@@ -471,6 +477,16 @@ function CreateSliderContainer(pin) {
                     <option value="servo">Servo</option>
                     <option value="tone">Tone</option>
                 </select>
+            </span>
+            <span>
+                <button class="slider-increment-btn slider-increment-minus">
+                    <i class="bi bi-dash-circle"></i>
+                </button>
+            </span>
+            <span>
+                <button class="slider-increment-btn slider-increment-plus">
+                    <i class="bi bi-plus-circle"></i>
+                </button>
             </span>
         </div>
         <div class="slider-controls flex">

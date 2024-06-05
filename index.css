@@ -296,3 +296,18 @@ input {
 .pulse-input {
     height:30px;
 }
+
+.pulse-btn {
+
+}
+
+.slider-increment-btn {
+    height: 5vh;
+    line-height: 5vh;
+    width: 5vw;
+    display: inline-block;
+    background: none;
+    margin-left: 15px;
+    margin-right: 15px;
+    text-align: center;
+}
