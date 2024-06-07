@@ -239,6 +239,12 @@ void handleNotFound() {
 
 #pragma region Post_Handlers
 
+int intArg(String name) {
+  String strVal = server.arg(name);
+  int val = strVal.toInt();
+  return val;
+}
+
 void handlePulsePost() {
   PrintCore("handlePulsePost");
   
@@ -402,6 +408,61 @@ void handleToneWritePost() {
   server.send(200, "application/json", response);
 }
 
+void handleSweepPost() {
+  int servoPin = intArg("servo");
+  int pwmPin = intArg("pwm");
+  int value = intArg("value");
+  int pointA = intArg("a");
+  int pointB = intArg("b");
+  int count = intArg("count");
+  int speed = intArg("delay");
+
+  pinMode(pwmPin, OUTPUT);
+  analogWrite(pwmPin, 0);
+
+  if (servoPin != servo_pin) {
+    if (servo_pin != 0) {
+      servo_ctrl.detach(servo_pin);
+    }
+    servo_ctrl.attach(servoPin);
+    servo_pin = servoPin;
+  }
+
+  servo_ctrl.write(pointA);
+
+  int pos = pointA;
+
+  analogWrite(pwmPin, value);
+
+  for(int i = 0; i <= count; i++) {
+
+    for(pos; pos <= pointB; pos++) {
+      servo_ctrl.write(pos);
+      delay(speed);
+    }
+
+    for(pos; pos >= pointA; pos--) {
+      servo_ctrl.write(pos);
+      delay(speed);
+    }
+
+  }
+
+  analogWrite(pwmPin, 0);
+
+  String response = "{";
+  response += jsonField("servoPin", String(servoPin), true);
+  response += jsonField("pwmPin", String(pwmPin), true);
+  response += jsonField("value", String(value), true);
+  response += jsonField("a", String(pointA), true);
+  response += jsonField("b", String(pointB), true);
+  response += jsonField("count", String(count), false);
+
+  response += "}";
+
+  server.send(200, "application/json", response);
+}
+
 void handleApiPost() {
   PrintCore("handleApiPost");
   String cmd = server.arg("cmd");
@@ -426,8 +487,6 @@ void handleApiPost() {
   server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
 }
 
-
-
 #pragma endregion Post_Handlers
 
 #pragma region Setup
@@ -448,6 +507,7 @@ void SetupServer() {
   server.on("/tone", HTTP_POST, handleToneWritePost);
   server.on("/api", HTTP_POST, handleApiPost);
   server.on("/pulse", HTTP_POST, handlePulsePost);
+  server.on("/sweep", HTTP_POST, handleSweepPost);
   
   server.onNotFound(handleNotFound);
   server.begin();
