@@ -140,6 +140,7 @@ body {
     display: flex;
     flex-direction: row;
     height: 10vh;
+    margin-bottom: 1em;
 }
 
 .toolbar-one {

@@ -488,6 +488,10 @@ function CreateSliderContainer(pin) {
                     <i class="bi bi-plus-circle"></i>
                 </button>
             </span>
+            <span>
+                <input type="checkbox" id="slider-enabled-${pin}" name="slider-enabled-${pin}" />
+                <label for="slider-enabled-${pin}" >Enabled</label>
+            </span>
         </div>
         <div class="slider-controls flex">
             <div class="">
