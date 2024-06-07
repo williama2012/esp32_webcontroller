@@ -434,7 +434,7 @@ void handleSweepPost() {
 
   analogWrite(pwmPin, value);
 
-  for(int i = 0; i <= count; i++) {
+  for(int i = 1; i <= count; i++) {
 
     for(pos; pos <= pointB; pos++) {
       servo_ctrl.write(pos);
@@ -456,7 +456,8 @@ void handleSweepPost() {
   response += jsonField("value", String(value), true);
   response += jsonField("a", String(pointA), true);
   response += jsonField("b", String(pointB), true);
-  response += jsonField("count", String(count), false);
+  response += jsonField("count", String(count), true);
+  response += jsonField("delay", String(speed), false);
 
   response += "}";
 
