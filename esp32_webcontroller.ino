@@ -428,6 +428,8 @@ void handleSweepPost() {
     servo_pin = servoPin;
   }
 
+  //analogWrite(pwmPin, 0);
+  
   servo_ctrl.write(pointA);
 
   int pos = pointA;
@@ -438,15 +440,21 @@ void handleSweepPost() {
 
     for(pos; pos <= pointB; pos++) {
       analogWrite(pwmPin, value);
+      delay(1);
       servo_ctrl.write(pos);
+      delay(1);
       analogWrite(pwmPin, 0);
+      delay(1);
       delay(speed);     
     }
 
     for(pos; pos >= pointA; pos--) {
       analogWrite(pwmPin, value);
+      delay(1);
       servo_ctrl.write(pos);
+      delay(1);
       analogWrite(pwmPin, 0);
+      delay(1);
       delay(speed);
     }
 
