@@ -13,10 +13,6 @@ var activity;
 var mode;
 var stepsize = 1;
 
-function currMax() {
-    return mode == "tone" ? MAX_TONE : MAX_PWM;
-}
-
 var dataset = [];
 
 var chart;
@@ -198,9 +194,6 @@ function BindContainer(i, obj) {
         if (value < 0) {
             value = 0;
         }
-        if (value > currMax()) {
-            value = currMax();
-        }
 
         slider.val(value);
         slider.trigger("input");
@@ -315,17 +308,6 @@ function AddActivity(message, direction) {
     </tr>`;
 
     activity.prepend($(item));
-}
-
-function modeSelect_changed(evt) {
-    localStorage.setItem('mode', this.value);
-    mode = this.value;
-    updateSliderMax();
-}
-
-function updateSliderMax() {
-    var max = currMax();
-    $("input.slider-range").attr("max", max);
 }
 
 function stepSize_changed(evt) {
@@ -500,7 +482,7 @@ function CreateSliderContainer(pin) {
                 </button>
             </div>
             <div class="flex-grow">
-                <input type='range' step='${stepsize}' min='0' max='${currMax()}' value='0' class='slider-range' id='slider-${pin}'>
+                <input type='range' step='${stepsize}' min='0' max='4095' value='0' class='slider-range' id='slider-${pin}'>
             </div>
             <div>
                 <input class="form-control pulse-input pulse-input-value" type="number" id="pulse-value-${pin}" min="1" max="1000000"
