@@ -9,19 +9,15 @@ const css_bad = "btn btn-danger";
 
 var pin_set = [2];
 
+const pinSettings = new Map();
+pinSettings.set(1, {pin: 1, mode: 'tone'});
+pinSettings.set(2, {pin: 2, mode: 'analogout'});
+
 var activity;
 var mode;
 var stepsize = 1;
 
 var dataset = [];
-
-var chart;
-
-var chartData = {
-    datasets: [
-
-    ]
-};
 
 const AnalogWrite = "analogout";
 const AnalogRead = "analogin";
@@ -39,6 +35,12 @@ function addData(data) {
 }
 
 $(function () {
+
+    pinSettings.forEach((value) => {
+        console.log(value);
+    });
+
+
     const exampleModal = document.getElementById('exampleModal');
     if (exampleModal) {
         exampleModal.addEventListener('show.bs.modal', event => {
@@ -58,22 +60,16 @@ $(function () {
         })
     }
 
-
     const sweepModal = document.getElementById('sweepModal');
     if (sweepModal) {
         sweepModal.addEventListener('show.bs.modal', event => {
             console.log(event);
-
             const button = event.relatedTarget;
-
             const modalTitle = exampleModal.querySelector('.modal-title')
             const modalBodyInput = exampleModal.querySelector('.modal-body input')
 
-        })
+        });
     }
-
-
-
 
     var cached_pins = localStorage.getItem("pin_set");
 

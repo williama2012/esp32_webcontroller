@@ -247,7 +247,7 @@ int intArg(String name) {
 
 void handlePulsePost() {
   PrintCore("handlePulsePost");
-  
+
   String pinStr = "";
   pinStr = server.arg("pin");
   int pin = pinStr.toInt();
@@ -315,7 +315,7 @@ void handleServoWritePost() {
   valueStr = server.arg("value");
   int pin = pinStr.toInt();
   int value = valueStr.toInt();
-  
+
   int pos = value;
   //int pos = map(value, 0, 4095, 0, 180);
 
@@ -412,8 +412,8 @@ void handleSweepPost() {
   int servoPin = intArg("servo");
   int pwmPin = intArg("pwm");
   int value = intArg("value");
-  int pointA = intArg("a");
-  int pointB = intArg("b");
+  int low = intArg("low");
+  int high = intArg("high");
   int count = intArg("count");
   int speed = intArg("delay");
 
@@ -429,25 +429,24 @@ void handleSweepPost() {
   }
 
   //analogWrite(pwmPin, 0);
-  
-  servo_ctrl.write(pointA);
 
-  int pos = pointA;
+  servo_ctrl.write(low);
+
+  int pos = low;
 
   analogWrite(pwmPin, value);
 
-  for(int i = 1; i <= count; i++) {
+  for (int i = 1; i <= count; i++) {
 
-    for(pos; pos <= pointB; pos++) {
+    for (pos; pos <= high; pos++) {
       servo_ctrl.write(pos);
       delay(speed);
     }
 
-    for(pos; pos >= pointA; pos--) {
+    for (pos; pos >= low; pos--) {
       servo_ctrl.write(pos);
       delay(speed);
     }
-
   }
 
   analogWrite(pwmPin, 0);
@@ -456,8 +455,8 @@ void handleSweepPost() {
   response += jsonField("servoPin", String(servoPin), true);
   response += jsonField("pwmPin", String(pwmPin), true);
   response += jsonField("value", String(value), true);
-  response += jsonField("a", String(pointA), true);
-  response += jsonField("b", String(pointB), true);
+  response += jsonField("low", String(low), true);
+  response += jsonField("high", String(high), true);
   response += jsonField("count", String(count), true);
   response += jsonField("delay", String(speed), false);
 
@@ -511,7 +510,7 @@ void SetupServer() {
   server.on("/api", HTTP_POST, handleApiPost);
   server.on("/pulse", HTTP_POST, handlePulsePost);
   server.on("/sweep", HTTP_POST, handleSweepPost);
-  
+
   server.onNotFound(handleNotFound);
   server.begin();
 
