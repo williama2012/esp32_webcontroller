@@ -40,7 +40,6 @@ function addData(data) {
 
 $(function () {
     const exampleModal = document.getElementById('exampleModal');
-
     if (exampleModal) {
         exampleModal.addEventListener('show.bs.modal', event => {
             // Button that triggered the modal
@@ -58,6 +57,23 @@ $(function () {
             modalBodyInput.value = recipient
         })
     }
+
+
+    const sweepModal = document.getElementById('sweepModal');
+    if (sweepModal) {
+        sweepModal.addEventListener('show.bs.modal', event => {
+            console.log(event);
+
+            const button = event.relatedTarget;
+
+            const modalTitle = exampleModal.querySelector('.modal-title')
+            const modalBodyInput = exampleModal.querySelector('.modal-body input')
+
+        })
+    }
+
+
+
 
     var cached_pins = localStorage.getItem("pin_set");
 
@@ -278,10 +294,6 @@ function GetPinValues_click(evt) {
     clearInterval(refreshInterval);
 
     RefreshPinValues();
-}
-
-function GetPinValues_rclick() {
-    alert("right click");
 }
 
 function InActivity(message) {
