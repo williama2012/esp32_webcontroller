@@ -1,6 +1,6 @@
 const MAX_PWM = 4095;
 const MAX_TONE = 40000; //4294967295;
-const MAX_SERVO = 180;
+const MAX_SERVO = 270;
 
 const css_normal = "btn btn-light";
 const css_busy = "btn btn-info";
@@ -61,14 +61,16 @@ $(function () {
     }
 
     const sweepModal = document.getElementById('sweepModal');
+
     if (sweepModal) {
         sweepModal.addEventListener('show.bs.modal', event => {
             console.log(event);
             const button = event.relatedTarget;
             const modalTitle = exampleModal.querySelector('.modal-title')
             const modalBodyInput = exampleModal.querySelector('.modal-body input')
-
         });
+
+        $("#sweep-submit-btn").on("click", handleSweepSubmit);
     }
 
     var cached_pins = localStorage.getItem("pin_set");
@@ -101,10 +103,22 @@ $(function () {
 
     document
         .getElementById("resetBtn")
-        .addEventListener("click", HardResetAllPins);
+        .addEventListener("click", PostHardResetAllPins);
 
     RebuildPins();
 });
+
+function handleSweepSubmit(evt) {
+    let servo = $("#sweep-servo").val();
+    let pwm = $("#sweep-pwm").val();
+    let value = $("#sweep-value").val();
+    let low = $("#sweep-low").val();
+    let high = $("#sweep-high").val();
+    let count = $("#sweep-count").val();
+    let speed = $("#sweep-speed").val();
+    console.log('sweep:', servo, pwm, value, low, high, count, speed);
+
+}
 
 function RebuildPins() {
     $(".slider-set").empty();
@@ -334,9 +348,16 @@ function activity_click(evt) {
     }
 }
 
+
 //#region === API ===
 
-function HardResetAllPins(evt) {
+
+function PostSweep(evt) {
+
+}
+
+
+function PostHardResetAllPins(evt) {
     var url = "/api";
 
     var data = { cmd: "reset" };
@@ -417,8 +438,6 @@ function PostPulsePin(pin, value, time, valueSpan) {
         updatePending = false;
     });
 }
-
-
 
 function RefreshPinValues() {
     var url = `/analogin`;

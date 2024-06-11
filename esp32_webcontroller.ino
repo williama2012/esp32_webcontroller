@@ -26,6 +26,16 @@ bool doBlink = false;
 int servo_pin = 0;
 servoPosDef servoPos;
 
+#pragma region server
+
+int intArg(String name) {
+  String strVal = server.arg(name);
+  int val = strVal.toInt();
+  return val;
+}
+
+#pragma endregion server
+
 
 #pragma region lcd
 
@@ -238,12 +248,6 @@ void handleNotFound() {
 #pragma endregion Get_Handlers
 
 #pragma region Post_Handlers
-
-int intArg(String name) {
-  String strVal = server.arg(name);
-  int val = strVal.toInt();
-  return val;
-}
 
 void handlePulsePost() {
   PrintCore("handlePulsePost");
