@@ -106,12 +106,14 @@ function handleSweepSubmit(evt) {
         low: $("#sweep-low").val(),
         high: $("#sweep-high").val(),
         count: $("#sweep-count").val(),
-        speed: $("#sweep-speed").val(),
+        delay: $("#sweep-delay").val(),
     };
 
     localStorage.setItem("sweepSettings", JSON.stringify(settings));
 
-    console.log('save sweep:', settings.servo, settings.pwm, settings.value, settings.low, settings.high, settings.count, settings.speed);
+    console.log('save sweep:', settings.servo, settings.pwm, settings.value, settings.low, settings.high, settings.count, settings.delay);
+
+    PostSweep(settings);
 }
 
 function updateSweepModal(settings) {
@@ -122,7 +124,7 @@ function updateSweepModal(settings) {
     $("#sweep-low").val(settings.low);
     $("#sweep-high").val(settings.high);
     $("#sweep-count").val(settings.count);
-    $("#sweep-speed").val(settings.speed);
+    $("#sweep-delay").val(settings.delay);
 }
 
 
@@ -401,12 +403,35 @@ function activity_click(evt) {
     }
 }
 
-
 //#region === API ===
 
+function PostSweep(data) {
+    updatePending = true;
+    var url = "/sweep";
 
-function PostSweep(evt) {
+    OutActivity({ url, ...data }, true);
 
+    $.post(url, data, function (response) {
+        if (valueSpan) {
+            $(valueSpan)
+                .addClass(css_normal)
+                .removeClass(css_warning)
+                .removeClass(css_bad)
+                .remove(css_busy);
+        }
+        InActivity(response);
+    }).fail(function (jqxhr, textStatus, errorThrown) {
+        errActivity(jqxhr.statusCode());
+        if (valueSpan) {
+            $(valueSpan)
+                .removeClass(css_normal)
+                .removeClass(css_warning)
+                .removeClass(css_busy)
+                .addClass(css_bad);
+        }
+    }).always(function () {
+        updatePending = false;
+    });
 }
 
 
