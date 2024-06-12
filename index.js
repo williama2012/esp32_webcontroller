@@ -7,11 +7,9 @@ const css_busy = "btn btn-info";
 const css_warning = "btn btn-warning";
 const css_bad = "btn btn-danger";
 
-var pin_set = [2];
-
-const pinSettings = new Map();
-pinSettings.set(1, {pin: 1, mode: 'tone'});
-pinSettings.set(2, {pin: 2, mode: 'analogout'});
+var pinSettings = [
+    {pin: 2, mode: 'analogout'}
+];
 
 var activity;
 var mode;
@@ -35,12 +33,6 @@ function addData(data) {
 }
 
 $(function () {
-
-    pinSettings.forEach((value) => {
-        console.log(value);
-    });
-
-
     const exampleModal = document.getElementById('exampleModal');
     if (exampleModal) {
         exampleModal.addEventListener('show.bs.modal', event => {
@@ -73,10 +65,10 @@ $(function () {
         $("#sweep-submit-btn").on("click", handleSweepSubmit);
     }
 
-    var cached_pins = localStorage.getItem("pin_set");
+    var cached_pins = localStorage.getItem("pinSettings");
 
     if (cached_pins != null && cached_pins !== "") {
-        pin_set = JSON.parse(cached_pins);
+        pinSettings = JSON.parse(cached_pins);
     }
 
     stepsize = localStorage.getItem("stepsize") || "1";
@@ -120,37 +112,62 @@ function handleSweepSubmit(evt) {
 
 }
 
+function SavePins() {
+    var save = JSON.stringify(pinSettings);
+
+    console.log("saving", save);
+
+    localStorage.setItem("pinSettings", save);
+}
+
 function RebuildPins() {
     $(".slider-set").empty();
-    pin_set.forEach(AddSliderContainer);
+
+    pinSettings.forEach((value) => {
+        AddSliderContainer(value.pin, value)
+    });
 }
 
 function AddNewSlider_Click(evt) {
     var max = 2;
-    if (pin_set.length > 0) {
-        max = Math.max(...pin_set) + 1;
+
+    var m = _.max(pinSettings, (i) => { return i.pin; }).pin;
+
+    if(m) {
+        max = m + 1;
     }
+
+    var pin = 0;
+
     if (evt.ctrlKey) {
         pin = max;
     } else {
-        var pin = prompt("Enter Pin Number", `${max}`);
+        pin = prompt("Enter Pin Number", `${max}`);
         if (!pin || pin == null || pin == "") {
             return;
         }
         pin = Number(pin);
     }
 
-    if (isNaN(pin) || pin_set.includes(pin) || pin < 2 || pin > 24) {
+    var alreadySet = (_.find(pinSettings, (i) => {
+        return i.pin == pin;
+    })) != null;
+
+    if (isNaN(pin) || alreadySet || pin < 2 || pin > 24) {
         return;
     }
-    pin_set.push(pin);
-    AddSliderContainer(pin);
-    localStorage.setItem("pin_set", JSON.stringify(pin_set));
+
+    var settings = {pin: pin, mode: 'analogout'};
+
+    pinSettings.push(settings);
+
+    AddSliderContainer(settings.pin, settings);
+    SavePins();
 }
 
-function AddSliderContainer(pin) {
+function AddSliderContainer(pin, settings) {
     var slideContainer = CreateSliderContainer(pin);
-    BindContainer(pin, slideContainer);
+    BindContainer(pin, slideContainer, settings);
     $(".slider-set").append(slideContainer);
 }
 
@@ -159,7 +176,7 @@ function AddSliderContainer(pin) {
  * @param {*} i 
  * @param {*} obj 
  */
-function BindContainer(i, obj) {
+function BindContainer(i, obj, settings) {
     var elem = $(obj);
     var pin = elem.attr("x-pin");
 
@@ -169,8 +186,25 @@ function BindContainer(i, obj) {
     var slider = elem.find("input.slider-range");
     var valueSpan = elem.find("span.slider-details-val");
 
+    var max = MAX_PWM;
+    if(settings) {
+        mode.val(settings.mode || "analogout");
+
+        switch (mode.val()) {
+            case "tone":
+                max = MAX_TONE;
+                break;
+            case "servo":
+                max = MAX_SERVO;
+                break;
+            case "digitalout":
+                max = 1;
+                break;
+        }
+        slider.attr("max", max);
+    }
+
     mode.on("change", function () {
-        console.log('mode', this.value);
         var max = MAX_PWM;
         switch (this.value) {
             case "tone":
@@ -185,18 +219,22 @@ function BindContainer(i, obj) {
         }
 
         slider.attr("max", max);
+        var save = _.find(pinSettings, (p) => {
+            return p.pin == pin;
+        });
+        if(save) {
+            save.mode = this.value;
+        }
+
+        SavePins();
     });
 
     slider.on("change", function (evt) {
-        console.log('slider', arguments);
-
         $(valueSpan)
             .removeClass(css_normal)
             .addClass(css_warning)
             .removeClass(css_busy)
             .removeClass(css_bad);
-
-        console.log("mode", mode.val());
 
         PostPinValue(mode.val(), pin, this.value, valueSpan);
     });
@@ -242,10 +280,14 @@ function BindContainer(i, obj) {
     });
 
     elem.find("button.slider-controls-remove").on("click", function (evt) {
-        var indx = pin_set.indexOf(Number(pin));
-        pin_set.splice(indx, 1);
+
+        var idx = _.findIndex(pinSettings, (i) => {
+            return i.pin == pin;
+        })
+
+        pinSettings.splice(idx, 1);
         RebuildPins();
-        localStorage.setItem("pin_set", JSON.stringify(pin_set));
+        localStorage.setItem("pinSettings", JSON.stringify(pinSettings));
     });
 
 
@@ -254,20 +296,16 @@ function BindContainer(i, obj) {
     var pulseBtn = elem.find("button.pulse-btn");
 
     pulseBtn.on("click", function(evt) {
-        console.log(`pulse: ${pin} | ${pulseValue.val()} | ${pulseTime.val()}`);
         PostPulsePin(pin, pulseValue.val(), pulseTime.val(), valueSpan);
-
     });
 
     var incrementBtn = elem.find("button.slider-increment-plus");
     incrementBtn.on("click", function(evt) {
-        console.log("add one");
         slider.val(Number(slider.val()) + 1).trigger("input").change();
     });
 
     var decrementBtn = elem.find("button.slider-increment-minus");
     decrementBtn.on("click", function(evt) {
-        console.log("add one");
         slider.val(Number(slider.val()) - 1).trigger("input").change();
     });
 
@@ -296,8 +334,6 @@ function GetPinValues_click(evt) {
         if (time < 100) {
             time = 100;
         }
-
-        console.log("starting timeout", time);
 
         refreshInterval = setInterval(RefreshPinValues, time);
 
@@ -341,7 +377,7 @@ function stepSize_changed(evt) {
     }
 
     localStorage.setItem('stepsize', this.value);
-    console.log("stepSize_changed", this.value);
+
     $("input.slider-range").attr("step", this.value);
 }
 
@@ -444,7 +480,12 @@ function PostPulsePin(pin, value, time, valueSpan) {
 
 function RefreshPinValues() {
     var url = `/analogin`;
-    var data = { pins: JSON.stringify(pin_set) };
+    var pins = _.map(pinSettings, (i) => {
+        return i;
+    })
+
+    var data = { pins: JSON.stringify(pins) };
+
     $.post(url, data, function (response) {
         response.forEach(function (part) {
             addData(part);
