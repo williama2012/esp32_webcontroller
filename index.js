@@ -1,6 +1,6 @@
 const MAX_PWM = 4095;
 const MAX_TONE = 40000; //4294967295;
-const MAX_SERVO = 270;
+const MAX_SERVO = 360;
 
 const css_normal = "btn btn-light";
 const css_busy = "btn btn-info";
