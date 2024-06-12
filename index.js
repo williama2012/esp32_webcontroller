@@ -8,7 +8,7 @@ const css_warning = "btn btn-warning";
 const css_bad = "btn btn-danger";
 
 var pinSettings = [
-    {pin: 2, mode: 'analogout'}
+    { pin: 2, mode: 'analogout' }
 ];
 
 var activity;
@@ -53,26 +53,24 @@ $(function () {
     }
 
     const sweepModal = document.getElementById('sweepModal');
-
     if (sweepModal) {
         sweepModal.addEventListener('show.bs.modal', event => {
             console.log(event);
-            const button = event.relatedTarget;
-            const modalTitle = exampleModal.querySelector('.modal-title')
-            const modalBodyInput = exampleModal.querySelector('.modal-body input')
+            var sweepSettings = localStorage.getItem("sweepSettings")
+            if (sweepSettings) {
+                updateSweepModal(JSON.parse(sweepSettings));
+            }
         });
 
         $("#sweep-submit-btn").on("click", handleSweepSubmit);
     }
 
     var cached_pins = localStorage.getItem("pinSettings");
-
     if (cached_pins != null && cached_pins !== "") {
         pinSettings = JSON.parse(cached_pins);
     }
 
     stepsize = localStorage.getItem("stepsize") || "1";
-
     $("#stepsize").val(stepsize).change();
 
     activity = $("#activity");
@@ -101,16 +99,32 @@ $(function () {
 });
 
 function handleSweepSubmit(evt) {
-    let servo = $("#sweep-servo").val();
-    let pwm = $("#sweep-pwm").val();
-    let value = $("#sweep-value").val();
-    let low = $("#sweep-low").val();
-    let high = $("#sweep-high").val();
-    let count = $("#sweep-count").val();
-    let speed = $("#sweep-speed").val();
-    console.log('sweep:', servo, pwm, value, low, high, count, speed);
+    var settings = {
+        servo: $("#sweep-servo").val(),
+        pwm: $("#sweep-pwm").val(),
+        value: $("#sweep-value").val(),
+        low: $("#sweep-low").val(),
+        high: $("#sweep-high").val(),
+        count: $("#sweep-count").val(),
+        speed: $("#sweep-speed").val(),
+    };
 
+    localStorage.setItem("sweepSettings", JSON.stringify(settings));
+
+    console.log('save sweep:', settings.servo, settings.pwm, settings.value, settings.low, settings.high, settings.count, settings.speed);
 }
+
+function updateSweepModal(settings) {
+    console.log("updateSweepModal", settings);
+    $("#sweep-servo").val(settings.servo);
+    $("#sweep-pwm").val(settings.pwm);
+    $("#sweep-value").val(settings.value);
+    $("#sweep-low").val(settings.low);
+    $("#sweep-high").val(settings.high);
+    $("#sweep-count").val(settings.count);
+    $("#sweep-speed").val(settings.speed);
+}
+
 
 function SavePins() {
     var save = JSON.stringify(pinSettings);
@@ -133,7 +147,7 @@ function AddNewSlider_Click(evt) {
 
     var m = _.max(pinSettings, (i) => { return i.pin; }).pin;
 
-    if(m) {
+    if (m) {
         max = m + 1;
     }
 
@@ -157,7 +171,7 @@ function AddNewSlider_Click(evt) {
         return;
     }
 
-    var settings = {pin: pin, mode: 'analogout'};
+    var settings = { pin: pin, mode: 'analogout' };
 
     pinSettings.push(settings);
 
@@ -187,7 +201,7 @@ function BindContainer(i, obj, settings) {
     var valueSpan = elem.find("span.slider-details-val");
 
     var max = MAX_PWM;
-    if(settings) {
+    if (settings) {
         mode.val(settings.mode || "analogout");
 
         switch (mode.val()) {
@@ -222,7 +236,7 @@ function BindContainer(i, obj, settings) {
         var save = _.find(pinSettings, (p) => {
             return p.pin == pin;
         });
-        if(save) {
+        if (save) {
             save.mode = this.value;
         }
 
@@ -295,17 +309,17 @@ function BindContainer(i, obj, settings) {
     var pulseTime = elem.find("input.pulse-input-time");
     var pulseBtn = elem.find("button.pulse-btn");
 
-    pulseBtn.on("click", function(evt) {
+    pulseBtn.on("click", function (evt) {
         PostPulsePin(pin, pulseValue.val(), pulseTime.val(), valueSpan);
     });
 
     var incrementBtn = elem.find("button.slider-increment-plus");
-    incrementBtn.on("click", function(evt) {
+    incrementBtn.on("click", function (evt) {
         slider.val(Number(slider.val()) + 1).trigger("input").change();
     });
 
     var decrementBtn = elem.find("button.slider-increment-minus");
-    decrementBtn.on("click", function(evt) {
+    decrementBtn.on("click", function (evt) {
         slider.val(Number(slider.val()) - 1).trigger("input").change();
     });
 
