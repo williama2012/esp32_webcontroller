@@ -179,6 +179,9 @@ function BindContainer(i, obj) {
             case "servo":
                 max = MAX_SERVO;
                 break;
+            case "digitalout":
+                max = 1;
+                break;
         }
 
         slider.attr("max", max);

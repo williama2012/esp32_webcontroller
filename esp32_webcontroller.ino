@@ -311,6 +311,33 @@ void handleAnalogWritePost() {
   server.send(200, "application/json", response);
 }
 
+void handleDigitalWritePost() {
+  PrintCore("handleDigitalWritePost");
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int pin = pinStr.toInt();
+  int value = valueStr.toInt();
+
+  ClearServo(pin);
+
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, value);
+
+  String response = "{";
+  response += jsonField("pin", String(pin), true);
+  response += jsonField("value", String(value), false);
+
+  response += "}";
+  doBlink = true;
+
+  lcd_row2 = "AnalogWrite";
+  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
+  server.send(200, "application/json", response);
+}
+
+
 void handleServoWritePost() {
   PrintCore("handleServoWritePost");
   String pinStr = "";
@@ -508,6 +535,7 @@ void SetupServer() {
   server.on("/index.css", HTTP_GET, handleGetStylesheet);
 
   server.on("/analogout", HTTP_POST, handleAnalogWritePost);
+  server.on("/digitalout", HTTP_POST, handleDigitalWritePost);
   server.on("/servo", HTTP_POST, handleServoWritePost);
   server.on("/analogin", HTTP_POST, handleAnalogReadPost);
   server.on("/tone", HTTP_POST, handleToneWritePost);
