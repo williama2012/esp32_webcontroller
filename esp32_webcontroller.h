@@ -2,6 +2,9 @@
 #define ESP32_CONTROLLER_H
 #include <Arduino.h>
 
+
+
+
 //enum PinModeEnum {AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone};
 
 typedef struct {

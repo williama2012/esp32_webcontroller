@@ -36,7 +36,6 @@ int intArg(String name) {
 
 #pragma endregion server
 
-
 #pragma region lcd
 
 String lcd_row1;
@@ -465,17 +464,23 @@ void handleSweepPost() {
 
   int pos = low;
 
-  analogWrite(pwmPin, value);
+  //analogWrite(pwmPin, value);
 
   for (int i = 1; i <= count; i++) {
 
     for (pos; pos <= high; pos++) {
+      analogWrite(pwmPin, value);
+      delayMicroseconds(1);
       servo_ctrl.write(pos);
+      analogWrite(pwmPin, value);
       delay(speed);
     }
 
     for (pos; pos >= low; pos--) {
+      analogWrite(pwmPin, value);
+      delayMicroseconds(1);
       servo_ctrl.write(pos);
+      analogWrite(pwmPin, value);
       delay(speed);
     }
   }
