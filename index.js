@@ -127,7 +127,6 @@ function updateSweepModal(settings) {
     $("#sweep-delay").val(settings.delay);
 }
 
-
 function SavePins() {
     var save = JSON.stringify(pinSettings);
 
@@ -425,7 +424,7 @@ function BindContainer(i, obj, settings) {
     var slider = elem.find("input.slider-range");
     var valueSpan = elem.find("span.slider-details-val");
 
-    //slider-enabled
+    var sliderEnabled = elem.find("input.slider-enabled");
 
     var max = MAX_PWM;
     if (settings) {
@@ -542,12 +541,19 @@ function BindContainer(i, obj, settings) {
 
     var incrementBtn = elem.find("button.slider-increment-plus");
     incrementBtn.on("click", function (evt) {
+        sliderEnabled.prop("checked", false).trigger("change");
         slider.val(Number(slider.val()) + 1).trigger("input").change();
     });
 
     var decrementBtn = elem.find("button.slider-increment-minus");
     decrementBtn.on("click", function (evt) {
+        sliderEnabled.prop("checked", false).trigger("change");
         slider.val(Number(slider.val()) - 1).trigger("input").change();
+    });
+
+    sliderEnabled.on("change", function(evt) {
+        var checked = sliderEnabled.prop("checked");
+        slider.prop("disabled", !checked);
     });
 
 }
@@ -581,8 +587,8 @@ function CreateSliderContainer(pin) {
                     <i class="bi bi-plus-circle"></i>
                 </button>
             </span>
-            <div class="form-check">
-                <input class="form-check-input slider-enabled" type="checkbox" value="" id="slider-enabled-${pin}" checked>
+            <div class="form-check form-switch">
+                <input class="form-check-input slider-enabled" type="checkbox" value="" role="switch" id="slider-enabled-${pin}" checked>
                 <label class="form-check-label" for="slider-enabled-${pin}">
                     Enabled
                 </label>
