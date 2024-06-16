@@ -187,148 +187,6 @@ function AddSliderContainer(pin, settings) {
     $(".slider-set").append(slideContainer);
 }
 
-/**
- * @description Bind UI fields for pin group
- * @param {*} i 
- * @param {*} obj 
- */
-function BindContainer(i, obj, settings) {
-    var elem = $(obj);
-    var pin = elem.attr("x-pin");
-
-    elem.find("span.slider-details-pin").html(`PIN ${pin}`);
-
-    var mode = elem.find("select.slider-mode");
-    var slider = elem.find("input.slider-range");
-    var valueSpan = elem.find("span.slider-details-val");
-
-    //slider-enabled
-
-    var max = MAX_PWM;
-    if (settings) {
-        mode.val(settings.mode || "analogout");
-
-        switch (mode.val()) {
-            case "tone":
-                max = MAX_TONE;
-                break;
-            case "servo":
-                max = MAX_SERVO;
-                break;
-            case "digitalout":
-                max = 1;
-                break;
-        }
-        slider.attr("max", max);
-    }
-
-    mode.on("change", function () {
-        var max = MAX_PWM;
-        switch (this.value) {
-            case "tone":
-                max = MAX_TONE;
-                break;
-            case "servo":
-                max = MAX_SERVO;
-                break;
-            case "digitalout":
-                max = 1;
-                break;
-        }
-
-        slider.attr("max", max);
-        var save = _.find(pinSettings, (p) => {
-            return p.pin == pin;
-        });
-        if (save) {
-            save.mode = this.value;
-        }
-
-        SavePins();
-    });
-
-    slider.on("change", function (evt) {
-        $(valueSpan)
-            .removeClass(css_normal)
-            .addClass(css_warning)
-            .removeClass(css_busy)
-            .removeClass(css_bad);
-
-        PostPinValue(mode.val(), pin, this.value, valueSpan);
-    });
-
-    slider.on("input", function (evt) {
-        $(valueSpan)
-            .removeClass(css_normal)
-            .removeClass(css_warning)
-            .removeClass(css_bad)
-            .addClass(css_busy)
-            .html(this.value);
-    });
-
-    valueSpan.on("click", function (evt) {
-        var value = prompt(`Set pin ${pin} value`, slider.val());
-        if (value == null || value == "") {
-            return;
-        }
-
-        value = Number(value);
-        if (isNaN(value)) {
-            return;
-        }
-        if (value < 0) {
-            value = 0;
-        }
-
-        slider.val(value);
-        slider.trigger("input");
-        slider.trigger("change");
-    });
-
-    elem.find("button.slider-controls-stop").on("click", function (evt) {
-
-        if (evt.ctrlKey) {
-            //evt.preventDefault();
-            $(".slider").val(0).trigger("input").change();
-
-            return;
-        }
-
-        slider.val(0).trigger("input").change();
-    });
-
-    elem.find("button.slider-controls-remove").on("click", function (evt) {
-
-        var idx = _.findIndex(pinSettings, (i) => {
-            return i.pin == pin;
-        })
-
-        pinSettings.splice(idx, 1);
-        RebuildPins();
-        localStorage.setItem("pinSettings", JSON.stringify(pinSettings));
-    });
-
-
-    var pulseValue = elem.find("input.pulse-input-value");
-    var pulseTime = elem.find("input.pulse-input-time");
-    var pulseBtn = elem.find("button.pulse-btn");
-
-    pulseBtn.on("click", function (evt) {
-        PostPulsePin(pin, pulseValue.val(), pulseTime.val(), valueSpan);
-    });
-
-    var incrementBtn = elem.find("button.slider-increment-plus");
-    incrementBtn.on("click", function (evt) {
-        slider.val(Number(slider.val()) + 1).trigger("input").change();
-    });
-
-    var decrementBtn = elem.find("button.slider-increment-minus");
-    decrementBtn.on("click", function (evt) {
-        slider.val(Number(slider.val()) - 1).trigger("input").change();
-    });
-
-}
-
 var refreshInterval;
 
 function GetPinValues_click(evt) {
@@ -540,10 +398,6 @@ function RefreshPinValues() {
 
 //#endregion === API ===
 
-
-
-
-
 /**
  * 
  * @param {*} pin 
@@ -555,6 +409,148 @@ function setSliderValue(pin, value) {
     $(container.find("span.slider-details-val")).html(value);
 }
 
+
+/**
+ * @description Bind UI fields for pin group
+ * @param {*} i
+ * @param {*} obj
+ */
+function BindContainer(i, obj, settings) {
+    var elem = $(obj);
+    var pin = elem.attr("x-pin");
+
+    elem.find("span.slider-details-pin").html(`PIN ${pin}`);
+
+    var mode = elem.find("select.slider-mode");
+    var slider = elem.find("input.slider-range");
+    var valueSpan = elem.find("span.slider-details-val");
+
+    //slider-enabled
+
+    var max = MAX_PWM;
+    if (settings) {
+        mode.val(settings.mode || "analogout");
+
+        switch (mode.val()) {
+            case "tone":
+                max = MAX_TONE;
+                break;
+            case "servo":
+                max = MAX_SERVO;
+                break;
+            case "digitalout":
+                max = 1;
+                break;
+        }
+        slider.attr("max", max);
+    }
+
+    mode.on("change", function () {
+        var max = MAX_PWM;
+        switch (this.value) {
+            case "tone":
+                max = MAX_TONE;
+                break;
+            case "servo":
+                max = MAX_SERVO;
+                break;
+            case "digitalout":
+                max = 1;
+                break;
+        }
+
+        slider.attr("max", max);
+        var save = _.find(pinSettings, (p) => {
+            return p.pin == pin;
+        });
+        if (save) {
+            save.mode = this.value;
+        }
+
+        SavePins();
+    });
+
+    slider.on("change", function (evt) {
+        $(valueSpan)
+            .removeClass(css_normal)
+            .addClass(css_warning)
+            .removeClass(css_busy)
+            .removeClass(css_bad);
+
+        PostPinValue(mode.val(), pin, this.value, valueSpan);
+    });
+
+    slider.on("input", function (evt) {
+        $(valueSpan)
+            .removeClass(css_normal)
+            .removeClass(css_warning)
+            .removeClass(css_bad)
+            .addClass(css_busy)
+            .html(this.value);
+    });
+
+    valueSpan.on("click", function (evt) {
+        var value = prompt(`Set pin ${pin} value`, slider.val());
+        if (value == null || value == "") {
+            return;
+        }
+
+        value = Number(value);
+        if (isNaN(value)) {
+            return;
+        }
+        if (value < 0) {
+            value = 0;
+        }
+
+        slider.val(value);
+        slider.trigger("input");
+        slider.trigger("change");
+    });
+
+    elem.find("button.slider-controls-stop").on("click", function (evt) {
+
+        if (evt.ctrlKey) {
+            //evt.preventDefault();
+            $(".slider").val(0).trigger("input").change();
+
+            return;
+        }
+
+        slider.val(0).trigger("input").change();
+    });
+
+    elem.find("button.slider-controls-remove").on("click", function (evt) {
+
+        var idx = _.findIndex(pinSettings, (i) => {
+            return i.pin == pin;
+        })
+
+        pinSettings.splice(idx, 1);
+        RebuildPins();
+        localStorage.setItem("pinSettings", JSON.stringify(pinSettings));
+    });
+
+
+    var pulseValue = elem.find("input.pulse-input-value");
+    var pulseTime = elem.find("input.pulse-input-time");
+    var pulseBtn = elem.find("button.pulse-btn");
+
+    pulseBtn.on("click", function (evt) {
+        PostPulsePin(pin, pulseValue.val(), pulseTime.val(), valueSpan);
+    });
+
+    var incrementBtn = elem.find("button.slider-increment-plus");
+    incrementBtn.on("click", function (evt) {
+        slider.val(Number(slider.val()) + 1).trigger("input").change();
+    });
+
+    var decrementBtn = elem.find("button.slider-increment-minus");
+    decrementBtn.on("click", function (evt) {
+        slider.val(Number(slider.val()) - 1).trigger("input").change();
+    });
+
+}
 
 /**
  * 
