@@ -202,6 +202,8 @@ function BindContainer(i, obj, settings) {
     var slider = elem.find("input.slider-range");
     var valueSpan = elem.find("span.slider-details-val");
 
+    //slider-enabled
+
     var max = MAX_PWM;
     if (settings) {
         mode.val(settings.mode || "analogout");
@@ -539,6 +541,9 @@ function RefreshPinValues() {
 //#endregion === API ===
 
 
+
+
+
 /**
  * 
  * @param {*} pin 
@@ -559,7 +564,7 @@ function setSliderValue(pin, value) {
 function CreateSliderContainer(pin) {
     var html = `
     <div x-pin="${pin}" class='slider-container'>
-        <div class="slider-details">
+        <div class="slider-details flex">
             <span class="slider-details-pin"></span>
             <span class="slider-details-val ${css_normal}" title="Click for manual set.">0</span>
             <span>
@@ -580,9 +585,16 @@ function CreateSliderContainer(pin) {
                     <i class="bi bi-plus-circle"></i>
                 </button>
             </span>
+            <div class="form-check">
+                <input class="form-check-input slider-enabled" type="checkbox" value="" id="slider-enabled-${pin}" checked>
+                <label class="form-check-label" for="slider-enabled-${pin}">
+                    Enabled
+                </label>
+            </div>
             <span>
-                <input type="checkbox" id="slider-enabled-${pin}" name="slider-enabled-${pin}" />
-                <label for="slider-enabled-${pin}" >Enabled</label>
+                <button id="settingsBtn" class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#configModal">
+                <i class="bi bi-gear"></i>
+                </button>
             </span>
         </div>
         <div class="slider-controls flex">

@@ -11,7 +11,7 @@
 #define FIRSTDUTY 0
 
 #define SERVOMIN 0
-#define SERVOMAX 360
+#define SERVOMAX 270
 #define DUTYCYLEMIN 100
 #define DUTYCYLEMAX 500
 
