@@ -52,12 +52,10 @@
           <i class="bi bi-radioactive"></i>
         </button>
 
-        <button id="sweepBtn" class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#sweepModal">
+        <button id="sweepBtn" class="btn btn-outline-primary" type="button" data-bs-toggle="modal"
+          data-bs-target="#sweepModal">
           <i class="bi bi-arrows-expand-vertical"></i>
         </button>
-        <!-- <button id="settingsBtn" class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#configModal">
-          <i class="bi bi-gear"></i>
-        </button> -->
       </div>
       <div class="">
         <input class="form-control stepsize" type="number" id="stepsize" name="stepsize" min="1" max="1000000"
@@ -66,23 +64,30 @@
     </div>
   </div>
   <div class="slider-set"></div>
-
   <div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="configModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="configModalLabel">Config Pin</h1>
+          <h1 class="modal-title fs-5 config-header">Config Pin</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <form>
             <div class="mb-3">
+              <select name="slider-mode-${pin}" class="slider-mode" title="Set mode">
+                <option value="analogout">Analog Write</option>
+                <option value="digitalout">Digital Write</option>
+                <option value="servo">Servo</option>
+                <option value="tone">Tone</option>
+              </select>
+            </div>
+            <div class="mb-3">
               <label for="config-servo-max" class="col-form-label">Servo Max:</label>
               <input type="number" class="form-control" id="config-servo-max">
             </div>
             <div class="mb-3">
-              <label for="message-text" class="col-form-label">Message:</label>
-              <textarea class="form-control" id="message-text"></textarea>
+              <label for="config-label" class="col-form-label">Label:</label>
+              <input type="text" class="form-control config-label" id="config-label"/>
             </div>
           </form>
         </div>
@@ -140,4 +145,5 @@
     </div>
   </div>
 </body>
+
 </html>

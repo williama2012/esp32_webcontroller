@@ -33,24 +33,22 @@ function addData(data) {
 }
 
 $(function () {
-    const exampleModal = document.getElementById('exampleModal');
-    if (exampleModal) {
-        exampleModal.addEventListener('show.bs.modal', event => {
-            // Button that triggered the modal
-            const button = event.relatedTarget
-            // Extract info from data-bs-* attributes
-            const recipient = button.getAttribute('data-bs-whatever')
-            // If necessary, you could initiate an Ajax request here
-            // and then do the updating in a callback.
-
-            // Update the modal's content.
-            const modalTitle = exampleModal.querySelector('.modal-title')
-            const modalBodyInput = exampleModal.querySelector('.modal-body input')
-
-            modalTitle.textContent = `New message to ${recipient}`
-            modalBodyInput.value = recipient
-        })
-    }
+    // const configModal = document.getElementById('configModal');
+    // if (configModal) {
+    //     configModal.addEventListener('show.bs.modal', event => {
+    //         // Button that triggered the modal
+    //         const button = event.relatedTarget
+    //         // Extract info from data-bs-* attributes
+    //         const recipient = button.getAttribute('data-bs-whatever')
+    //         // If necessary, you could initiate an Ajax request here
+    //         // and then do the updating in a callback.
+    //         // Update the modal's content.
+    //         const modalTitle = configModal.querySelector('.modal-title')
+    //         const modalBodyInput = configModal.querySelector('.modal-body input')
+    //         modalTitle.textContent = `New message to ${recipient}`
+    //         modalBodyInput.value = recipient
+    //     })
+    // }
 
     const sweepModal = document.getElementById('sweepModal');
     if (sweepModal) {
@@ -423,8 +421,8 @@ function BindContainer(i, obj, settings) {
     var mode = elem.find("select.slider-mode");
     var slider = elem.find("input.slider-range");
     var valueSpan = elem.find("span.slider-details-val");
-
     var sliderEnabled = elem.find("input.slider-enabled");
+    var settingsBtn = elem.find("button.slider-settings");
 
     var max = MAX_PWM;
     if (settings) {
@@ -512,7 +510,6 @@ function BindContainer(i, obj, settings) {
         if (evt.ctrlKey) {
             //evt.preventDefault();
             $(".slider").val(0).trigger("input").change();
-
             return;
         }
 
@@ -529,7 +526,6 @@ function BindContainer(i, obj, settings) {
         RebuildPins();
         localStorage.setItem("pinSettings", JSON.stringify(pinSettings));
     });
-
 
     var pulseValue = elem.find("input.pulse-input-value");
     var pulseTime = elem.find("input.pulse-input-time");
@@ -551,9 +547,22 @@ function BindContainer(i, obj, settings) {
         slider.val(Number(slider.val()) - 1).trigger("input").change();
     });
 
-    sliderEnabled.on("change", function(evt) {
+    sliderEnabled.on("change", function (evt) {
         var checked = sliderEnabled.prop("checked");
         slider.prop("disabled", !checked);
+    });
+
+    settingsBtn.on("click", function (evt) {
+        let modal = $('#configModal');
+        modal.modal('show');
+        modal.find(".config-header").html(`Pin ${pin} Config`);
+        var config = _.find(pinSettings, (i) => {
+            return i.pin == pin;
+        });
+        console.log("config", config);
+        modal.find("input.config-label").val(`PIN ${pin}`);
+
+
     });
 
 }
@@ -594,8 +603,8 @@ function CreateSliderContainer(pin) {
                 </label>
             </div>
             <span>
-                <button id="settingsBtn" class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#configModal">
-                <i class="bi bi-gear"></i>
+                <button id="slider-settings-${pin}" class="btn btn-outline-primary slider-settings" type="button">
+                    <i class="bi bi-gear"></i>
                 </button>
             </span>
         </div>
