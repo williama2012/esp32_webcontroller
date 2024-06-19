@@ -458,31 +458,33 @@ void handleSweepPost() {
     servo_pin = servoPin;
   }
 
-  //analogWrite(pwmPin, 0);
-
-  servo_ctrl.write(low);
-
   int pos = low;
+  servo_ctrl.write(pos);
+  delay(2500);
 
-  //analogWrite(pwmPin, value);
 
   for (int i = 1; i <= count; i++) {
 
     for (pos; pos <= high; pos++) {
       analogWrite(pwmPin, value);
-      delayMicroseconds(speed);
+      //delayMicroseconds(speed);
       servo_ctrl.write(pos);
       delayMicroseconds(speed);
       analogWrite(pwmPin, 0);
     }
 
-    for (pos; pos >= low; pos--) {
-      analogWrite(pwmPin, value);
-      delayMicroseconds(speed);
-      servo_ctrl.write(pos);
-      delayMicroseconds(speed);
-      analogWrite(pwmPin, 0);
-    }
+    servo_ctrl.write(pos);
+    pos = low;
+    delayMicroseconds(speed);
+
+
+    // for (pos; pos >= low; pos--) {
+    //   analogWrite(pwmPin, value);
+    //   delayMicroseconds(speed);
+    //   servo_ctrl.write(pos);
+    //   delayMicroseconds(speed);
+    //   analogWrite(pwmPin, 0);
+    // }
   }
 
   analogWrite(pwmPin, 0);
