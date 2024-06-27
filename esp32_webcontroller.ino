@@ -472,10 +472,12 @@ void handleSweepPost() {
       delayMicroseconds(speed);
       analogWrite(pwmPin, 0);
     }
-
-    servo_ctrl.write(pos);
+    
+    analogWrite(pwmPin, 0);
+    delay(100);
     pos = low;
-    delayMicroseconds(speed);
+    servo_ctrl.write(pos);
+    delay(1000);
 
 
     // for (pos; pos >= low; pos--) {
