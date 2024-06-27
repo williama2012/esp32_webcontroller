@@ -219,15 +219,15 @@ function GetPinValues_click(evt) {
 }
 
 function InActivity(message) {
-    AddActivity(message, `<span class="act-in"><i class="bi bi-telephone-inbound"></i></span>`);
+    AddActivity(message, `<i class="bi bi-telephone-inbound act-icon"></i>`);
 }
 
 function OutActivity(message) {
-    AddActivity(message, `<span class="act-out"><i class="bi bi-telephone-outbound"></i></span>`);
+    AddActivity(message, `<i class="bi bi-telephone-outbound act-icon"></i>`);
 }
 
 function errActivity(message) {
-    AddActivity(message, `<span class="act-bug"><i class="bi bi-bug"></i></span>`);
+    AddActivity(message, `<i class="bi bi-bug act-icon"></i>`);
 }
 
 function AddActivity(message, direction) {
@@ -577,7 +577,7 @@ function CreateSliderContainer(pin) {
     <div x-pin="${pin}" class='slider-container'>
         <div class="slider-details flex">
             <span class="slider-details-pin"></span>
-            <span class="slider-details-val ${css_normal}" title="Click for manual set.">0</span>
+            <span class="slider-details-val ${css_normal}">0</span>
             <span>
                 <select id="slider-mode-${pin}" name="slider-mode-${pin}" class="slider-mode" title="Set mode">
                     <option value="analogout">Analog Write</option>
@@ -590,8 +590,6 @@ function CreateSliderContainer(pin) {
                 <button class="slider-increment-btn slider-increment-minus">
                     <i class="bi bi-dash-circle"></i>
                 </button>
-            </span>
-            <span>
                 <button class="slider-increment-btn slider-increment-plus">
                     <i class="bi bi-plus-circle"></i>
                 </button>
@@ -607,6 +605,11 @@ function CreateSliderContainer(pin) {
                     <i class="bi bi-gear"></i>
                 </button>
             </span>
+            <div class="">
+                <button class="slider-controls-remove slider-settings">
+                    <i class="bi bi-node-minus slider-controls-remove-icon"></i>
+                </button>
+            </div>
         </div>
         <div class="slider-controls flex">
             <div class="">
@@ -616,16 +619,6 @@ function CreateSliderContainer(pin) {
             </div>
             <div class="flex-grow">
                 <input type='range' step='${stepsize}' min='0' max='4095' value='0' class='slider-range' id='slider-${pin}'>
-            </div>
-            <div>
-                <input class="form-control pulse-input pulse-input-value" type="number" id="pulse-value-${pin}" min="1" max="1000000"
-                title="Pulse Value">
-                <input class="form-control pulse-input pulse-input-time" type="number" id="pulse-time-${pin}" min="1" max="1000000"
-                title="Pulse Time">
-                <button type="button" class="btn btn-warning pulse-btn" id="pulse-btn-${pin}">Pulse</button>
-            </div>
-            <div class="">
-                <button class="slider-controls-remove"><i class="bi bi-node-minus slider-controls-remove-icon"></i></button>
             </div>
         </div>
     </div>`;

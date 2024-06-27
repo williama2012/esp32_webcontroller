@@ -90,6 +90,14 @@
               <input type="text" class="form-control config-label" id="config-label"/>
             </div>
           </form>
+          <div>
+            <input class="form-control pulse-input pulse-input-value" type="number" id="pulse-value-${pin}" min="1" max="1000000"
+            title="Pulse Value">
+            <input class="form-control pulse-input pulse-input-time" type="number" id="pulse-time-${pin}" min="1" max="1000000"
+            title="Pulse Time">
+            <button type="button" class="btn btn-warning pulse-btn" id="pulse-btn-${pin}">Pulse</button>
+          </div>
+
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -107,13 +115,15 @@
         </div>
         <div class="modal-body">
           <form>
-            <div class="mb-3">
-              <label for="sweep-servo" class="col-form-label">Servo Pin:</label>
-              <input type="number" class="form-control" id="sweep-servo">
-            </div>
-            <div class="mb-3">
-              <label for="sweep-pwm" class="col-form-label">PWM Pin:</label>
-              <input type="number" class="form-control" id="sweep-pwm">
+            <div class="form-row">
+              <div class="col">
+                <label for="sweep-servo" class="col-form-label">Servo Pin:</label>
+                <input type="number" class="form-control" id="sweep-servo">
+              </div>
+              <div class="col">
+                <label for="sweep-pwm" class="col-form-label">PWM Pin:</label>
+                <input type="number" class="form-control" id="sweep-pwm">
+              </div>
             </div>
             <div class="mb-3">
               <label for="sweep-value" class="col-form-label">Value:</label>

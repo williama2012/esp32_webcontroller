@@ -35,7 +35,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 15vh;
-    margin-bottom: 1em;
+    margin-bottom: 2em;
 
 }
 
@@ -54,11 +54,11 @@ body {
 
 .slider-details-pin {
     font-weight: bold;
-    font-size: xx-large;
+    font-size: x-large;
 
     height: 5vh;
     line-height: 5vh;
-    width: 15vw;
+    width: 10vw;
     text-align: center;
 }
 
@@ -82,10 +82,11 @@ body {
     background: none;
     margin-right: 15px;
     color: red;
+    height: 10vh;
 }
 
 .slider-controls-stop-icon {
-    font-size: 5em;
+    font-size: 4em;
 }
 
 .slider-controls-remove {
@@ -94,8 +95,7 @@ body {
 }
 
 .slider-controls-remove-icon {
-    font-size: 2.5em;
-
+    font-size: 2em;
 }
 
 .slider-range {
@@ -247,6 +247,12 @@ input {
     padding: 0;
     margin: 0;
     border: none;
+    /* font-size: .5em; */
+}
+
+.act-icon {
+    font-size:0.75em;
+    margin:1em;
 }
 
 .statusbar {
