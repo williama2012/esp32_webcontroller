@@ -281,7 +281,7 @@ input {
 }
 
 .act-out {
-    color: yellow;
+    color: rgb(0, 139, 238);
     padding: 0;
 }
 
@@ -294,18 +294,6 @@ input {
     display: flex;
     flex-direction: row;
     /* height: 10vh; */
-}
-
-.bi-telephone-outbound {
-    color: green;
-}
-
-.bi-telephone-inbound {
-    color: green;
-}
-
-.bi-bug {
-    color: red;
 }
 
 .flex {
