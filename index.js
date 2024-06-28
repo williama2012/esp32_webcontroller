@@ -60,7 +60,7 @@ $(function () {
             }
         });
 
-        $("#sweep-submit-btn").on("click", handleSweepSubmit);
+        $(".sweep-submit-btn").on("click", handleSweepSubmit);
     }
 
     var cached_pins = localStorage.getItem("pinSettings");
