@@ -242,17 +242,52 @@ input {
 
 /* #endregion Inputs */
 
-#activity {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    border: none;
-    /* font-size: .5em; */
+.activity-table {
+    width: 100%;
+}
+
+.activity-table>tr td:nth-child(1) {
+    width: 1%;
+}
+
+.activity-table>tr td:nth-child(2) {
+    width: 1%;
+}
+
+.activity-table>tr td:nth-child(3) {
+    width: 98%;
+}
+
+.activity-table tr:hover {
+    background-color: #D6EEEE;
+}
+
+.activity-table td {
+    padding: 0 0.5em 0 0.5em;
+}
+
+.activity-container {
+    max-height: 5em;
+
 }
 
 .act-icon {
-    font-size:0.75em;
-    margin:1em;
+    margin: 0;
+}
+
+.act-in {
+    color: green;
+    padding: 0;
+}
+
+.act-out {
+    color: yellow;
+    padding: 0;
+}
+
+.act-bug {
+    color: red;
+    padding: 0;
 }
 
 .statusbar {
@@ -276,6 +311,8 @@ input {
 .flex {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+
 }
 
 .flex-grow {
@@ -302,12 +339,10 @@ input {
 
 
 .pulse-input {
-    height:30px;
+    height: 30px;
 }
 
-.pulse-btn {
-
-}
+.pulse-btn {}
 
 .slider-increment-btn {
     height: 5vh;
@@ -318,4 +353,10 @@ input {
     margin-left: 15px;
     margin-right: 15px;
     text-align: center;
+}
+
+
+.sweep-modal-footer {
+    justify-content: space-between;
+
 }

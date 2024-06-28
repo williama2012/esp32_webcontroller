@@ -219,15 +219,15 @@ function GetPinValues_click(evt) {
 }
 
 function InActivity(message) {
-    AddActivity(message, `<i class="bi bi-telephone-inbound act-icon"></i>`);
+    AddActivity(message, `<span class="act-in"><i class="bi bi-telephone-inbound act-icon"></i></span>`);
 }
 
 function OutActivity(message) {
-    AddActivity(message, `<i class="bi bi-telephone-outbound act-icon"></i>`);
+    AddActivity(message, `<span class="act-out"><i class="bi bi-telephone-outbound act-icon"></i></span>`);
 }
 
 function errActivity(message) {
-    AddActivity(message, `<i class="bi bi-bug act-icon"></i>`);
+    AddActivity(message, `<span class="act-bug"><i class="bi bi-bug act-icon"></i></span>`);
 }
 
 function AddActivity(message, direction) {
@@ -235,8 +235,15 @@ function AddActivity(message, direction) {
     if (typeof message === "object") {
         message = JSON.stringify(message);
     }
+    var hr = d.getHours();
+    if(hr > 12) {
+        hr = hr - 12;
+    }
+
+    var time = `${String(hr).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}.${String(d.getMilliseconds()).padStart(3, '0')}`;
+
     var item = `<tr>
-        <td>${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}.${d.getMilliseconds()}</td>
+        <td>${time}</td>
         <td>${direction}</td>
         <td>${message}</td>
     </tr>`;

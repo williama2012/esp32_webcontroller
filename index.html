@@ -32,8 +32,8 @@
 
   <div class="toolbar flex">
     <div class="toolbar-one flex-grow">
-      <div class="">
-        <table id="activity" class="table table-borderless border-primary"></table>
+      <div class="activity-container">
+        <table id="activity" class="activity-table"></table>
       </div>
     </div>
     <div class="toolbar-three">
@@ -110,45 +110,53 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="sweepModalLabel">New message</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dont</button>
+          <h1 class="modal-title fs-5" id="sweepModalLabel">Laser Sweep</h1>
+          <button type="button" class="btn btn-primary" id="sweep-submit-btn">Start</button>
         </div>
         <div class="modal-body">
           <form>
-            <div class="form-row">
-              <div class="col">
-                <label for="sweep-servo" class="col-form-label">Servo Pin:</label>
-                <input type="number" class="form-control" id="sweep-servo">
-              </div>
-              <div class="col">
-                <label for="sweep-pwm" class="col-form-label">PWM Pin:</label>
+            <div class="flex">
+              <div class="">
+                <label for="sweep-pwm" class="col-form-label">PWM Pin</label>
                 <input type="number" class="form-control" id="sweep-pwm">
               </div>
+              <div class="">
+                <label for="sweep-servo" class="col-form-label">Servo Pin</label>
+                <input type="number" class="form-control" id="sweep-servo">
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="sweep-value" class="col-form-label">Value:</label>
-              <input type="number" class="form-control" id="sweep-value">
+            <div class="flex">
+              <div class="">
+                <label for="sweep-value" class="col-form-label">Value</label>
+                <input type="number" class="form-control" id="sweep-value">
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="sweep-low" class="col-form-label">Low:</label>
-              <input type="number" class="form-control" id="sweep-low">
+            <div class="flex">
+              <div class="">
+                <label for="sweep-low" class="col-form-label">Low</label>
+                <input type="number" class="form-control" id="sweep-low">
+              </div>
+              <div class="">
+                <label for="sweep-high" class="col-form-label">High</label>
+                <input type="number" class="form-control" id="sweep-high">
+              </div>
             </div>
-            <div class="mb-3">
-              <label for="sweep-high" class="col-form-label">High:</label>
-              <input type="number" class="form-control" id="sweep-high">
-            </div>
-            <div class="mb-3">
-              <label for="sweep-count" class="col-form-label">Count:</label>
-              <input type="number" class="form-control" id="sweep-count">
-            </div>
-            <div class="mb-3">
-              <label for="sweep-delay" class="col-form-label">Delay:</label>
-              <input type="number" class="form-control" id="sweep-delay">
+            <div class="flex">
+              <div class="">
+                <label for="sweep-count" class="col-form-label">Count</label>
+                <input type="number" class="form-control" id="sweep-count">
+              </div>
+              <div class="">
+                <label for="sweep-delay" class="col-form-label">Delay:</label>
+                <input type="number" class="form-control" id="sweep-delay">
+              </div>
             </div>
           </form>
         </div>
-        <div class="modal-footer">
+        <div class="modal-footer sweep-modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Dont</button>
+          <h1 class="modal-title fs-5" id=""></h1>
           <button type="button" class="btn btn-primary" id="sweep-submit-btn">Start</button>
         </div>
       </div>
