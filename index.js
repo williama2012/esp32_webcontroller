@@ -109,6 +109,10 @@ function handleSweepSubmit(evt) {
 
     localStorage.setItem("sweepSettings", JSON.stringify(settings));
 
+    if(!confirm("Start Sweep?")) {
+        return;
+    }
+
     console.log('save sweep:', settings.servo, settings.pwm, settings.value, settings.low, settings.high, settings.count, settings.delay);
 
     PostSweep(settings);
