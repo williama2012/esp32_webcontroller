@@ -14,6 +14,21 @@
 
 #define SERIAL_BAUDRATE 115200
 
+TaskHandle_t Task1;
+WebServer server(80);
+//Servo servo_ctrl;
+LiquidCrystal_I2C lcd(0x27, 20, 2);
+
+INCTXT(WebPage, "index.html");
+INCTXT(WebJavascript, "index.js");
+INCTXT(WebStylesheet, "index.css");
+
+String url;
+bool doBlink = false;
+int servo_pin = 0;
+//servoPosDef servoPos;
+
+
 //enum PinModeEnum {AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone};
 
 typedef struct {
@@ -39,6 +54,67 @@ String makeStatusItem(int pin, String message, bool includeComma = true) {
   }
   return msg;
 }
+
+
+#pragma region Printing
+
+void Print(String msg) {
+  if (Serial) {
+    Serial.print(msg);
+  }
+}
+
+void Print(const char *msg) {
+  if (Serial) {
+    Serial.print(msg);
+  }
+}
+
+void Print(char *msg) {
+  if (Serial) {
+    Serial.print(msg);
+  }
+}
+
+void Print(uint32_t msg) {
+  if (Serial) {
+    Serial.print(msg);
+  }
+}
+
+void Println(String msg) {
+  if (Serial) {
+    Serial.println(msg);
+  }
+}
+
+void Println(const char *msg) {
+  if (Serial) {
+    Serial.println(msg);
+  }
+}
+
+void Println(char *msg) {
+  if (Serial) {
+    Serial.println(msg);
+  }
+}
+
+void Println(uint32_t msg) {
+  if (Serial) {
+    Serial.println(msg);
+  }
+}
+
+void PrintCore(char *msg) {
+  Print("--- " + String(msg) + " running on core ");
+  Print(xPortGetCoreID());
+  Println(" ---");
+}
+
+#pragma endregion Printing
+
+
 
 
 

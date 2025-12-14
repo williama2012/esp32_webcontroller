@@ -1,30 +1,4 @@
 #include "esp32_webcontroller.h"
-#include "esp32_timer.h"
-#include "secrets.h"
-//#include "Servo.h"
-#include "incbin.h"
-#include "Wire.h"
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <WebServer.h>
-#include <ESPmDNS.h>
-#include <LiquidCrystal_I2C.h>
-
-#define SERIAL_BAUDRATE 115200
-
-TaskHandle_t Task1;
-WebServer server(80);
-//Servo servo_ctrl;
-LiquidCrystal_I2C lcd(0x27, 20, 2);
-
-INCTXT(WebPage, "index.html");
-INCTXT(WebJavascript, "index.js");
-INCTXT(WebStylesheet, "index.css");
-
-String url;
-bool doBlink = false;
-int servo_pin = 0;
-servoPosDef servoPos;
 
 #pragma region server
 
@@ -151,64 +125,6 @@ void Blue(bool on) {
 // }
 
 #pragma endregion servo
-
-#pragma region Printing
-
-void Print(String msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
-}
-
-void Print(const char *msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
-}
-
-void Print(char *msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
-}
-
-void Print(uint32_t msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
-}
-
-void Println(String msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
-}
-
-void Println(const char *msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
-}
-
-void Println(char *msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
-}
-
-void Println(uint32_t msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
-}
-
-void PrintCore(char *msg) {
-  Print("--- " + String(msg) + " running on core ");
-  Print(xPortGetCoreID());
-  Println(" ---");
-}
-
-#pragma endregion Printing
 
 #pragma region Get_Handlers
 
@@ -586,7 +502,7 @@ void SetupWifi() {
 }
 
 void setup(void) {
-  Red(true);
+
   Serial.begin(SERIAL_BAUDRATE);
   delay(1000);
 
@@ -594,7 +510,6 @@ void setup(void) {
   analogReadResolution(12);
   analogWriteResolution(23, 12);
 
-  Red(false);
   Blue(true);
 
   SetupLCD();
