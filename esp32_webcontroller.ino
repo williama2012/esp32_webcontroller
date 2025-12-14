@@ -1,7 +1,7 @@
 #include "esp32_webcontroller.h"
 #include "esp32_timer.h"
 #include "secrets.h"
-#include "Servo.h"
+//#include "Servo.h"
 #include "incbin.h"
 #include "Wire.h"
 #include <WiFi.h>
@@ -14,7 +14,7 @@
 
 TaskHandle_t Task1;
 WebServer server(80);
-Servo servo_ctrl;
+//Servo servo_ctrl;
 LiquidCrystal_I2C lcd(0x27, 20, 2);
 
 INCTXT(WebPage, "index.html");
@@ -129,26 +129,26 @@ void Blue(bool on) {
 
 #pragma region servo
 
-void MoveServo(int pin, int pos) {
-  PrintCore("MoveServo");
+// void MoveServo(int pin, int pos) {
+//   PrintCore("MoveServo");
 
-  if (pin != servo_pin) {
-    if (servo_pin != 0) {
-      servo_ctrl.detach(servo_pin);
-    }
-    servo_ctrl.attach(pin);
-    servo_pin = pin;
-  }
+//   if (pin != servo_pin) {
+//     if (servo_pin != 0) {
+//       servo_ctrl.detach(servo_pin);
+//     }
+//     servo_ctrl.attach(pin);
+//     servo_pin = pin;
+//   }
 
-  servo_ctrl.write(pos);
-}
+//   servo_ctrl.write(pos);
+// }
 
-void ClearServo(int pin) {
-  if (servo_pin == pin) {
-    servo_ctrl.detach(servo_pin);
-    servo_pin = 0;
-  }
-}
+// void ClearServo(int pin) {
+//   if (servo_pin == pin) {
+//     servo_ctrl.detach(servo_pin);
+//     servo_pin = 0;
+//   }
+// }
 
 #pragma endregion servo
 
@@ -263,7 +263,7 @@ void handlePulsePost() {
   timeStr = server.arg("time");
   int time = timeStr.toInt();
 
-  ClearServo(pin);
+  //ClearServo(pin);
 
   pinMode(pin, OUTPUT);
 
@@ -293,7 +293,7 @@ void handleAnalogWritePost() {
   int pin = pinStr.toInt();
   int value = valueStr.toInt();
 
-  ClearServo(pin);
+  //ClearServo(pin);
 
   pinMode(pin, OUTPUT);
   analogWrite(pin, value);
@@ -319,7 +319,7 @@ void handleDigitalWritePost() {
   int pin = pinStr.toInt();
   int value = valueStr.toInt();
 
-  ClearServo(pin);
+  //ClearServo(pin);
 
   pinMode(pin, OUTPUT);
   digitalWrite(pin, value);
@@ -349,7 +349,7 @@ void handleServoWritePost() {
   int pos = value;
   //int pos = map(value, 0, 4095, 0, 180);
 
-  MoveServo(pin, pos);
+  //MoveServo(pin, pos);
   // servoPos.pin = pin;
   // servoPos.pos = pos;
   // servoPos.isNew = true;
@@ -391,7 +391,7 @@ void handleAnalogReadPost() {
     }
 
     if (pin > 0) {
-      ClearServo(pin);
+      //ClearServo(pin);
       pinMode(pin, INPUT);
       int value = analogRead(pin);
       response += "{"
@@ -414,7 +414,7 @@ void handleToneWritePost() {
   String pinStr = "";
   pinStr = server.arg("pin");
   int pin = pinStr.toInt();
-  ClearServo(pin);
+  //ClearServo(pin);
 
   String valueStr = server.arg("value");
   unsigned int value = atol(valueStr.c_str());
@@ -452,14 +452,14 @@ void handleSweepPost() {
 
   if (servoPin != servo_pin) {
     if (servo_pin != 0) {
-      servo_ctrl.detach(servo_pin);
+      //servo_ctrl.detach(servo_pin);
     }
-    servo_ctrl.attach(servoPin);
+    //servo_ctrl.attach(servoPin);
     servo_pin = servoPin;
   }
 
   int pos = low;
-  servo_ctrl.write(pos);
+  //servo_ctrl.write(pos);
   delay(2500);
 
 
@@ -468,7 +468,7 @@ void handleSweepPost() {
     for (pos; pos <= high; pos++) {
       analogWrite(pwmPin, value);
       //delayMicroseconds(speed);
-      servo_ctrl.write(pos);
+      //servo_ctrl.write(pos);
       delayMicroseconds(speed);
       analogWrite(pwmPin, 0);
     }
@@ -476,7 +476,7 @@ void handleSweepPost() {
     analogWrite(pwmPin, 0);
     delay(100);
     pos = low;
-    servo_ctrl.write(pos);
+    //servo_ctrl.write(pos);
     delay(1000);
 
 
@@ -512,7 +512,7 @@ void handleApiPost() {
 
   if (cmd == "reset") {
     for (int i = 2; i <= 24; i++) {
-      servo_ctrl.detach(i);
+      //servo_ctrl.detach(i);
       pinMode(i, OUTPUT);
       analogWrite(i, 0);
       pinMode(i, INPUT);
@@ -592,7 +592,7 @@ void setup(void) {
 
   PrintCore("setup");
   analogReadResolution(12);
-  analogWriteResolution(12);
+  analogWriteResolution(23, 12);
 
   Red(false);
   Blue(true);
@@ -629,10 +629,6 @@ void Core0Processor(void *parameter) {
 }
 
 void loop(void) {
-  if (servoPos.isNew == true) {
-    MoveServo(servoPos.pin, servoPos.pos);
-    servoPos.isNew = false;
-  }
 
   if (doBlink) {
     Blink();
@@ -640,7 +636,7 @@ void loop(void) {
   }
 
   if (CheckTimer(0)) {
-    LcdUpdateRows();
+    //LcdUpdateRows();
   }
 
   delayMicroseconds(1);
