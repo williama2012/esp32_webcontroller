@@ -1,16 +1,18 @@
 #include "esp32_webcontroller.h"
+#include <Adafruit_NeoPixel.h>
+
 Timer timers;
 
+#define LED_PIN 6
+#define LED_COUNT 484
+
 void SetupPins() {
-  Println("SetupPins");
-  pinMode(2, OUTPUT);
+  pinMode(31, OUTPUT);
+  pinMode(32, OUTPUT);
 }
 
 void SetupTimers() {
-  Println("SetupTimers");
-
   timers.AddTimer(0, 3000);
-  //Blue(true);
 }
 
 #pragma region servo
@@ -51,16 +53,16 @@ void Core0Processor(void *parameter) {
 void loop(void) {
 
   if (doBlink) {
-    //Blink();
+    Blink();
     doBlink = false;
   }
 
   if (timers.CheckTimer(0)) {
-    Blink();
+    //Blink();
     //LcdUpdateRows();
   }
 
-  delayMicroseconds(1);
+  //delayMicroseconds(1);
 }
 
 #pragma endregion core loops
