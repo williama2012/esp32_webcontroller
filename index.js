@@ -1,6 +1,7 @@
 const MAX_PWM = 4095;
 const MAX_TONE = 40000; //4294967295;
 const MAX_SERVO = 180;
+const MAX_COLOR = 255;
 
 const css_normal = "btn btn-light";
 const css_busy = "btn btn-info";
@@ -24,8 +25,9 @@ const DigitalRead = "digitalin";
 const Servo = "servo";
 const Tone = "tone";
 const Integer = "integer";
+const Color = "color";
 
-const PinMode = { AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone, Integer };
+const PinMode = { AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone, Integer, Color };
 
 function addData(data) {
     var time = new Date();
@@ -171,7 +173,7 @@ function AddNewSlider_Click(evt) {
         return i.pin == pin;
     })) != null;
 
-    if (isNaN(pin) || alreadySet || pin < 2 || pin > 24) {
+    if (isNaN(pin) || alreadySet || pin < 2 || pin > 64) {
         return;
     }
 
@@ -450,6 +452,8 @@ function BindContainer(i, obj, settings) {
             case "digitalout":
                 max = 1;
                 break;
+            case "color":
+                max = MAX_COLOR;
         }
         slider.attr("max", max);
     }
@@ -466,6 +470,8 @@ function BindContainer(i, obj, settings) {
             case "digitalout":
                 max = 1;
                 break;
+            case "color":
+                max = MAX_COLOR;
         }
 
         slider.attr("max", max);
@@ -597,6 +603,7 @@ function CreateSliderContainer(pin) {
                     <option value="servo">Servo</option>
                     <option value="tone">Tone</option>
                     <option value="integer">Integer</option>
+                    <option value="color">Color</option>
                 </select>
             </span>
             <span>

@@ -130,6 +130,12 @@ void PrintCore(char *msg) {
   Println(" ---");
 }
 
+void PrintCore(String msg) {
+  Print("--- " + String(msg) + " running on core ");
+  Print(xPortGetCoreID());
+  Println(" ---");
+}
+
 #pragma endregion Printing
 
 #pragma region server
@@ -607,6 +613,7 @@ void SetupServer() {
   server.on("/index.js", HTTP_GET, handleGetJavascript);
   server.on("/index.css", HTTP_GET, handleGetStylesheet);
 
+  server.on("/color", HTTP_POST, handleIntegerPost);
   server.on("/integer", HTTP_POST, handleIntegerPost);
   server.on("/analogout", HTTP_POST, handleAnalogWritePost);
   server.on("/digitalout", HTTP_POST, handleDigitalWritePost);
@@ -648,7 +655,13 @@ void SetupWifi() {
   Println("URL: " + url);
 }
 
-void Core0Processor(void *parameter);
+void Core0Processor(void *parameter) {
+  PrintCore("Core0Processor");
+
+  for (;;) {
+    server.handleClient();
+  }
+}
 
 void SetupPins();
 

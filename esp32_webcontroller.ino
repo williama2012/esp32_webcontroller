@@ -12,6 +12,9 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
 uint8_t flip = 1;
 uint8_t color_weight = 1;
+uint8_t color_r = 0;
+uint8_t color_g = 0;
+uint8_t color_b = 0;
 bool color_up = true;
 
 uint8_t mode = 1;
@@ -36,13 +39,6 @@ void set_brightness(uint8_t percent) {
 }
 
 
-void Core0Processor(void *parameter) {
-  PrintCore("Core0Processor");
-
-  for (;;) {
-    server.handleClient();
-  }
-}
 
 void flip_color() {
   if (flip == 1) {
@@ -52,6 +48,8 @@ void flip_color() {
   }
 }
 
+PinSet prev_mode;
+
 void loop(void) {
 
   if (doBlink) {
@@ -59,38 +57,68 @@ void loop(void) {
     doBlink = false;
   }
   
-  if (mode == 1) {
-    mode1process();
-  } else if (mode == 2) {
-    mode2process();
+  PinSet mode = get_pin(50);
+
+  bool changed = mode.value != prev_mode.value;
+
+  if (changed) {
+    PrintCore("Mode Changed: " + String(mode.value));
   }
 
+  switch (mode.value) {
+    case 1:
+      mode1process();
+      break;
+    case 2:
+      mode2process();
+      break;
+    case 3:
+      break;
+    default:
+      mode1process();
+  }
+
+  prev_mode = mode;
+}
+
+
+void step_weight() {
+  if (color_up) {
+    color_weight = color_weight + 1;
+    if (color_weight >= 255) {
+      color_weight = 255;
+      color_up = false;
+    }
+  } else {
+    color_weight = color_weight - 1;
+    if (color_weight <= 1) {
+      color_weight = 1;
+      flip_color();
+      color_up = true;
+    }
+  }
 }
 
 void mode2process() {
-
+  PinSet red_set = get_pin(51);
+  PinSet green_set = get_pin(52);
+  PinSet blue_set = get_pin(53);
+  setAllColor(red_set.value, green_set.value, blue_set.value);
 }
 
 void mode1process() {
   if (timers.CheckTimer(0)) {
-    if (color_up) {
-      color_weight = color_weight + 1;
-      if (color_weight >= 255) {
-        color_weight = 255;
-        color_up = false;
-      }
-    } else {
-      color_weight = color_weight - 1;
-      if (color_weight <= 1) {
-        color_weight = 1;
-        flip_color();
-        color_up = true;
-      }
-    }
+    step_weight();
 
     if (flip == 1) {
-      setAllColor(color_weight, 0, 0);
+      color_r = color_weight;
+      color_g = 0;
+      color_b = 0;
+      setAllColor(color_r, color_g, color_b);
     } else {
+      color_r = 0;
+      color_g = color_weight;
+      color_b = 0;
       setAllColor(0, color_weight, 0);
     }
   }
