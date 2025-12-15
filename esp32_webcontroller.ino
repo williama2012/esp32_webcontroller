@@ -10,42 +10,27 @@ Timer timers;
 
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 
+uint8_t flip = 1;
+uint8_t color_weight = 1;
+bool color_up = true;
+uint32_t color = strip.Color(color_weight, 0, 0); // Start Red
+
+
 void SetupPins() {
   pinMode(23, OUTPUT);
 }
 
 void SetupTimers() {
-  timers.AddTimer(0, 3000);
+  timers.AddTimer(0, 1);
+  timers.AddTimer(1, 10000);
+
 
   strip.begin();           // Initialize NeoPixel object
   strip.setBrightness(128); // Set BRIGHTNESS (max = 255)
   strip.show();      
 }
 
-#pragma region servo
 
-// void MoveServo(int pin, int pos) {
-//   PrintCore("MoveServo");
-
-//   if (pin != servo_pin) {
-//     if (servo_pin != 0) {
-//       servo_ctrl.detach(servo_pin);
-//     }
-//     servo_ctrl.attach(pin);
-//     servo_pin = pin;
-//   }
-
-//   servo_ctrl.write(pos);
-// }
-
-// void ClearServo(int pin) {
-//   if (servo_pin == pin) {
-//     servo_ctrl.detach(servo_pin);
-//     servo_pin = 0;
-//   }
-// }
-
-#pragma endregion servo
 
 void Core0Processor(void *parameter) {
   PrintCore("Core0Processor");
@@ -55,7 +40,13 @@ void Core0Processor(void *parameter) {
   }
 }
 
-uint32_t flip = 1;
+void flip_color() {
+  if (flip == 1) {
+    flip = 2;
+  } else {
+    flip = 1;
+  }
+}
 
 void loop(void) {
 
@@ -64,38 +55,35 @@ void loop(void) {
     doBlink = false;
   }
 
+  // Pulse Color
   if (timers.CheckTimer(0)) {
-    //Blink();
-    //LcdUpdateRows();
+    if (color_up) {
+      color_weight = color_weight + 1;
+      if (color_weight >= 255) {
+        color_weight = 255;
+        color_up = false;
+      }
+    } else {
+      color_weight = color_weight - 1;
+      if (color_weight <= 1) {
+        color_weight = 1;
+        flip_color();
+        color_up = true;
+      }
+    }
+
+    if (flip == 1) {
+      setAllColor(color_weight, 0, 0);
+    } else {
+      setAllColor(0, color_weight, 0);
+    }
+
   }
 
-
-  if (flip == 1) {
-    Println("Red");
-    setAllColor(255, 0, 0);
-    flip = 2;
-  } else if (flip == 2) {
-    Println("Green");
-    setAllColor(0, 255, 0);
-    flip = 3;
-  } else if (flip == 3) {
-    Println("Blue");
-    setAllColor(0, 0, 255);
-    flip = 4;
-  } else if (flip == 4) {
-    Println("Rainbow");
-    rainbow(10);
-    flip = 5;
-  } else {
-    Println(flip);
-
-    setLEDMatrix(FullBlack);
-    delay(3000);
-
-    flip = 1;
+  if (timers.CheckTimer(1)) {
+    //flip_color();
   }
-  //rainbow(10);
-  //delayMicroseconds(1);
+
 }
 
 void setLEDMatrix(uint32_t pixels[]) {
@@ -110,16 +98,59 @@ void setLEDMatrix(uint32_t pixels[]) {
   strip.show();
 }
 
+void setAllColor(uint32_t color) {
+  for(int i = 0; i < LED_COUNT; i++) {
+    strip.setPixelColor(i, color);
+  }
+  strip.show();
+}
 
 void setAllColor(uint8_t red, uint8_t green, uint8_t blue) {
   for(int i = 0; i < LED_COUNT; i++) {
     strip.setPixelColor(i, red, green, blue);
+  }
+  strip.show();
+}
+
+void setAllColorSequence(uint8_t red, uint8_t green, uint8_t blue, uint32_t wait) {
+  for(int i = 0; i < LED_COUNT; i++) {
+    strip.setPixelColor(i, red, green, blue);
     strip.show();
-    delay(10);
-  }  
+    delay(wait);
+  }
+}
+
+void setPixel(uint8_t x, uint8_t y, uint32_t color) {
+
+
+
 }
 
 
+
+void snowflakes(uint8_t wait) {
+  // Setup the pixel array
+  int pixel[LED_COUNT];
+  for(int p = 0; p < LED_COUNT; p++){
+    pixel[p] = random(0, 255); 
+  }
+  
+  // Run some snowflake cycles
+  for (int j=0; j < 200; j++) {
+    // Every five cycles, light a new pixel
+    if((j%5)==0){
+      strip.setPixelColor(random(0,60), 255,255,255);
+    }
+    
+    // Dim all pixels by 10
+    for(int p=0; p < LED_COUNT; p++){
+      strip.setPixelColor(p, pixel[p],pixel[p],pixel[p] );
+      pixel[p] =  pixel[p] - 10;
+    }
+    strip.show();
+    delay(wait);
+  }
+}
 
 
 void rainbow(int wait) {
