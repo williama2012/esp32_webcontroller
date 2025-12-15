@@ -1,7 +1,6 @@
 #include "esp32_webcontroller.h"
 #include <Adafruit_NeoPixel.h>
 #include "WS2812_Definitions.h"
-#include "WS2812_Matrix.h"
 
 Timer timers;
 

@@ -39,55 +39,6 @@ String _lcd_row2_printed;
 String _lcd_row3_printed;
 String _lcd_row4_printed;
 
-enum PinModeEnum { 
-  AnalogWrite = 1, 
-  AnalogRead = 2, 
-  DigitalWrite = 3, 
-  DigitalRead = 4, 
-  Servo = 5, 
-  Tone = 6,
-  Pulse = 7,
-  Integer = 8
-};
-
-typedef struct {
-  uint8_t pin;
-  int value;
-  PinModeEnum mode;
-} PinSet;
-
-#define MAX_PIN 64
-
-PinSet PIN_SET[MAX_PIN];
-
-void set_pin(uint8_t pin, PinModeEnum mode, int value) {
-  if (pin > MAX_PIN) {
-    pin = MAX_PIN;
-  }
-  PIN_SET[pin].pin = pin;
-  PIN_SET[pin].mode = mode;
-  PIN_SET[pin].value = value;
-}
-
-PinSet get_pin(uint8_t pin) {
-  if (pin > MAX_PIN) {
-    pin = MAX_PIN;
-  }
-  return PIN_SET[pin];
-}
-
-String jsonField(String field, String value, bool addMore) {
-  return "\"" + field + "\":" + "\"" + value + "\"" + (addMore ? "," : "");
-}
-
-String makeStatusItem(int pin, String message, bool includeComma = true) {
-  String msg = "{" + jsonField("pin", String(pin), true) + jsonField("status", message, false) + "}";
-  if (includeComma) {
-    msg += ",";
-  }
-  return msg;
-}
-
 void OnApiCommand(String cmd);
 
 void ResetPins() {
@@ -115,20 +66,6 @@ int intArg(String name) {
 }
 
 #pragma endregion server
-
-#pragma region led
-
-void Led(bool on) {
-  digitalWrite(2, on);
-}
-
-void Blink() {
-  Led(true);
-  delay(50);
-  Led(false);
-}
-
-#pragma endregion led
 
 #pragma region lcd
 
