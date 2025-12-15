@@ -1,7 +1,6 @@
 #ifndef ESP32_CONTROLLER
 #define ESP32_CONTROLLER_H
 #include <Arduino.h>
-#include "esp32_timer.h"
 #include "secrets.h"
 //#include "Servo.h"
 #include "incbin.h"
@@ -11,6 +10,8 @@
 #include <WebServer.h>
 #include <ESPmDNS.h>
 #include <LiquidCrystal_I2C.h>
+#include "esp32_timer.h"
+#include "esp32_helpers.h"
 
 #define SERIAL_BAUDRATE 115200
 
@@ -23,9 +24,20 @@ INCTXT(WebPage, "index.html");
 INCTXT(WebJavascript, "index.js");
 INCTXT(WebStylesheet, "index.css");
 
+String api_cmd = "";
 String url;
 bool doBlink = false;
 int servo_pin = 0;
+
+String lcd_row1;
+String lcd_row2;
+String lcd_row3;
+String lcd_row4;
+
+String _lcd_row1_printed;
+String _lcd_row2_printed;
+String _lcd_row3_printed;
+String _lcd_row4_printed;
 
 enum PinModeEnum { 
   AnalogWrite = 1, 
@@ -44,11 +56,13 @@ typedef struct {
   PinModeEnum mode;
 } PinSet;
 
-PinSet PIN_SET[64];
+#define MAX_PIN 64
+
+PinSet PIN_SET[MAX_PIN];
 
 void set_pin(uint8_t pin, PinModeEnum mode, int value) {
-  if (pin > 64) {
-    pin = 64;
+  if (pin > MAX_PIN) {
+    pin = MAX_PIN;
   }
   PIN_SET[pin].pin = pin;
   PIN_SET[pin].mode = mode;
@@ -56,8 +70,8 @@ void set_pin(uint8_t pin, PinModeEnum mode, int value) {
 }
 
 PinSet get_pin(uint8_t pin) {
-  if (pin > 64) {
-    pin = 64;
+  if (pin > MAX_PIN) {
+    pin = MAX_PIN;
   }
   return PIN_SET[pin];
 }
@@ -74,69 +88,23 @@ String makeStatusItem(int pin, String message, bool includeComma = true) {
   return msg;
 }
 
-#pragma region Printing
+void OnApiCommand(String cmd);
 
-void Print(String msg) {
-  if (Serial) {
-    Serial.print(msg);
+void ResetPins() {
+  api_cmd = "";
+  servo_pin = 0;
+  for (int i = 2; i <= 24; i++) {
+    //servo_ctrl.detach(i);
+    pinMode(i, OUTPUT);
+    analogWrite(i, 0);
+    pinMode(i, INPUT);
+    int val = analogRead(i);
+    set_pin(i, AnalogRead, val);
+    Println("reset pin - " + String(i));
   }
+  lcd_row2 = "All reset";
+  lcd_row3 = "";
 }
-
-void Print(const char *msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
-}
-
-void Print(char *msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
-}
-
-void Print(uint32_t msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
-}
-
-void Println(String msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
-}
-
-void Println(const char *msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
-}
-
-void Println(char *msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
-}
-
-void Println(uint32_t msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
-}
-
-void PrintCore(char *msg) {
-  Print("--- " + String(msg) + " running on core ");
-  Print(xPortGetCoreID());
-  Println(" ---");
-}
-
-void PrintCore(String msg) {
-  Print("--- " + String(msg) + " running on core ");
-  Print(xPortGetCoreID());
-  Println(" ---");
-}
-
-#pragma endregion Printing
 
 #pragma region server
 
@@ -163,16 +131,6 @@ void Blink() {
 #pragma endregion led
 
 #pragma region lcd
-
-String lcd_row1;
-String lcd_row2;
-String lcd_row3;
-String lcd_row4;
-
-String _lcd_row1_printed;
-String _lcd_row2_printed;
-String _lcd_row3_printed;
-String _lcd_row4_printed;
 
 void LcdUpdateRows() {
 
@@ -341,7 +299,6 @@ void handleIntegerPost() {
   lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
-
 
 void handleAnalogWritePost() {
   PrintCore("handleAnalogWritePost");
@@ -574,31 +531,38 @@ void handleSweepPost() {
   server.send(200, "application/json", response);
 }
 
-String api_cmd = "";
-
 void handleApiPost() {
   PrintCore("handleApiPost");
   api_cmd = server.arg("cmd");
   api_cmd.toLowerCase();
-
-  if (api_cmd == "reset") {
-    for (int i = 2; i <= 24; i++) {
-      //servo_ctrl.detach(i);
-      pinMode(i, OUTPUT);
-      analogWrite(i, 0);
-      pinMode(i, INPUT);
-      int val = analogRead(i);
-      set_pin(i, AnalogRead, val);
-      Println("reset pin - " + String(i));
-    }
-    lcd_row2 = "All reset";
-    lcd_row3 = "";
-  }
-
-  servo_pin = 0;
-
+  
   doBlink = true;
-  server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
+  
+  if (api_cmd == "reset") {
+    ResetPins();
+    server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
+  } else if (api_cmd == "color") {
+    handleIntegerPost();
+  } else if (api_cmd == "integer") {
+    handleIntegerPost();
+  } else if (api_cmd == "analogout") {
+    handleAnalogWritePost();
+  } else if (api_cmd == "digitalout") {
+    handleDigitalWritePost();
+  } else if (api_cmd == "servo") {
+    handleServoWritePost();
+  } else if (api_cmd == "analogin") {
+    handleAnalogReadPost();
+  } else if (api_cmd == "tone") {
+    handleToneWritePost();
+  } else if (api_cmd == "pulse") {
+    handlePulsePost();
+  } else if (api_cmd == "sweep") {
+    handleSweepPost();
+  } else {
+    OnApiCommand(api_cmd);
+    server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
+  }
 }
 
 #pragma endregion Post_Handlers

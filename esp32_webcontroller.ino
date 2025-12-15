@@ -56,7 +56,9 @@ void loop(void) {
     Blink();
     doBlink = false;
   }
-  
+
+  CheckApiCommand();
+
   PinSet mode = get_pin(50);
 
   bool mode_changed = mode.value != prev_mode.value;
@@ -129,6 +131,17 @@ void mode1process() {
       color_b = 0;
       setAllColor(0, color_weight, 0);
     }
+  }
+}
+
+void OnApiCommand(String cmd) {
+  PrintCore("OnApiCommand: " + cmd);
+}
+
+void CheckApiCommand() {
+  if (api_cmd != "") {
+    PrintCore("CheckApiCommand: " + api_cmd);
+    api_cmd = "";
   }
 }
 
