@@ -574,12 +574,14 @@ void handleSweepPost() {
   server.send(200, "application/json", response);
 }
 
+String api_cmd = "";
+
 void handleApiPost() {
   PrintCore("handleApiPost");
-  String cmd = server.arg("cmd");
-  cmd.toLowerCase();
+  api_cmd = server.arg("cmd");
+  api_cmd.toLowerCase();
 
-  if (cmd == "reset") {
+  if (api_cmd == "reset") {
     for (int i = 2; i <= 24; i++) {
       //servo_ctrl.detach(i);
       pinMode(i, OUTPUT);

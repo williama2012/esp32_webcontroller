@@ -59,9 +59,9 @@ void loop(void) {
   
   PinSet mode = get_pin(50);
 
-  bool changed = mode.value != prev_mode.value;
+  bool mode_changed = mode.value != prev_mode.value;
 
-  if (changed) {
+  if (mode_changed) {
     PrintCore("Mode Changed: " + String(mode.value));
   }
 
@@ -99,11 +99,19 @@ void step_weight() {
   }
 }
 
+PinSet prev_brightness;
+
 void mode2process() {
+  PinSet brightness = get_pin(54);
+  if (brightness.value != prev_brightness.value) {
+    strip.setBrightness(brightness.value);
+  }
+
   PinSet red_set = get_pin(51);
   PinSet green_set = get_pin(52);
   PinSet blue_set = get_pin(53);
   setAllColor(red_set.value, green_set.value, blue_set.value);
+  prev_brightness = brightness;
 }
 
 void mode1process() {
