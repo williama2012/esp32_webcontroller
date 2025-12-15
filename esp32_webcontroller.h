@@ -21,6 +21,7 @@ WebServer server(80);
 LiquidCrystal_I2C lcd(0x27, 20, 2);
 
 INCTXT(WebPage, "index.html");
+INCTXT(TerminalWebPage, "terminal.html");
 INCTXT(WebJavascript, "index.js");
 INCTXT(WebStylesheet, "index.css");
 
@@ -140,6 +141,11 @@ void LcdUpdateRows() {
 void handleGetIndex() {
   PrintCore("handleGetIndex");
   server.send(200, "text/html", gWebPageData);
+}
+
+void handleGetTerminal() {
+  PrintCore("handleGetTerminal");
+  server.send(200, "text/html", gTerminalWebPageData);
 }
 
 void handleGetJavascript() {
@@ -515,6 +521,7 @@ void SetupServer() {
   server.enableCrossOrigin(true);
 
   server.on("/", HTTP_GET, handleGetIndex);
+  server.on("/terminal", HTTP_GET, handleGetTerminal);
   server.on("/index.js", HTTP_GET, handleGetJavascript);
   server.on("/index.css", HTTP_GET, handleGetStylesheet);
 
