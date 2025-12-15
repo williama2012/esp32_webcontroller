@@ -15,7 +15,7 @@
 }
 
 body {
-    margin: 10px 25px 10px 25px;
+    margin: 5px 25px 10px 25px;
     display: flex;
     flex-direction: column;
 }
@@ -34,7 +34,7 @@ body {
     width: 100%;
     display: flex;
     flex-direction: column;
-    height: 15vh;
+    height: 10vh;
     margin-bottom: 2em;
 
 }
@@ -82,11 +82,11 @@ body {
     background: none;
     margin-right: 15px;
     color: red;
-    height: 10vh;
+    height: 5vh;
 }
 
 .slider-controls-stop-icon {
-    font-size: 4em;
+    font-size: 2em;
 }
 
 .slider-controls-remove {
@@ -102,7 +102,7 @@ body {
     -webkit-appearance: none;
     appearance: none;
     width: 100%;
-    height: 10vh;
+    height: 5vh;
     background: #d3d3d3;
     outline: none;
     opacity: 0.7;
@@ -119,14 +119,14 @@ body {
     -webkit-appearance: none;
     appearance: none;
     width: 25px;
-    height: 10vh;
+    height: 5vh;
     background: #04AA6D;
     cursor: pointer;
 }
 
 .slider-range::-moz-range-thumb {
     width: 25px;
-    height: 10vh;
+    height: 5vh;
     background: #04AA6D;
     cursor: pointer;
 }
@@ -139,19 +139,24 @@ body {
 .toolbar {
     display: flex;
     flex-direction: row;
-    height: 10vh;
+    align-items: flex-start;
+    
+    height: 20vh;
     margin-bottom: 1em;
 }
 
 .toolbar-one {
     display: inline;
     width: 50vw;
-    overflow-y: scroll;
+    margin-right: 0.5em;
+
+    /* overflow-y: scroll; */
 }
 
 .toolbar-three {
     display: flex;
     flex-direction: column;
+    
 }
 
 .topbarRightBtns {
@@ -242,8 +247,19 @@ input {
 
 /* #endregion Inputs */
 
+.activity-container {
+    height: 10vh;
+    max-height: 10vh;
+    overflow-y: scroll;
+
+}
+
 .activity-table {
     width: 100%;
+    height: 10vh;
+    max-height: 10vh;
+    font-size:small;
+
 }
 
 .activity-table>tr td:nth-child(1) {
@@ -266,10 +282,19 @@ input {
     padding: 0 0.5em 0 0.5em;
 }
 
-.activity-container {
-    max-height: 5em;
+
+.terminal-input {
+    margin: 0;
+    padding: 0;
+}
+
+.terminal-container {
+    padding-top: 0.5em;
 
 }
+
+
+/* #region OTHER */
 
 .act-icon {
     margin: 0;
@@ -293,7 +318,7 @@ input {
 .statusbar {
     display: flex;
     flex-direction: row;
-    /* height: 10vh; */
+     height: 5vh; 
 }
 
 .flex {
@@ -348,3 +373,5 @@ input {
     justify-content: space-between;
 
 }
+
+/* #endregion OTHER */

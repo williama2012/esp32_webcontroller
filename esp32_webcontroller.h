@@ -498,7 +498,7 @@ void handleApiPost() {
     handleSweepPost();
   } else {
     OnApiCommand(api_cmd);
-    server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
+    server.send(200, "application/json", "{" + jsonField("received", api_cmd, false) + "}");
   }
 }
 
@@ -511,6 +511,8 @@ void SetupServer() {
   if (MDNS.begin("esp32")) {
     Println("MDNS responder started");
   }
+  server.enableCORS(true);
+  server.enableCrossOrigin(true);
 
   server.on("/", HTTP_GET, handleGetIndex);
   server.on("/index.js", HTTP_GET, handleGetJavascript);

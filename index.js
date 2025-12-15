@@ -3,6 +3,8 @@ const MAX_TONE = 40000; //4294967295;
 const MAX_SERVO = 180;
 const MAX_COLOR = 255;
 
+const BASE_URL = "http://192.168.0.137";
+
 const css_normal = "btn btn-light";
 const css_busy = "btn btn-info";
 const css_warning = "btn btn-warning";
@@ -36,23 +38,6 @@ function addData(data) {
 }
 
 $(function () {
-    // const configModal = document.getElementById('configModal');
-    // if (configModal) {
-    //     configModal.addEventListener('show.bs.modal', event => {
-    //         // Button that triggered the modal
-    //         const button = event.relatedTarget
-    //         // Extract info from data-bs-* attributes
-    //         const recipient = button.getAttribute('data-bs-whatever')
-    //         // If necessary, you could initiate an Ajax request here
-    //         // and then do the updating in a callback.
-    //         // Update the modal's content.
-    //         const modalTitle = configModal.querySelector('.modal-title')
-    //         const modalBodyInput = configModal.querySelector('.modal-body input')
-    //         modalTitle.textContent = `New message to ${recipient}`
-    //         modalBodyInput.value = recipient
-    //     })
-    // }
-
     const sweepModal = document.getElementById('sweepModal');
     if (sweepModal) {
         sweepModal.addEventListener('show.bs.modal', event => {
@@ -66,6 +51,18 @@ $(function () {
         $(".sweep-submit-btn").on("click", handleSweepSubmit);
     }
 
+    // const terminalModal = document.getElementById('terminalModal');
+    // if (terminalModal) {
+    //     terminalModal.addEventListener('show.bs.modal', event => {
+    //         console.log(event);
+    //     });
+
+    //     $(".terminal-submit-btn").on("click", handleTerminalSubmit);
+    //     $("#terminal-input").on("keypress", handleTerminalKeypress);
+    // }
+
+
+
     var cached_pins = localStorage.getItem("pinSettings");
     if (cached_pins != null && cached_pins !== "") {
         pinSettings = JSON.parse(cached_pins);
@@ -77,9 +74,12 @@ $(function () {
     activity = $("#activity");
 
     document
-        .getElementById("commandBtn")
+        .getElementById("terminalBtn")
         .addEventListener("click", Command_Click);
-
+    
+    document
+        .getElementById("terminal-input")
+        .addEventListener("keypress", handleTerminalKeypress);
 
     document
         .getElementById("refreshBtn")
@@ -103,6 +103,14 @@ $(function () {
 
     RebuildPins();
 });
+
+function handleTerminalKeypress(evt) {
+    if (evt.charCode == 13) {
+        PostApiCommand($("#terminal-input").val(), function(response) {
+            $("#terminal-input").val("");
+        });
+    }
+}
 
 function handleSweepSubmit(evt) {
     var settings = {
@@ -158,7 +166,9 @@ function Command_Click(evt) {
     if (!command || command == null || command == "") {
         return;
     }
-    PostApiCommand(command);
+    PostApiCommand(command, function(response) {
+        console.log('response', response);
+    });
 }
 
 function AddNewSlider_Click(evt) {
@@ -291,7 +301,7 @@ function activity_click(evt) {
 
 function PostSweep(data) {
     updatePending = true;
-    var url = "/sweep";
+    var url = BASE_URL + "/sweep";
 
     OutActivity({ url, ...data }, true);
 
@@ -318,8 +328,8 @@ function PostSweep(data) {
     });
 }
 
-function PostApiCommand(command) {
-    var url = "/api";
+function PostApiCommand(command, onComplete) {
+    var url = BASE_URL + "/api";
 
     var data = { cmd: command };
 
@@ -327,34 +337,25 @@ function PostApiCommand(command) {
 
     $.post(url, data, function (response) {
         InActivity(response);
-        RebuildPins();
+        if (typeof(onComplete) == 'function') {
+            onComplete(response);
+        }
     }).fail(function (jqxhr, textStatus, errorThrown) {
         errActivity(jqxhr.statusCode());
-    }).always(function () {
-        //
-    });
+    }).always(function() {});
 }
 
 function PostHardResetAllPins(evt) {
-    PostApiCommand("reset");
-
-    // var url = "/api";
-    // var data = { cmd: "reset" };
-    // OutActivity({ url, ...data }, true);
-    // $.post(url, data, function (response) {
-    //     InActivity(response);
-    //     RebuildPins();
-    // }).fail(function (jqxhr, textStatus, errorThrown) {
-    //     errActivity(jqxhr.statusCode());
-    // }).always(function () {
-    // });
+    PostApiCommand("reset", function() {
+        RebuildPins();
+    });
 }
 
 var updatePending = false;
 function PostPinValue(mode, pin, value, valueSpan) {
     updatePending = true;
 
-    var url = `/${mode}`;
+    var url = BASE_URL + `/${mode}`;
     var data = { pin: pin, value: value };
 
     OutActivity({ url, ...data }, true);
@@ -385,7 +386,7 @@ function PostPinValue(mode, pin, value, valueSpan) {
 function PostPulsePin(pin, value, time, valueSpan) {
     updatePending = true;
 
-    var url = `/pulse`;
+    var url = BASE_URL + `/pulse`;
     var data = { pin, value, time };
 
     OutActivity({ url, ...data }, true);
@@ -417,7 +418,7 @@ function PostPulsePin(pin, value, time, valueSpan) {
 }
 
 function RefreshPinValues() {
-    var url = `/analogin`;
+    var url = BASE_URL + `/analogin`;
     var pins = _.map(pinSettings, (i) => {
         return i;
     })

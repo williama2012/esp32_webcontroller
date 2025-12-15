@@ -26,24 +26,29 @@
 </head>
 
 <body>
-  <div class="statusbar">
-
-  </div>
 
   <div class="toolbar flex">
+
     <div class="toolbar-one flex-grow">
       <div class="activity-container">
-        <table id="activity" class="activity-table"></table>
+        <div>
+          <table id="activity" class="activity-table"></table>
+        </div>
+      </div>
+      <div class="terminal-container">
+        <input type="text" class="form-control terminal-input" id="terminal-input" />
       </div>
     </div>
+    
     <div class="toolbar-three">
       <div class="btn-group" role="group" aria-label="Basic example">
         <button id="addSliderBtn" class="btn btn-outline-primary"
           title="Add pin to list. Ctrl click adds the next number in order.">
           <i class="bi bi-node-plus"></i>
         </button>
-        <button id="commandBtn" class="btn btn-outline-primary"
-          title="Post Command to API">
+
+        <button id="terminalBtn" class="btn btn-outline-primary"
+          title="API Terminal">
           <i class="bi bi-terminal"></i>
         </button>
 
@@ -67,7 +72,9 @@
       </div>
     </div>
   </div>
+
   <div class="slider-set"></div>
+
   <div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="configModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -168,6 +175,7 @@
       </div>
     </div>
   </div>
+
 </body>
 
 </html>

@@ -110,7 +110,16 @@ void ProcessCommand(String cmd) {
 
     if (pixel_str != "") {
       int pixel = pixel_str.toInt();
-      set_pixel(pixel, WHITE);
+
+      String color_str = str_split(cmd, 2);
+
+      if (color_str != "") {
+        int color = color_str.toInt();
+        set_pixel(pixel, color);
+      } else {
+        set_pixel(pixel, WHITE);
+      }
+
     }
   }
 }
