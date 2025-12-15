@@ -77,6 +77,11 @@ $(function () {
     activity = $("#activity");
 
     document
+        .getElementById("commandBtn")
+        .addEventListener("click", Command_Click);
+
+
+    document
         .getElementById("refreshBtn")
         .addEventListener("click", GetPinValues_click);
 
@@ -146,6 +151,14 @@ function RebuildPins() {
     pinSettings.forEach((value) => {
         AddSliderContainer(value.pin, value)
     });
+}
+
+function Command_Click(evt) {
+    var command = prompt("Enter Command", ``);
+    if (!command || command == null || command == "") {
+        return;
+    }
+    PostApiCommand(command);
 }
 
 function AddNewSlider_Click(evt) {
@@ -305,11 +318,10 @@ function PostSweep(data) {
     });
 }
 
-
-function PostHardResetAllPins(evt) {
+function PostApiCommand(command) {
     var url = "/api";
 
-    var data = { cmd: "reset" };
+    var data = { cmd: command };
 
     OutActivity({ url, ...data }, true);
 
@@ -319,7 +331,23 @@ function PostHardResetAllPins(evt) {
     }).fail(function (jqxhr, textStatus, errorThrown) {
         errActivity(jqxhr.statusCode());
     }).always(function () {
+        //
     });
+}
+
+function PostHardResetAllPins(evt) {
+    PostApiCommand("reset");
+
+    // var url = "/api";
+    // var data = { cmd: "reset" };
+    // OutActivity({ url, ...data }, true);
+    // $.post(url, data, function (response) {
+    //     InActivity(response);
+    //     RebuildPins();
+    // }).fail(function (jqxhr, textStatus, errorThrown) {
+    //     errActivity(jqxhr.statusCode());
+    // }).always(function () {
+    // });
 }
 
 var updatePending = false;
