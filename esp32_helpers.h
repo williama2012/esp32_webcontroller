@@ -5,6 +5,11 @@
 #define BLINK_DELAY 50
 #define MAX_PIN 64
 
+typedef struct {
+  char *name;
+  char *value;
+} Aarg;
+
 enum PinModeEnum { 
   AnalogWrite = 1, 
   AnalogRead = 2, 
@@ -22,6 +27,29 @@ typedef struct {
   PinModeEnum mode;
 } PinSet;
 
+String str_split(String str, uint8_t position) {
+  String strs[32];
+  int StringCount = 0;
+
+  // Split the string into substrings
+  while (str.length() > 0) {
+    int index = str.indexOf(' ');
+    if (index == -1) { // No space found, last part
+      strs[StringCount++] = str;
+      break;
+    } else {
+      strs[StringCount++] = str.substring(0, index);
+      str = str.substring(index + 1);
+    }
+  }
+
+  if(position > StringCount) {
+    return "";
+  }
+  
+  return strs[position];
+}
+
 #pragma region Pins
 
 PinSet PIN_SET[MAX_PIN];
@@ -33,6 +61,11 @@ void set_pin(uint8_t pin, PinModeEnum mode, int value) {
   PIN_SET[pin].pin = pin;
   PIN_SET[pin].mode = mode;
   PIN_SET[pin].value = value;
+
+  // Aarg args;
+  // args.name = "";
+  // args.value = "";
+  // PIN_SET[pin].args = args;
 }
 
 PinSet get_pin(uint8_t pin) {
@@ -137,5 +170,8 @@ void PrintCore(String msg) {
 }
 
 #pragma endregion Printing
+
+
+
 
 #endif
