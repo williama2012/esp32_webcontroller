@@ -13,8 +13,8 @@ Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
 uint8_t flip = 1;
 uint8_t color_weight = 1;
 bool color_up = true;
-uint32_t color = strip.Color(color_weight, 0, 0); // Start Red
 
+uint8_t mode = 1;
 
 void SetupPins() {
   pinMode(23, OUTPUT);
@@ -24,12 +24,16 @@ void SetupTimers() {
   timers.AddTimer(0, 1);
   timers.AddTimer(1, 10000);
 
-
-  strip.begin();           // Initialize NeoPixel object
-  strip.setBrightness(128); // Set BRIGHTNESS (max = 255)
+  strip.begin();
+  set_brightness(100);
   strip.show();      
+
 }
 
+void set_brightness(uint8_t percent) {
+  uint8_t val = map(percent, 0, 100, 0, 255);
+  strip.setBrightness(val);
+}
 
 
 void Core0Processor(void *parameter) {
@@ -54,8 +58,20 @@ void loop(void) {
     Blink();
     doBlink = false;
   }
+  
+  if (mode == 1) {
+    mode1process();
+  } else if (mode == 2) {
+    mode2process();
+  }
 
-  // Pulse Color
+}
+
+void mode2process() {
+
+}
+
+void mode1process() {
   if (timers.CheckTimer(0)) {
     if (color_up) {
       color_weight = color_weight + 1;
@@ -77,13 +93,7 @@ void loop(void) {
     } else {
       setAllColor(0, color_weight, 0);
     }
-
   }
-
-  if (timers.CheckTimer(1)) {
-    //flip_color();
-  }
-
 }
 
 void setLEDMatrix(uint32_t pixels[]) {

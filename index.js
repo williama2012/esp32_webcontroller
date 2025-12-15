@@ -23,8 +23,9 @@ const DigitalWrite = "digitalout";
 const DigitalRead = "digitalin";
 const Servo = "servo";
 const Tone = "tone";
+const Integer = "integer";
 
-const PinMode = { AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone };
+const PinMode = { AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone, Integer };
 
 function addData(data) {
     var time = new Date();
@@ -595,6 +596,7 @@ function CreateSliderContainer(pin) {
                     <option value="digitalout">Digital Write</option>
                     <option value="servo">Servo</option>
                     <option value="tone">Tone</option>
+                    <option value="integer">Integer</option>
                 </select>
             </span>
             <span>

@@ -27,19 +27,40 @@ String url;
 bool doBlink = false;
 int servo_pin = 0;
 
-//enum PinModeEnum {AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone};
+enum PinModeEnum { 
+  AnalogWrite = 1, 
+  AnalogRead = 2, 
+  DigitalWrite = 3, 
+  DigitalRead = 4, 
+  Servo = 5, 
+  Tone = 6,
+  Pulse = 7,
+  Integer = 8
+};
 
 typedef struct {
-  int pin;
-  int pos;
-  bool isNew;
-} servoPosDef;
-
-typedef struct {
-  int pin;
+  uint8_t pin;
   int value;
-  int mode; // TODO - AnalogWrite, AnalogRead, DigitalWrite, DigitalRead, Servo, Tone
-} PinMode;
+  PinModeEnum mode;
+} PinSet;
+
+PinSet PIN_SET[64];
+
+void set_pin(uint8_t pin, PinModeEnum mode, int value) {
+  if (pin > 64) {
+    pin = 64;
+  }
+  PIN_SET[pin].pin = pin;
+  PIN_SET[pin].mode = mode;
+  PIN_SET[pin].value = value;
+}
+
+PinSet get_pin(uint8_t pin) {
+  if (pin > 64) {
+    pin = 64;
+  }
+  return PIN_SET[pin];
+}
 
 String jsonField(String field, String value, bool addMore) {
   return "\"" + field + "\":" + "\"" + value + "\"" + (addMore ? "," : "");
@@ -266,6 +287,7 @@ void handlePulsePost() {
   timeStr = server.arg("time");
   int time = timeStr.toInt();
 
+  set_pin(pin, Pulse, value);
   //ClearServo(pin);
 
   pinMode(pin, OUTPUT);
@@ -287,6 +309,34 @@ void handlePulsePost() {
   server.send(200, "application/json", response);
 }
 
+void handleIntegerPost() {
+  PrintCore("handleIntegerPost");
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int pin = pinStr.toInt();
+  int value = valueStr.toInt();
+
+  //ClearServo(pin);
+  set_pin(pin, Integer, value);
+
+  //pinMode(pin, OUTPUT);
+  //analogWrite(pin, value);
+
+  String response = "{";
+  response += jsonField("pin", String(pin), true);
+  response += jsonField("value", String(value), false);
+
+  response += "}";
+  doBlink = true;
+
+  lcd_row2 = "IntegerWrite";
+  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
+  server.send(200, "application/json", response);
+}
+
+
 void handleAnalogWritePost() {
   PrintCore("handleAnalogWritePost");
   String pinStr = "";
@@ -297,6 +347,7 @@ void handleAnalogWritePost() {
   int value = valueStr.toInt();
 
   //ClearServo(pin);
+  set_pin(pin, AnalogWrite, value);
 
   pinMode(pin, OUTPUT);
   analogWrite(pin, value);
@@ -323,6 +374,7 @@ void handleDigitalWritePost() {
   int value = valueStr.toInt();
 
   //ClearServo(pin);
+  set_pin(pin, DigitalWrite, value);
 
   pinMode(pin, OUTPUT);
   digitalWrite(pin, value);
@@ -339,7 +391,6 @@ void handleDigitalWritePost() {
   server.send(200, "application/json", response);
 }
 
-
 void handleServoWritePost() {
   PrintCore("handleServoWritePost");
   String pinStr = "";
@@ -351,6 +402,8 @@ void handleServoWritePost() {
 
   int pos = value;
   //int pos = map(value, 0, 4095, 0, 180);
+
+  set_pin(pin, Servo, value);
 
   //MoveServo(pin, pos);
   // servoPos.pin = pin;
@@ -397,6 +450,8 @@ void handleAnalogReadPost() {
       //ClearServo(pin);
       pinMode(pin, INPUT);
       int value = analogRead(pin);
+      set_pin(pin, AnalogRead, value);
+
       response += "{"
                   + jsonField("pin", String(pin), true)
                   + jsonField("value", String(value), false)
@@ -421,6 +476,8 @@ void handleToneWritePost() {
 
   String valueStr = server.arg("value");
   unsigned int value = atol(valueStr.c_str());
+
+  set_pin(pin, Tone, value);
 
   pinMode(pin, OUTPUT);
 
@@ -452,6 +509,9 @@ void handleSweepPost() {
 
   pinMode(pwmPin, OUTPUT);
   analogWrite(pwmPin, 0);
+
+  set_pin(servoPin, Servo, count);
+  set_pin(pwmPin, AnalogWrite, value);
 
   if (servoPin != servo_pin) {
     if (servo_pin != 0) {
@@ -519,7 +579,8 @@ void handleApiPost() {
       pinMode(i, OUTPUT);
       analogWrite(i, 0);
       pinMode(i, INPUT);
-      analogRead(i);
+      int val = analogRead(i);
+      set_pin(i, AnalogRead, val);
       Println("reset pin - " + String(i));
     }
     lcd_row2 = "All reset";
@@ -546,6 +607,7 @@ void SetupServer() {
   server.on("/index.js", HTTP_GET, handleGetJavascript);
   server.on("/index.css", HTTP_GET, handleGetStylesheet);
 
+  server.on("/integer", HTTP_POST, handleIntegerPost);
   server.on("/analogout", HTTP_POST, handleAnalogWritePost);
   server.on("/digitalout", HTTP_POST, handleDigitalWritePost);
   server.on("/servo", HTTP_POST, handleServoWritePost);
