@@ -15,6 +15,8 @@ var pinSettings = [
 ];
 
 var activity;
+var terminal;
+
 var mode;
 var stepsize = 1;
 
@@ -38,69 +40,80 @@ function addData(data) {
 }
 
 $(function () {
-    const sweepModal = document.getElementById('sweepModal');
-    if (sweepModal) {
-        sweepModal.addEventListener('show.bs.modal', event => {
-            console.log(event);
-            var sweepSettings = localStorage.getItem("sweepSettings")
-            if (sweepSettings) {
-                updateSweepModal(JSON.parse(sweepSettings));
-            }
-        });
+    
+    terminal = document.getElementById("terminal-history");
 
-        $(".sweep-submit-btn").on("click", handleSweepSubmit);
+    if (terminal) {
+        terminal = $(terminal);
+        document
+            .getElementById("terminal-input")
+            .addEventListener("keypress", handleTerminalKeypress);
     }
 
-    // const terminalModal = document.getElementById('terminalModal');
-    // if (terminalModal) {
-    //     terminalModal.addEventListener('show.bs.modal', event => {
-    //         console.log(event);
-    //     });
+    activity = document.getElementById("activity");
 
-    //     $(".terminal-submit-btn").on("click", handleTerminalSubmit);
-    //     $("#terminal-input").on("keypress", handleTerminalKeypress);
-    // }
+    if (activity) {
+        activity = $(activity);
 
+        const sweepModal = document.getElementById('sweepModal');
+        if (sweepModal) {
+            sweepModal.addEventListener('show.bs.modal', event => {
+                console.log(event);
+                var sweepSettings = localStorage.getItem("sweepSettings")
+                if (sweepSettings) {
+                    updateSweepModal(JSON.parse(sweepSettings));
+                }
+            });
 
+            $(".sweep-submit-btn").on("click", handleSweepSubmit);
+        }
 
-    var cached_pins = localStorage.getItem("pinSettings");
-    if (cached_pins != null && cached_pins !== "") {
-        pinSettings = JSON.parse(cached_pins);
+        var cached_pins = localStorage.getItem("pinSettings");
+        if (cached_pins != null && cached_pins !== "") {
+            pinSettings = JSON.parse(cached_pins);
+        }
+
+        stepsize = localStorage.getItem("stepsize") || "1";
+        $("#stepsize").val(stepsize).change();
+
+        document
+            .getElementById("command-input")
+            .addEventListener("keypress", handleCommandKeypress);
+
+        document
+            .getElementById("refreshBtn")
+            .addEventListener("click", GetPinValues_click);
+
+        document
+            .getElementById("addSliderBtn")
+            .addEventListener("click", AddNewSlider_Click);
+
+        document
+            .getElementById("stepsize")
+            .addEventListener("change", stepSize_changed);
+
+        document
+            .getElementById("activity")
+            .addEventListener("click", activity_click);
+
+        document
+            .getElementById("resetBtn")
+            .addEventListener("click", PostHardResetAllPins);
+
+        RebuildPins();
+
     }
-
-    stepsize = localStorage.getItem("stepsize") || "1";
-    $("#stepsize").val(stepsize).change();
-
-    activity = $("#activity");
-
-    document
-        .getElementById("command-input")
-        .addEventListener("keypress", handleTerminalKeypress);
-
-    document
-        .getElementById("refreshBtn")
-        .addEventListener("click", GetPinValues_click);
-
-    document
-        .getElementById("addSliderBtn")
-        .addEventListener("click", AddNewSlider_Click);
-
-    document
-        .getElementById("stepsize")
-        .addEventListener("change", stepSize_changed);
-
-    document
-        .getElementById("activity")
-        .addEventListener("click", activity_click);
-
-    document
-        .getElementById("resetBtn")
-        .addEventListener("click", PostHardResetAllPins);
-
-    RebuildPins();
 });
 
 function handleTerminalKeypress(evt) {
+    if (evt.charCode == 13) {
+        PostApiCommand($("#terminal-input").val(), function(response) {
+            $("#terminal-input").val("");
+        });
+    }
+}
+
+function handleCommandKeypress(evt) {
     if (evt.charCode == 13) {
         PostApiCommand($("#command-input").val(), function(response) {
             $("#command-input").val("");
@@ -274,7 +287,14 @@ function AddActivity(message, direction) {
         <td>${message}</td>
     </tr>`;
 
-    activity.prepend($(item));
+    if (activity) {
+        activity.prepend($(item));
+    }
+    
+    if (terminal) {
+        terminal.append($(item));
+    }
+    
 }
 
 function stepSize_changed(evt) {
