@@ -74,11 +74,7 @@ $(function () {
     activity = $("#activity");
 
     document
-        .getElementById("terminalBtn")
-        .addEventListener("click", Command_Click);
-    
-    document
-        .getElementById("terminal-input")
+        .getElementById("command-input")
         .addEventListener("keypress", handleTerminalKeypress);
 
     document
@@ -106,8 +102,8 @@ $(function () {
 
 function handleTerminalKeypress(evt) {
     if (evt.charCode == 13) {
-        PostApiCommand($("#terminal-input").val(), function(response) {
-            $("#terminal-input").val("");
+        PostApiCommand($("#command-input").val(), function(response) {
+            $("#command-input").val("");
         });
     }
 }
