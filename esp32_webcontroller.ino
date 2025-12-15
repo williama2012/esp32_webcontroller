@@ -1,4 +1,17 @@
 #include "esp32_webcontroller.h"
+Timer timers;
+
+void SetupPins() {
+  Println("SetupPins");
+  pinMode(2, OUTPUT);
+}
+
+void SetupTimers() {
+  Println("SetupTimers");
+
+  timers.AddTimer(0, 3000);
+  //Blue(true);
+}
 
 #pragma region servo
 
@@ -38,11 +51,12 @@ void Core0Processor(void *parameter) {
 void loop(void) {
 
   if (doBlink) {
-    Blink();
+    //Blink();
     doBlink = false;
   }
 
-  if (CheckTimer(0)) {
+  if (timers.CheckTimer(0)) {
+    Blink();
     //LcdUpdateRows();
   }
 

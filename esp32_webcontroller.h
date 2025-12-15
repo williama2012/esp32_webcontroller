@@ -123,14 +123,14 @@ int intArg(String name) {
 
 #pragma region led
 
-void Blue(bool on) {
-  digitalWrite(2, !on);
+void Led(bool on) {
+  digitalWrite(2, on);
 }
 
 void Blink() {
-  Blue(true);
-  delay(25);
-  Blue(false);
+  Led(true);
+  delay(50);
+  Led(false);
 }
 
 #pragma endregion led
@@ -509,7 +509,6 @@ void handleApiPost() {
 
 #pragma endregion Post_Handlers
 
-
 #pragma region Setup
 
 void SetupServer() {
@@ -544,9 +543,7 @@ void SetupLCD() {
   // lcd.clear();
 }
 
-void SetupTimers() {
-  AddTimer("LCD_DISPLAY", 250);
-}
+void SetupTimers();
 
 void SetupWifi() {
   PrintCore("SetupWifi");
@@ -566,8 +563,9 @@ void SetupWifi() {
 
 void Core0Processor(void *parameter);
 
-void setup(void) {
+void SetupPins();
 
+void setup(void) {
   Serial.begin(SERIAL_BAUDRATE);
   delay(1000);
 
@@ -575,12 +573,11 @@ void setup(void) {
   analogReadResolution(12);
   analogWriteResolution(23, 12);
 
-  Blue(true);
-
-  SetupLCD();
   SetupWifi();
   SetupServer();
+  SetupPins();
   SetupTimers();
+  SetupLCD();
 
   xTaskCreatePinnedToCore(
     Core0Processor,   /* Function to implement the task */
@@ -592,10 +589,9 @@ void setup(void) {
     0);               /* Core where the task should run */
 
   lcd_row1 = url;
+  
 }
 
 #pragma endregion Setup
-
-
 
 #endif

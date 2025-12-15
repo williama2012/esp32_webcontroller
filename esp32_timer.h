@@ -9,10 +9,18 @@
 #define ESP32_TIMER_H
 #include <Arduino.h>
 
-void AddTimer(String name, unsigned long delay);
-unsigned long GetTimer(int timerId);
-int GetTimerIndex(String name);
-void SetTimer(int timerId, unsigned long delay, String name = "");
-bool CheckTimer(int timerId);
+#define MAX_TIMERS 16
+
+class Timer {
+public:
+  void AddTimer(unsigned int timerId, unsigned long delay);
+  unsigned long GetTimer(unsigned int timerId);
+  void SetTimer(unsigned int timerId, unsigned long delay);
+  bool CheckTimer(unsigned int timerId);
+  bool CheckTimer(unsigned int timerId, unsigned long currentMillis);
+private:
+  unsigned long TIMERS[MAX_TIMERS];
+  unsigned long TIMERS_DELAY[MAX_TIMERS];
+};
 
 #endif
