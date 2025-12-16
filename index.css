@@ -147,8 +147,7 @@ body {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    
-    height: 20vh;
+    padding: 0.5em 0 0 0;
     margin-bottom: 1em;
 }
 

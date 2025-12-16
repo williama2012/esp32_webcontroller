@@ -3,7 +3,7 @@ const MAX_TONE = 40000; //4294967295;
 const MAX_SERVO = 180;
 const MAX_COLOR = 255;
 
-const BASE_URL = "";//"http://192.168.0.137";
+const BASE_URL = "http://192.168.0.137";
 
 const css_normal = "btn btn-light";
 const css_busy = "btn btn-info";
