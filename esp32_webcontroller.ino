@@ -24,7 +24,7 @@ void loop(void) {
     doBlink = false;
   }
 
-  CheckApiCommand();
+  //CheckApiCommand();
 
   PinSet mode = get_pin(50);
 
@@ -94,26 +94,35 @@ void mode1process() {
 
 
 // Runs on Core 0
-void OnApiCommand(String cmd) {
-  //PrintCore("OnApiCommand: " + cmd);
-
-
-  
+bool OnApiCommand(String cmd) {
+  PrintCore("OnApiCommand: " + cmd);
+  return ProcessCommand(cmd);
 }
 
 // Runs on Core 1
-void ProcessCommand(String cmd) {
+bool ProcessCommand(String cmd) {
+  PrintCore("ProcessCommand: " + cmd);
   String first_word = str_split(cmd, 0);
   
+  if (first_word == "mode") {
+    int m = str_int(cmd, 1);
+    if (m > -1) {
+      set_pin(50, Integer, m);
+      return send_msg("mode changed to " + String(mode));
+    }
+    return send_msg("invalid mode value");
+  }
+
   if (first_word == "clear") {
     setAllColor(BLACK);
-    return;
-  } else if (first_word == "pixel") {
+    return send_msg("LED Strip Cleared");
+  }
+  
+  if (first_word == "pixel") {
     String pixel_str = str_split(cmd, 1);
 
     if (pixel_str != "") {
       int pixel = pixel_str.toInt();
-
       String color_str = str_split(cmd, 2);
 
       if (color_str != "") {
@@ -123,15 +132,19 @@ void ProcessCommand(String cmd) {
         set_pixel(pixel, WHITE);
       }
 
+      return send_msg("Pixel: " + String(pixel) + " changed to " + String(color_str));
     }
+
   }
+
+  return false;
 }
 
 // Runs on Core 1
 void CheckApiCommand() {
   if (api_cmd != "") {
     PrintCore("CheckApiCommand: " + api_cmd);
-    ProcessCommand(api_cmd);
+    bool command_processed = ProcessCommand(api_cmd);
     api_cmd = "";
   }
 }

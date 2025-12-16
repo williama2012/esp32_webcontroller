@@ -40,7 +40,7 @@ String _lcd_row2_printed;
 String _lcd_row3_printed;
 String _lcd_row4_printed;
 
-void OnApiCommand(String cmd);
+bool OnApiCommand(String cmd);
 
 void ResetPins() {
   api_cmd = "";
@@ -66,117 +66,30 @@ int intArg(String name) {
   return val;
 }
 
+bool send_body(String body) {
+  server.send(200, "application/json", "{" + body + "}");
+  return true;
+}
+
+bool send_rec(String cmd) {
+  send_body(jsonField("received", cmd, false));
+  return true;
+}
+
+bool send_rec() {
+  send_rec(jsonField("received", "command", false));
+  return true;
+}
+
+bool send_msg(String msg) {
+  send_body(jsonField("msg", msg, false));
+  return true;
+}
+
+
 #pragma endregion server
 
-#pragma region lcd
-
-void LcdUpdateRows() {
-
-  if (lcd_row1 != _lcd_row1_printed
-      || lcd_row2 != _lcd_row2_printed
-      || lcd_row3 != _lcd_row3_printed
-      || lcd_row4 != _lcd_row4_printed) {
-
-    lcd.clear();
-    _lcd_row1_printed = "";
-    _lcd_row2_printed = "";
-    _lcd_row3_printed = "";
-    _lcd_row4_printed = "";
-  }
-
-  if (lcd_row1 != _lcd_row1_printed) {
-    lcd.setCursor(0, 0);
-    lcd.print(lcd_row1);
-    _lcd_row1_printed = lcd_row1;
-  }
-
-  if (lcd_row2 != _lcd_row2_printed) {
-    lcd.setCursor(0, 1);
-    lcd.print(lcd_row2);
-    _lcd_row2_printed = lcd_row2;
-  }
-
-  if (lcd_row3 != _lcd_row3_printed) {
-    lcd.setCursor(0, 2);
-    lcd.print(lcd_row3);
-    _lcd_row3_printed = lcd_row3;
-  }
-
-  if (lcd_row4 != _lcd_row4_printed) {
-    lcd.setCursor(0, 3);
-    lcd.print(lcd_row4);
-    _lcd_row4_printed = lcd_row4;
-  }
-}
-
-#pragma endregion lcd
-
-#pragma region servo
-
-// void MoveServo(int pin, int pos) {
-//   PrintCore("MoveServo");
-
-//   if (pin != servo_pin) {
-//     if (servo_pin != 0) {
-//       servo_ctrl.detach(servo_pin);
-//     }
-//     servo_ctrl.attach(pin);
-//     servo_pin = pin;
-//   }
-
-//   servo_ctrl.write(pos);
-// }
-
-// void ClearServo(int pin) {
-//   if (servo_pin == pin) {
-//     servo_ctrl.detach(servo_pin);
-//     servo_pin = 0;
-//   }
-// }
-
-#pragma endregion servo
-
-#pragma region Get_Handlers
-
-void handleGetIndex() {
-  PrintCore("handleGetIndex");
-  server.send(200, "text/html", gWebPageData);
-}
-
-void handleGetTerminal() {
-  PrintCore("handleGetTerminal");
-  server.send(200, "text/html", gTerminalWebPageData);
-}
-
-void handleGetJavascript() {
-  PrintCore("handleGetJavascript");
-  server.send(200, "text/javascript", gWebJavascriptData);
-}
-
-void handleGetStylesheet() {
-  PrintCore("handleGetStylesheet");
-  server.send(200, "text/css", gWebStylesheetData);
-}
-
-void handleNotFound() {
-  String message = "File Not Found\n\n";
-  message += "URI: ";
-  message += server.uri();
-  message += "\nMethod: ";
-  message += (server.method() == HTTP_GET) ? "GET" : "POST";
-  message += "\nArguments: ";
-  message += server.args();
-  message += "\n";
-
-  for (uint8_t i = 0; i < server.args(); i++) {
-    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
-  }
-
-  server.send(404, "text/plain", message);
-}
-
-#pragma endregion Get_Handlers
-
+#pragma region Actions
 
 void PulsePost(int pin, int value, int time) {
   PrintCore("PulsePost");
@@ -344,6 +257,116 @@ void ToneWritePost(int pin, unsigned int value) {
   server.send(200, "application/json", response);
 }
 
+#pragma endregion Actions
+
+#pragma region lcd
+
+void LcdUpdateRows() {
+
+  if (lcd_row1 != _lcd_row1_printed
+      || lcd_row2 != _lcd_row2_printed
+      || lcd_row3 != _lcd_row3_printed
+      || lcd_row4 != _lcd_row4_printed) {
+
+    lcd.clear();
+    _lcd_row1_printed = "";
+    _lcd_row2_printed = "";
+    _lcd_row3_printed = "";
+    _lcd_row4_printed = "";
+  }
+
+  if (lcd_row1 != _lcd_row1_printed) {
+    lcd.setCursor(0, 0);
+    lcd.print(lcd_row1);
+    _lcd_row1_printed = lcd_row1;
+  }
+
+  if (lcd_row2 != _lcd_row2_printed) {
+    lcd.setCursor(0, 1);
+    lcd.print(lcd_row2);
+    _lcd_row2_printed = lcd_row2;
+  }
+
+  if (lcd_row3 != _lcd_row3_printed) {
+    lcd.setCursor(0, 2);
+    lcd.print(lcd_row3);
+    _lcd_row3_printed = lcd_row3;
+  }
+
+  if (lcd_row4 != _lcd_row4_printed) {
+    lcd.setCursor(0, 3);
+    lcd.print(lcd_row4);
+    _lcd_row4_printed = lcd_row4;
+  }
+}
+
+#pragma endregion lcd
+
+#pragma region servo
+
+// void MoveServo(int pin, int pos) {
+//   PrintCore("MoveServo");
+
+//   if (pin != servo_pin) {
+//     if (servo_pin != 0) {
+//       servo_ctrl.detach(servo_pin);
+//     }
+//     servo_ctrl.attach(pin);
+//     servo_pin = pin;
+//   }
+
+//   servo_ctrl.write(pos);
+// }
+
+// void ClearServo(int pin) {
+//   if (servo_pin == pin) {
+//     servo_ctrl.detach(servo_pin);
+//     servo_pin = 0;
+//   }
+// }
+
+#pragma endregion servo
+
+#pragma region Get_Handlers
+
+void handleGetIndex() {
+  PrintCore("handleGetIndex");
+  server.send(200, "text/html", gWebPageData);
+}
+
+void handleGetTerminal() {
+  PrintCore("handleGetTerminal");
+  server.send(200, "text/html", gTerminalWebPageData);
+}
+
+void handleGetJavascript() {
+  PrintCore("handleGetJavascript");
+  server.send(200, "text/javascript", gWebJavascriptData);
+}
+
+void handleGetStylesheet() {
+  PrintCore("handleGetStylesheet");
+  server.send(200, "text/css", gWebStylesheetData);
+}
+
+void handleNotFound() {
+  String message = "File Not Found\n\n";
+  message += "URI: ";
+  message += server.uri();
+  message += "\nMethod: ";
+  message += (server.method() == HTTP_GET) ? "GET" : "POST";
+  message += "\nArguments: ";
+  message += server.args();
+  message += "\n";
+
+  for (uint8_t i = 0; i < server.args(); i++) {
+    message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
+  }
+
+  server.send(404, "text/plain", message);
+}
+
+#pragma endregion Get_Handlers
 
 #pragma region Post_Handlers
 
@@ -501,12 +524,12 @@ void handleSweepPost() {
 
 void handleApiPost() {
   PrintCore("handleApiPost");
-  api_cmd = server.arg("cmd");
-  api_cmd.toLowerCase();
+  String cmd = server.arg("cmd");
+  cmd.toLowerCase();
   
   doBlink = true;
   
-  String first_word = str_split(api_cmd, 0);
+  String first_word = str_split(cmd, 0);
 
   if (first_word == "reset") {
     ResetPins();
@@ -539,8 +562,12 @@ void handleApiPost() {
 
     //handleSweepPost();
   } else {
-    OnApiCommand(api_cmd);
-    server.send(200, "application/json", "{" + jsonField("received", api_cmd, false) + "}");
+    bool response_handled = OnApiCommand(cmd);
+    if (!response_handled) {
+      api_cmd = cmd;
+      send_rec(api_cmd);
+    }
+    
   }
 }
 
