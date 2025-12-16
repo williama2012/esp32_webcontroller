@@ -132,6 +132,12 @@ bool OnApiCommand(String cmd) {
     set_pixel(x, y);
   }
 
+  if (first_word == "color") {
+      set_pin(51, Integer, str_int(cmd, 1));
+      set_pin(52, Integer, str_int(cmd, 2));
+      set_pin(53, Integer, str_int(cmd, 3));
+  }
+
   if (first_word == "mode") {
     int m = str_int(cmd, 1);
     if (m > -1) {
