@@ -42,28 +42,37 @@ void loop(void) {
       mode2process();
       break;
     case 3:
+      mode3process();
       break;
     default:
-      mode1process();
+      break;
   }
 
   prev_mode = mode;
 }
 
-void set_pixel(uint8_t x, uint8_t y, uint32_t color) {
+PinSet prev_brightness;
+
+void mode3process() {
+  PinSet brightness = get_pin(54);
+  if (brightness.value != prev_brightness.value) {
+    set_brightness(brightness.value);
+    prev_brightness = brightness;
+  }
+
+  PinSet red_set = get_pin(51);
+  PinSet green_set = get_pin(52);
+  PinSet blue_set = get_pin(53);
+  led_clear();
+  setAllColorSequence(red_set.value, green_set.value, blue_set.value);
   
 }
 
-void mode3process() {
-
-}
-
-PinSet prev_brightness;
 
 void mode2process() {
   PinSet brightness = get_pin(54);
   if (brightness.value != prev_brightness.value) {
-    strip.setBrightness(brightness.value);
+    set_brightness(brightness.value);
     prev_brightness = brightness;
   }
 
@@ -87,7 +96,7 @@ void mode1process() {
       color_r = 0;
       color_g = color_weight;
       color_b = 0;
-      setAllColor(0, color_weight, 0);
+      setAllColor(color_r, color_g, color_b);
     }
   }
 }
@@ -104,6 +113,13 @@ bool ProcessCommand(String cmd) {
   PrintCore("ProcessCommand: " + cmd);
   String first_word = str_split(cmd, 0);
   
+  if (first_word == "p") {
+    int x = str_int(cmd, 1);
+    int y = str_int(cmd, 2);
+    set_pixel(x, y);
+  }
+
+
   if (first_word == "mode") {
     int m = str_int(cmd, 1);
     if (m > -1) {
@@ -114,7 +130,7 @@ bool ProcessCommand(String cmd) {
   }
 
   if (first_word == "clear") {
-    setAllColor(BLACK);
+    led_clear();
     return send_msg("cleared");
   }
   
@@ -134,10 +150,12 @@ bool processCmd_setPixel(String cmd) {
     }
     String color_str = str_split(cmd, 2);
     if (color_str == "") {
-      set_pixel(pixel, WHITE);
+
+      set_pixel(pixel, CRGB(255, 255, 255));
+
       return send_msg("pixel " + String (pixel) + " set to WHITE");
     }
-    uint32_t color = led_color(color_str);
+    CRGB color = led_color(color_str);
     set_pixel(pixel, color);
     return send_msg("pixel " + String (pixel) + " set to " + color_str);
 }

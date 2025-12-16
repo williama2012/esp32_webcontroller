@@ -1,13 +1,18 @@
 #ifndef ESP32_LEDSTRIP
 #define ESP32_LEDSTRIP_H
 #include <Arduino.h>
-#include <Adafruit_NeoPixel.h>
-#include "WS2812_Definitions.h"
+#include <FastLED.h>
 
-#define LED_PIN 22
+// Configuration
+#define LED_PIN     22
+#define NUM_LEDS    484
+#define LED_TYPE    WS2812B
+#define COLOR_ORDER GRB
+
 #define LED_COUNT 484
 
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+CRGB leds[NUM_LEDS];
+
 
 uint8_t flip = 1;
 uint8_t color_weight = 1;
@@ -16,45 +21,114 @@ uint8_t color_g = 0;
 uint8_t color_b = 0;
 bool color_up = true;
 
+
+// Params for width and height
+const uint16_t kMatrixWidth = 22;
+const uint16_t kMatrixHeight = 22;
+
+// Param for different pixel layouts
+const bool    kMatrixSerpentineLayout = true;
+const bool    kMatrixVertical = false;
+
+uint16_t XY( uint8_t x, uint8_t y)
+{
+  uint16_t i;
+  
+  if( kMatrixSerpentineLayout == false) {
+    if (kMatrixVertical == false) {
+      i = (y * kMatrixWidth) + x;
+    } else {
+      i = kMatrixHeight * (kMatrixWidth - (x+1))+y;
+    }
+  }
+
+  if( kMatrixSerpentineLayout == true) {
+    if (kMatrixVertical == false) {
+      if( y & 0x01) {
+        // Odd rows run backwards
+        uint8_t reverseX = (kMatrixWidth - 1) - x;
+        i = (y * kMatrixWidth) + reverseX;
+      } else {
+        // Even rows run forwards
+        i = (y * kMatrixWidth) + x;
+      }
+    } else { // vertical positioning
+      if ( x & 0x01) {
+        i = kMatrixHeight * (kMatrixWidth - (x+1))+y;
+      } else {
+        i = kMatrixHeight * (kMatrixWidth - x) - (y+1);
+      }
+    }
+  }
+  
+  return i;
+}
+
+
+
+
+
+
+
+void led_clear() {
+  fill_solid(leds, NUM_LEDS, CRGB(0,0,0));
+  FastLED.show();  
+}
+
+
 void BeginStrip() {
-  strip.begin();
-  strip.setBrightness(255);
-  strip.show();
+    FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
+    FastLED.setBrightness(100);
+    led_clear();
 }
 
-void set_brightness(uint8_t percent) {
-  uint8_t val = map(percent, 0, 100, 0, 255);
-  strip.setBrightness(val);
+void set_brightness(uint16_t brightness) {
+  FastLED.setBrightness(brightness);
 }
 
-void set_pixel(uint8_t i, uint32_t color) {
-  strip.setPixelColor(i, color);
-  strip.show();
+void set_brightnessP(uint16_t percent) {
+  uint16_t val = map(percent, 0, 100, 0, 255);
+  FastLED.setBrightness(val);
 }
 
-void set_pixel(uint8_t i, uint8_t r, uint8_t g, uint8_t b) {
-  uint32_t color = strip.Color(r, g, b);
+void set_pixel(uint16_t i, CRGB color) {
+  if (i >= LED_COUNT) {
+    i = LED_COUNT - 1;
+  }
+  
+  Println("set_pixel:" + String(i));
+
+  leds[i] = color;
+  FastLED.show();
+}
+
+void set_pixel(uint16_t x, uint16_t y, CRGB color = CRGB::White) {
+
+  uint16_t i = XY(x, y);
+
+  Println(String(x) + "," + String(y) + ":" + String(i));
+
   set_pixel(i, color);
 }
 
-uint32_t led_color(String color) {
+CRGB led_color(String color) {
   Serial.println(color);
   color.toLowerCase();
 
   if (color == "white") {
-    return WHITE;
+    return CRGB::White;
   }
   if (color == "red") {
-    return RED;
+    return CRGB::Red;
   }
   if (color == "green") {
-    return GREEN;
+    return CRGB::Green;
   }
   if (color == "blue") {
-    return BLUE;
+    return CRGB::Blue;
   }
 
-  return BLACK;
+  return CRGB::Black;
 }
 
 void flip_color() {
@@ -82,6 +156,24 @@ void step_weight() {
   }
 }
 
+void setAllColor(CRGB color) {
+  fill_solid(leds, NUM_LEDS, color);
+  FastLED.show();
+}
+
+void setAllColor(uint16_t r, uint16_t g, uint16_t b) {
+  setAllColor(CRGB(r, g, b));
+}
+
+void setAllColorSequence(uint16_t red, uint16_t green, uint16_t blue, uint32_t wait = 10) {
+  for(int i = 0; i < LED_COUNT; i++) {
+    leds[i] = CRGB(red, green, blue);
+    FastLED.show();
+    delay(wait);
+  }
+}
+
+
 void setLEDMatrix(uint32_t pixels[]) {
   uint32_t length = sizeof(pixels) / sizeof(pixels[0]);
 
@@ -89,67 +181,50 @@ void setLEDMatrix(uint32_t pixels[]) {
 
   for(int i = 0; i < LED_COUNT; i++) {
     uint32_t color = pixels[i];
-    strip.setPixelColor(i, color);
+    //strip.setPixelColor(i, color);
   }  
-  strip.show();
+  //strip.show();
 }
 
-void setAllColor(uint32_t color) {
-  for(int i = 0; i < LED_COUNT; i++) {
-    strip.setPixelColor(i, color);
-  }
-  strip.show();
-}
 
-void setAllColor(uint8_t red, uint8_t green, uint8_t blue) {
-  for(int i = 0; i < LED_COUNT; i++) {
-    strip.setPixelColor(i, red, green, blue);
-  }
-  strip.show();
-}
 
-void setAllColorSequence(uint8_t red, uint8_t green, uint8_t blue, uint32_t wait) {
-  for(int i = 0; i < LED_COUNT; i++) {
-    strip.setPixelColor(i, red, green, blue);
-    strip.show();
-    delay(wait);
-  }
-}
+
+
 
 #pragma region Effects
 
-void snowflakes(uint8_t wait) {
-  // Setup the pixel array
-  int pixel[LED_COUNT];
-  for(int p = 0; p < LED_COUNT; p++){
-    pixel[p] = random(0, 255); 
-  }
+// void snowflakes(uint8_t wait) {
+//   // Setup the pixel array
+//   int pixel[LED_COUNT];
+//   for(int p = 0; p < LED_COUNT; p++){
+//     pixel[p] = random(0, 255); 
+//   }
   
-  // Run some snowflake cycles
-  for (int j=0; j < 200; j++) {
-    // Every five cycles, light a new pixel
-    if((j%5)==0){
-      strip.setPixelColor(random(0,60), 255,255,255);
-    }
+//   // Run some snowflake cycles
+//   for (int j=0; j < 200; j++) {
+//     // Every five cycles, light a new pixel
+//     if((j%5)==0){
+//       strip.setPixelColor(random(0,60), 255,255,255);
+//     }
     
-    // Dim all pixels by 10
-    for(int p=0; p < LED_COUNT; p++){
-      strip.setPixelColor(p, pixel[p],pixel[p],pixel[p] );
-      pixel[p] =  pixel[p] - 10;
-    }
-    strip.show();
-    delay(wait);
-  }
-}
+//     // Dim all pixels by 10
+//     for(int p=0; p < LED_COUNT; p++){
+//       strip.setPixelColor(p, pixel[p],pixel[p],pixel[p] );
+//       pixel[p] =  pixel[p] - 10;
+//     }
+//     strip.show();
+//     delay(wait);
+//   }
+// }
 
-void rainbow(int wait) {
-  // 5 cycles of all colors on wheel
-  for(long firstPixelHue = 0; firstPixelHue < 5*65536; firstPixelHue += 256) {
-    strip.rainbow(firstPixelHue);
-    strip.show(); // Update strip with new contents
-    delay(wait);  // Pause for a moment
-  }
-}
+// void rainbow(int wait) {
+//   // 5 cycles of all colors on wheel
+//   for(long firstPixelHue = 0; firstPixelHue < 5*65536; firstPixelHue += 256) {
+//     strip.rainbow(firstPixelHue);
+//     strip.show(); // Update strip with new contents
+//     delay(wait);  // Pause for a moment
+//   }
+// }
 
 #pragma endregion Effects
 
