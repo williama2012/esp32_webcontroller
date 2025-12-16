@@ -3,7 +3,7 @@ const MAX_TONE = 40000; //4294967295;
 const MAX_SERVO = 180;
 const MAX_COLOR = 255;
 
-const BASE_URL = "";//"http://192.168.0.137";
+const BASE_URL = "http://192.168.0.137";
 
 const css_normal = "btn btn-light";
 const css_busy = "btn btn-info";
@@ -108,6 +108,7 @@ $(function () {
 function handleTerminalKeypress(evt) {
     if (evt.charCode == 13) {
         PostApiCommand($("#terminal-input").val(), function(response) {
+
             $("#terminal-input").val("");
         });
     }
@@ -292,7 +293,7 @@ function AddActivity(message, direction) {
     }
 
     if (terminal) {
-        terminal.append($(item));
+        terminal.prepend($(item));
     }
     
 }
@@ -314,6 +315,23 @@ function activity_click(evt) {
 }
 
 //#region === API ===
+
+function PostApiCommand(command, onComplete) {
+    var url = BASE_URL + "/api";
+
+    var data = { cmd: command };
+
+    OutActivity({ url, ...data }, true);
+
+    $.post(url, data, function (response) {
+        InActivity(response);
+        if (typeof(onComplete) == 'function') {
+            onComplete(response);
+        }
+    }).fail(function (jqxhr, textStatus, errorThrown) {
+        errActivity(jqxhr.statusCode());
+    }).always(function() {});
+}
 
 function PostSweep(data) {
     updatePending = true;
@@ -342,23 +360,6 @@ function PostSweep(data) {
     }).always(function () {
         updatePending = false;
     });
-}
-
-function PostApiCommand(command, onComplete) {
-    var url = BASE_URL + "/api";
-
-    var data = { cmd: command };
-
-    OutActivity({ url, ...data }, true);
-
-    $.post(url, data, function (response) {
-        InActivity(response);
-        if (typeof(onComplete) == 'function') {
-            onComplete(response);
-        }
-    }).fail(function (jqxhr, textStatus, errorThrown) {
-        errActivity(jqxhr.statusCode());
-    }).always(function() {});
 }
 
 function PostHardResetAllPins(evt) {

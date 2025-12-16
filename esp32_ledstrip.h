@@ -37,7 +37,25 @@ void set_pixel(uint8_t i, uint8_t r, uint8_t g, uint8_t b) {
   set_pixel(i, color);
 }
 
+uint32_t led_color(String color) {
+  Serial.println(color);
+  color.toLowerCase();
 
+  if (color == "white") {
+    return WHITE;
+  }
+  if (color == "red") {
+    return RED;
+  }
+  if (color == "green") {
+    return GREEN;
+  }
+  if (color == "blue") {
+    return BLUE;
+  }
+
+  return BLACK;
+}
 
 void flip_color() {
   if (flip == 1) {

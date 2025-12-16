@@ -86,6 +86,11 @@ bool send_msg(String msg) {
   return true;
 }
 
+bool send_500(String msg) {
+  return send_body(jsonField("status", "500", true) + jsonField("msg", msg, false));
+}
+
+
 
 #pragma endregion server
 

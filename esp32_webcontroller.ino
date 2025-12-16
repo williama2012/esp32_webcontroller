@@ -119,22 +119,20 @@ bool ProcessCommand(String cmd) {
   }
   
   if (first_word == "pixel") {
-    String pixel_str = str_split(cmd, 1);
+    int pixel = str_int(cmd, 1);
+    Serial.println(pixel);
 
-    if (pixel_str != "") {
-      int pixel = pixel_str.toInt();
-      String color_str = str_split(cmd, 2);
-
-      if (color_str != "") {
-        int color = color_str.toInt();
-        set_pixel(pixel, color);
-      } else {
-        set_pixel(pixel, WHITE);
-      }
-
-      return send_msg("Pixel: " + String(pixel) + " changed to " + String(color_str));
+    if (pixel < 0) {
+      return send_500("format: pixel {pixel#} {color}");
     }
-
+    String color_str = str_split(cmd, 2);
+    if (color_str == "") {
+      set_pixel(pixel, WHITE);
+      return send_msg("Pixel " + String (pixel) + "set to WHITE");
+    }
+    uint32_t color = led_color(color_str);
+    set_pixel(pixel, color);
+    return send_msg("Pixel " + String (pixel) + " set to " + color_str);
   }
 
   return false;
