@@ -39,8 +39,42 @@ function addData(data) {
     localStorage.setItem("dataset", dataset);
 }
 
+const GRID_X = 22;
+const GRID_Y = 22;
+
+function matrix_box(x, y) {
+    return $(`<div id='matrix-box-${x}-${y}' class='matrix-box'></div>`);
+}
+
+function matrix_row(y) {
+    const row = $(`<div id='matrix-row-${y}' class='matrix-row'></div>`);
+
+    for(var x = 0; x < GRID_X; x++) {
+        row.append(matrix_box(x,y));
+    }
+
+    return row;
+}
+
+function matrix_box_onclick(evt) {
+    
+}
+
+
 $(function () {
     
+    var matrix = document.getElementById("matrix");
+    if (matrix) {
+        matrix = $("#matrix");
+
+
+        for(var y = 0; y < GRID_Y; y++) {
+            matrix.append(matrix_row(y));
+        }
+
+    }
+
+
     const urlInput = document.getElementById("hosturl-input");
     if (urlInput) {
         urlInput.addEventListener("change", (evt) => {
