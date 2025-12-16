@@ -41,6 +41,17 @@ function addData(data) {
 
 $(function () {
     
+    const urlInput = document.getElementById("hosturl-input");
+    if (urlInput) {
+        urlInput.addEventListener("change", (evt) => {
+                console.log(evt.target.value);
+                BASE_URL = evt.target.value;
+                localStorage.setItem("hosturl-input", BASE_URL);
+            });
+        BASE_URL = localStorage.getItem("hosturl-input");
+        urlInput.value = BASE_URL;
+    }
+
     terminal = document.getElementById("terminal-history");
 
     if (terminal) {
@@ -48,32 +59,12 @@ $(function () {
         document
             .getElementById("terminal-input")
             .addEventListener("keydown", handleTerminalKeypress);
-
-        document
-            .getElementById("hosturl-input")
-            .addEventListener("change", (evt) => {
-                console.log(evt);
-                BASE_URL = $("#hosturl-input").val();
-                localStorage.setItem("hosturl-input", BASE_URL);
-            });
-        BASE_URL = localStorage.getItem("hosturl-input");
-        $("#hosturl-input").val(BASE_URL);
     }
 
     activity = document.getElementById("activity");
 
     if (activity) {
         activity = $(activity);
-
-        document
-            .getElementById("hosturl-input")
-            .addEventListener("change", (evt) => {
-                console.log(evt);
-                BASE_URL = $("#hosturl-input").val();
-                localStorage.setItem("hosturl-input", BASE_URL);
-            });
-        BASE_URL = localStorage.getItem("hosturl-input");
-        $("#hosturl-input").val(BASE_URL);
 
         const sweepModal = document.getElementById('sweepModal');
         if (sweepModal) {
