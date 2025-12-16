@@ -84,10 +84,6 @@ body {
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.slider-details-mode {
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
 .slider-controls-stop {
     display: inline-block;
     background: none;
@@ -345,7 +341,7 @@ input {
     overflow-y: scroll;
 
     background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 5px;
+    border-radius: 5px 5px 0 0;
     scrollbar-width: none;
 }
 
@@ -359,14 +355,22 @@ input {
 }
 
 .terminal-input-container {
-    border:white;
-    border-width: 1px;
+
+    margin: 0 0 1em 0;
+    padding: 0 0 1em 0;
+
 }
 
 .terminal-input {
+    max-height: 30vh;
+    border-radius: 0 0 5px 5px;
+    border: 2px solid black;
+    margin: 0 0 1em 0;
+    padding: 0 0 1em 0;
     background-color: rgba(0, 0, 0, 0.5);
     color:#04AA6D;
     width:100%;
+    font-size:medium;
 
 }
 

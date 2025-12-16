@@ -115,7 +115,7 @@ bool ProcessCommand(String cmd) {
 
   if (first_word == "clear") {
     setAllColor(BLACK);
-    return send_msg("LED Strip Cleared");
+    return send_msg("cleared");
   }
   
   if (first_word == "pixel") {
@@ -128,11 +128,11 @@ bool ProcessCommand(String cmd) {
     String color_str = str_split(cmd, 2);
     if (color_str == "") {
       set_pixel(pixel, WHITE);
-      return send_msg("Pixel " + String (pixel) + "set to WHITE");
+      return send_msg("pixel " + String (pixel) + "set to WHITE");
     }
     uint32_t color = led_color(color_str);
     set_pixel(pixel, color);
-    return send_msg("Pixel " + String (pixel) + " set to " + color_str);
+    return send_msg("pixel " + String (pixel) + " set to " + color_str);
   }
 
   return false;
