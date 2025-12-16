@@ -21,6 +21,21 @@ body {
     background-color: white;
 }
 
+.controller-body {
+    background-color: black;
+    background-image: radial-gradient(
+    rgba(0, 150, 0, 0.75), black 120%
+    );
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    color: white;
+    font: 1.3rem Inconsolata, monospace;
+    text-shadow: 0 0 5px #C8C8C8;
+
+}
+
+
 /* #endregion base */
 
 /* #region slider */
@@ -315,6 +330,8 @@ input {
     font-size:medium;
 }
 
+
+
 .terminal-body {
     background-color: black;
     background-image: radial-gradient(
@@ -326,7 +343,8 @@ input {
     color: white;
     font: 1.3rem Inconsolata, monospace;
     text-shadow: 0 0 5px #C8C8C8;
-
+    display: flex;
+    flex-direction: column;
 }
 
 ::selection {
@@ -335,8 +353,8 @@ input {
 }
 
 .terminal-history-container {
-    min-height: 50vh;
-    max-height: 50vh;
+    min-height:75vh;
+    max-height:75vh;
     overflow-y: scroll;
 
     background-color: rgba(0, 0, 0, 0.5);
@@ -370,12 +388,14 @@ input {
 }
 
 .terminal-input-container {
+
     margin: 0 0 1em 0;
     padding: 0 0 1em 0;
 }
 
 .terminal-input {
-    max-height: 30vh;
+    min-height:20vh;
+    max-height:20vh;
     border-radius: 0 0 5px 5px;
     border: 2px solid black;
     margin: 0 0 1em 0;
