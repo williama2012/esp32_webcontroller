@@ -328,6 +328,7 @@ input {
     color:#04AA6D;
     width:100%;
     font-size:medium;
+    outline: none;
 }
 
 
@@ -380,7 +381,7 @@ input {
 }
 
 .terminal-history tr:hover {
-    background-color: #D6EEEE;
+    background-color:black;
 }
 
 .terminal-history td {
@@ -388,7 +389,8 @@ input {
 }
 
 .terminal-input-container {
-
+    display: flex;
+    flex-direction: row;
     margin: 0 0 1em 0;
     padding: 0 0 1em 0;
 }
@@ -397,6 +399,7 @@ input {
     min-height:20vh;
     max-height:20vh;
     border-radius: 0 0 5px 5px;
+    
     border: 2px solid black;
     margin: 0 0 1em 0;
     padding: 0 0 1em 0;
@@ -404,7 +407,26 @@ input {
     color:#04AA6D;
     width:100%;
     font-size:medium;
+    outline: none;
+}
 
+.terminal-input-sidebar {
+    border-radius: 0 0 5px 5px;
+    border: 2px solid black;
+    padding: 0.25em;
+    background-color: black;
+
+    background-image: linear-gradient(
+    rgba(22, 0, 150, 0.75), black 120%
+    );
+}
+
+.terminal-input-load {
+
+}
+
+.terminal-input-enter {
+    margin: 0.5em;
 }
 
 footer {
