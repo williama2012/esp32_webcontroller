@@ -349,15 +349,29 @@ input {
     table-layout: fixed;
 }
 
-.terminal-history tr {
-    height:25px;
+.terminal-history>tr td:nth-child(1) {
+    width: 1%;
+}
+
+.terminal-history>tr td:nth-child(2) {
+    width: 1%;
+}
+
+.terminal-history>tr td:nth-child(3) {
+    width: 98%;
+}
+
+.terminal-history tr:hover {
+    background-color: #D6EEEE;
+}
+
+.terminal-history td {
+    padding: 0 0.5em 0 0.5em;
 }
 
 .terminal-input-container {
-
     margin: 0 0 1em 0;
     padding: 0 0 1em 0;
-
 }
 
 .terminal-input {

@@ -128,7 +128,7 @@ bool ProcessCommand(String cmd) {
     String color_str = str_split(cmd, 2);
     if (color_str == "") {
       set_pixel(pixel, WHITE);
-      return send_msg("pixel " + String (pixel) + "set to WHITE");
+      return send_msg("pixel " + String (pixel) + " set to WHITE");
     }
     uint32_t color = led_color(color_str);
     set_pixel(pixel, color);

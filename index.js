@@ -78,7 +78,7 @@ $(function () {
 
         document
             .getElementById("command-input")
-            .addEventListener("keypress", handleCommandKeypress);
+            .addEventListener("onkeydown", handleCommandKeypress);
 
         document
             .getElementById("refreshBtn")
@@ -105,12 +105,30 @@ $(function () {
     }
 });
 
-function handleTerminalKeypress(evt) {
-    if (evt.charCode == 13) {
-        PostApiCommand($("#terminal-input").val(), function(response) {
+const command_history = [];
 
-            $("#terminal-input").val("");
-        });
+function terminalSubmit() {
+    const command = $("#terminal-input").val();
+    command_history.push(command);
+
+    const commands = command.split("\n");
+    console.log("commands", commands);
+
+    commands.forEach(cmd => {
+        if (cmd != "") {
+            PostApiCommand(cmd, function(response) {
+                $("#terminal-input").val("");
+            });
+        }
+    });
+
+}
+
+function handleTerminalKeypress(evt) {
+    console.log(evt);
+
+    if (evt.charCode == 10) {
+        terminalSubmit();
     }
 }
 
