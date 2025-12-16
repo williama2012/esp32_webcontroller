@@ -47,7 +47,7 @@ $(function () {
         terminal = $(terminal);
         document
             .getElementById("terminal-input")
-            .addEventListener("keypress", handleTerminalKeypress);
+            .addEventListener("keydown", handleTerminalKeypress);
     }
 
     activity = document.getElementById("activity");
@@ -78,7 +78,7 @@ $(function () {
 
         document
             .getElementById("command-input")
-            .addEventListener("onkeydown", handleCommandKeypress);
+            .addEventListener("keydown", handleCommandKeypress);
 
         document
             .getElementById("refreshBtn")
@@ -106,10 +106,13 @@ $(function () {
 });
 
 const command_history = [];
+let history_selected = 0;
+
 
 function terminalSubmit() {
     const command = $("#terminal-input").val();
-    command_history.push(command);
+    command_history.unshift(command);
+    history_selected = 0;
 
     const commands = command.split("\n");
     console.log("commands", commands);
@@ -121,20 +124,41 @@ function terminalSubmit() {
             });
         }
     });
-
 }
 
 function handleTerminalKeypress(evt) {
-    console.log(evt);
+    if (evt.ctrlKey && evt.keyCode == 38) {
+        const hist = command_history[history_selected];
+        
+        $("#terminal-input").val(hist);
+        history_selected++;
+        if (history_selected > command_history.length) {
+            history_selected = 0;
+        }
+    }
 
-    if (evt.charCode == 10) {
+    if (evt.ctrlKey && evt.keyCode == 13) {
         terminalSubmit();
     }
 }
 
+
 function handleCommandKeypress(evt) {
-    if (evt.charCode == 13) {
-        PostApiCommand($("#command-input").val(), function(response) {
+    if (evt.keyCode == 38) {
+        const hist = command_history[history_selected];
+        
+        $("#command-input").val(hist);
+        history_selected++;
+        if (history_selected > command_history.length) {
+            history_selected = 0;
+        }
+    }
+
+    if (evt.keyCode == 13) {
+        const command = $("#command-input").val();
+        command_history.unshift(command);
+        history_selected = 0;
+        PostApiCommand(command, function(response) {
             $("#command-input").val("");
         });
     }
