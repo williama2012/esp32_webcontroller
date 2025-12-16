@@ -3,7 +3,7 @@ const MAX_TONE = 40000; //4294967295;
 const MAX_SERVO = 180;
 const MAX_COLOR = 255;
 
-const BASE_URL = "http://192.168.0.137";
+let BASE_URL = "";
 
 const css_normal = "btn btn-light";
 const css_busy = "btn btn-info";
@@ -48,12 +48,32 @@ $(function () {
         document
             .getElementById("terminal-input")
             .addEventListener("keydown", handleTerminalKeypress);
+
+        document
+            .getElementById("hosturl-input")
+            .addEventListener("change", (evt) => {
+                console.log(evt);
+                BASE_URL = $("#hosturl-input").val();
+                localStorage.setItem("hosturl-input", BASE_URL);
+            });
+        BASE_URL = localStorage.getItem("hosturl-input");
+        $("#hosturl-input").val(BASE_URL);
     }
 
     activity = document.getElementById("activity");
 
     if (activity) {
         activity = $(activity);
+
+        document
+            .getElementById("hosturl-input")
+            .addEventListener("change", (evt) => {
+                console.log(evt);
+                BASE_URL = $("#hosturl-input").val();
+                localStorage.setItem("hosturl-input", BASE_URL);
+            });
+        BASE_URL = localStorage.getItem("hosturl-input");
+        $("#hosturl-input").val(BASE_URL);
 
         const sweepModal = document.getElementById('sweepModal');
         if (sweepModal) {
@@ -196,6 +216,8 @@ function updateSweepModal(settings) {
     $("#sweep-count").val(settings.count);
     $("#sweep-delay").val(settings.delay);
 }
+
+
 
 function SavePins() {
     var save = JSON.stringify(pinSettings);

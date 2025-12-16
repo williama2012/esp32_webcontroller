@@ -337,7 +337,6 @@ input {
 }
 
 
-
 .terminal-body {
     padding: 1em;
     background-color: black;
@@ -516,6 +515,7 @@ footer {
     margin: 0;
     padding: 0;
     background-color: black;
-    
+    color:#04AA6D;
+    width:25vw;
 }
 
