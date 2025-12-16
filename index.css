@@ -35,7 +35,6 @@ body {
 
 }
 
-
 /* #endregion base */
 
 /* #region slider */
@@ -278,6 +277,8 @@ input {
 
 /* #endregion Inputs */
 
+/* #region Activity */
+
 .activity-table>tr td:nth-child(1) {
     width: 1%;
 }
@@ -314,6 +315,10 @@ input {
     font-size:small;
 
 }
+
+/* #endregion Activity */
+
+/* #region Terminal */
 
 .command-container {
     
@@ -411,6 +416,9 @@ input {
     outline: none;
 }
 
+/* #endregion Terminal */
+
+/* #region Other */
 
 input:focus,
 select:focus,
@@ -422,8 +430,6 @@ button:focus {
 footer {
   margin-top: auto;
 }
-
-/* #region OTHER */
 
 .act-icon {
     margin: 0;
@@ -503,4 +509,13 @@ footer {
 
 }
 
-/* #endregion OTHER */
+/* #endregion Other */
+
+
+.hosturl-input {
+    margin: 0;
+    padding: 0;
+    background-color: black;
+    
+}
+
