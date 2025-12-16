@@ -96,6 +96,9 @@ void mode1process() {
 // Runs on Core 0
 void OnApiCommand(String cmd) {
   //PrintCore("OnApiCommand: " + cmd);
+
+
+  
 }
 
 // Runs on Core 1

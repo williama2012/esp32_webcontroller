@@ -50,6 +50,14 @@ String str_split(String str, uint8_t position) {
   return strs[position];
 }
 
+int str_int(String str, uint8_t position) {
+  String valueStr = str_split(str, position);
+  if (valueStr == "") {
+    return -1;
+  }
+  return valueStr.toInt();
+}
+
 #pragma region Pins
 
 PinSet PIN_SET[MAX_PIN];

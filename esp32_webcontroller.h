@@ -177,22 +177,9 @@ void handleNotFound() {
 
 #pragma endregion Get_Handlers
 
-#pragma region Post_Handlers
 
-void handlePulsePost() {
-  PrintCore("handlePulsePost");
-
-  String pinStr = "";
-  pinStr = server.arg("pin");
-  int pin = pinStr.toInt();
-
-  String valueStr = "";
-  valueStr = server.arg("value");
-  int value = valueStr.toInt();
-
-  String timeStr = "";
-  timeStr = server.arg("time");
-  int time = timeStr.toInt();
+void PulsePost(int pin, int value, int time) {
+  PrintCore("PulsePost");
 
   set_pin(pin, Pulse, value);
   //ClearServo(pin);
@@ -211,25 +198,13 @@ void handlePulsePost() {
 
   doBlink = true;
 
-  lcd_row2 = "AnalogWrite";
-  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
 
-void handleIntegerPost() {
-  PrintCore("handleIntegerPost");
-  String pinStr = "";
-  pinStr = server.arg("pin");
-  String valueStr = "";
-  valueStr = server.arg("value");
-  int pin = pinStr.toInt();
-  int value = valueStr.toInt();
+void IntegerPost(int pin, int value) {
+  PrintCore("IntegerPost");
 
-  //ClearServo(pin);
   set_pin(pin, Integer, value);
-
-  //pinMode(pin, OUTPUT);
-  //analogWrite(pin, value);
 
   String response = "{";
   response += jsonField("pin", String(pin), true);
@@ -238,19 +213,11 @@ void handleIntegerPost() {
   response += "}";
   doBlink = true;
 
-  lcd_row2 = "IntegerWrite";
-  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
 
-void handleAnalogWritePost() {
-  PrintCore("handleAnalogWritePost");
-  String pinStr = "";
-  pinStr = server.arg("pin");
-  String valueStr = "";
-  valueStr = server.arg("value");
-  int pin = pinStr.toInt();
-  int value = valueStr.toInt();
+void AnalogWritePost(int pin, int value) {
+  PrintCore("AnalogWritePost");
 
   //ClearServo(pin);
   set_pin(pin, AnalogWrite, value);
@@ -265,19 +232,11 @@ void handleAnalogWritePost() {
   response += "}";
   doBlink = true;
 
-  lcd_row2 = "AnalogWrite";
-  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
 
-void handleDigitalWritePost() {
-  PrintCore("handleDigitalWritePost");
-  String pinStr = "";
-  pinStr = server.arg("pin");
-  String valueStr = "";
-  valueStr = server.arg("value");
-  int pin = pinStr.toInt();
-  int value = valueStr.toInt();
+void DigitalWritePost(int pin, int value) {
+  PrintCore("DigitalWritePost");
 
   //ClearServo(pin);
   set_pin(pin, DigitalWrite, value);
@@ -292,19 +251,11 @@ void handleDigitalWritePost() {
   response += "}";
   doBlink = true;
 
-  lcd_row2 = "AnalogWrite";
-  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
 
-void handleServoWritePost() {
-  PrintCore("handleServoWritePost");
-  String pinStr = "";
-  pinStr = server.arg("pin");
-  String valueStr = "";
-  valueStr = server.arg("value");
-  int pin = pinStr.toInt();
-  int value = valueStr.toInt();
+void ServoWritePost(int pin, int value) {
+  PrintCore("ServoWritePost");
 
   int pos = value;
   //int pos = map(value, 0, 4095, 0, 180);
@@ -323,13 +274,11 @@ void handleServoWritePost() {
   response += "}";
   doBlink = true;
 
-  lcd_row2 = "ServoWrite";
-  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
   server.send(200, "application/json", response);
 }
 
-void handleAnalogReadPost() {
-  PrintCore("handleAnalogReadPost");
+void AnalogReadPost() {
+  PrintCore("AnalogReadPost");
 
   String pinStr = server.arg("pins");
   pinStr.replace("[", "");
@@ -370,18 +319,10 @@ void handleAnalogReadPost() {
   response += "]";
 
   server.send(200, "application/json", response);
-  return;
 }
 
-void handleToneWritePost() {
-  PrintCore("handleToneWritePost");
-  String pinStr = "";
-  pinStr = server.arg("pin");
-  int pin = pinStr.toInt();
-  //ClearServo(pin);
-
-  String valueStr = server.arg("value");
-  unsigned int value = atol(valueStr.c_str());
+void ToneWritePost(int pin, unsigned int value) {
+  PrintCore("ToneWritePost");
 
   set_pin(pin, Tone, value);
 
@@ -399,9 +340,93 @@ void handleToneWritePost() {
   response += jsonField("value", String(value), false);
   response += "}";
   doBlink = true;
-  lcd_row2 = "ToneWrite";
-  lcd_row3 = "pin:" + pinStr + ",val:" + valueStr;
+
   server.send(200, "application/json", response);
+}
+
+
+#pragma region Post_Handlers
+
+void handlePulsePost() {
+  PrintCore("handlePulsePost");
+
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  int pin = pinStr.toInt();
+
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int value = valueStr.toInt();
+
+  String timeStr = "";
+  timeStr = server.arg("time");
+  int time = timeStr.toInt();
+
+  PulsePost(pin, value, time);
+}
+
+void handleIntegerPost() {
+  PrintCore("handleIntegerPost");
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int pin = pinStr.toInt();
+  int value = valueStr.toInt();
+
+  IntegerPost(pin, value);
+}
+
+void handleAnalogWritePost() {
+  PrintCore("handleAnalogWritePost");
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int pin = pinStr.toInt();
+  int value = valueStr.toInt();
+
+  AnalogWritePost(pin, value);
+}
+
+void handleDigitalWritePost() {
+  PrintCore("handleDigitalWritePost");
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int pin = pinStr.toInt();
+  int value = valueStr.toInt();
+  DigitalWritePost(pin, value);
+}
+
+void handleServoWritePost() {
+  PrintCore("handleServoWritePost");
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int pin = pinStr.toInt();
+  int value = valueStr.toInt();
+
+  ServoWritePost(pin, value);
+}
+
+void handleAnalogReadPost() {
+  PrintCore("handleAnalogReadPost");
+  AnalogReadPost();
+}
+
+void handleToneWritePost() {
+  PrintCore("handleToneWritePost");
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  int pin = pinStr.toInt();
+  //ClearServo(pin);
+
+  String valueStr = server.arg("value");
+  unsigned int value = atol(valueStr.c_str());
+  ToneWritePost(pin, value);
 }
 
 void handleSweepPost() {
@@ -481,27 +506,38 @@ void handleApiPost() {
   
   doBlink = true;
   
-  if (api_cmd == "reset") {
+  String first_word = str_split(api_cmd, 0);
+
+  if (first_word == "reset") {
     ResetPins();
     server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
-  } else if (api_cmd == "color") {
-    handleIntegerPost();
-  } else if (api_cmd == "integer") {
-    handleIntegerPost();
-  } else if (api_cmd == "analogout") {
-    handleAnalogWritePost();
-  } else if (api_cmd == "digitalout") {
-    handleDigitalWritePost();
-  } else if (api_cmd == "servo") {
-    handleServoWritePost();
-  } else if (api_cmd == "analogin") {
-    handleAnalogReadPost();
-  } else if (api_cmd == "tone") {
-    handleToneWritePost();
-  } else if (api_cmd == "pulse") {
-    handlePulsePost();
-  } else if (api_cmd == "sweep") {
-    handleSweepPost();
+  } else if (first_word == "color") {
+    
+    //handleIntegerPost();
+  } else if (first_word == "integer") {
+
+    //handleIntegerPost();
+  } else if (first_word == "analogout") {
+
+    //handleAnalogWritePost();
+  } else if (first_word == "digitalout") {
+
+    //handleDigitalWritePost();
+  } else if (first_word == "servo") {
+
+    //handleServoWritePost();
+  } else if (first_word == "analogin") {
+
+    //handleAnalogReadPost();
+  } else if (first_word == "tone") {
+
+    //handleToneWritePost();
+  } else if (first_word == "pulse") {
+
+    //handlePulsePost();
+  } else if (first_word == "sweep") {
+
+    //handleSweepPost();
   } else {
     OnApiCommand(api_cmd);
     server.send(200, "application/json", "{" + jsonField("received", api_cmd, false) + "}");
