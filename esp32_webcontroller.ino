@@ -119,6 +119,13 @@ bool ProcessCommand(String cmd) {
   }
   
   if (first_word == "pixel") {
+    return processCmd_setPixel(cmd);
+  }
+
+  return false;
+}
+
+bool processCmd_setPixel(String cmd) {
     int pixel = str_int(cmd, 1);
     Serial.println(pixel);
 
@@ -133,16 +140,4 @@ bool ProcessCommand(String cmd) {
     uint32_t color = led_color(color_str);
     set_pixel(pixel, color);
     return send_msg("pixel " + String (pixel) + " set to " + color_str);
-  }
-
-  return false;
-}
-
-// Runs on Core 1
-void CheckApiCommand() {
-  if (api_cmd != "") {
-    PrintCore("CheckApiCommand: " + api_cmd);
-    bool command_processed = ProcessCommand(api_cmd);
-    api_cmd = "";
-  }
 }

@@ -18,7 +18,7 @@ body {
     margin: 5px 25px 10px 25px;
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: black;
 }
 
 .controller-body {
@@ -334,6 +334,7 @@ input {
 
 
 .terminal-body {
+    padding: 1em;
     background-color: black;
     background-image: radial-gradient(
     rgba(0, 150, 0, 0.75), black 120%
@@ -391,8 +392,8 @@ input {
 .terminal-input-container {
     display: flex;
     flex-direction: row;
-    margin: 0 0 1em 0;
-    padding: 0 0 1em 0;
+    margin: 0;
+    padding: 0;
 }
 
 .terminal-input {
@@ -401,8 +402,8 @@ input {
     border-radius: 0 0 5px 5px;
     
     border: 2px solid black;
-    margin: 0 0 1em 0;
-    padding: 0 0 1em 0;
+    margin: 0;
+    padding: 0;
     background-color: rgba(0, 0, 0, 0.5);
     color:#04AA6D;
     width:100%;
@@ -410,23 +411,12 @@ input {
     outline: none;
 }
 
-.terminal-input-sidebar {
-    border-radius: 0 0 5px 5px;
-    border: 2px solid black;
-    padding: 0.25em;
-    background-color: black;
 
-    background-image: linear-gradient(
-    rgba(22, 0, 150, 0.75), black 120%
-    );
-}
-
-.terminal-input-load {
-
-}
-
-.terminal-input-enter {
-    margin: 0.5em;
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: none;
 }
 
 footer {
