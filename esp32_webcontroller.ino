@@ -102,45 +102,6 @@ void mode1process() {
 }
 
 
-// Runs on Core 0
-bool OnApiCommand(String cmd) {
-  PrintCore("OnApiCommand: " + cmd);
-  return ProcessCommand(cmd);
-}
-
-// Runs on Core 1
-bool ProcessCommand(String cmd) {
-  PrintCore("ProcessCommand: " + cmd);
-  String first_word = str_split(cmd, 0);
-  
-  if (first_word == "p") {
-    int x = str_int(cmd, 1);
-    int y = str_int(cmd, 2);
-    set_pixel(x, y);
-  }
-
-
-  if (first_word == "mode") {
-    int m = str_int(cmd, 1);
-    if (m > -1) {
-      set_pin(50, Integer, m);
-      return send_msg("mode changed to " + String(mode));
-    }
-    return send_msg("invalid mode value");
-  }
-
-  if (first_word == "clear") {
-    led_clear();
-    return send_msg("cleared");
-  }
-  
-  if (first_word == "pixel") {
-    return processCmd_setPixel(cmd);
-  }
-
-  return false;
-}
-
 bool processCmd_setPixel(String cmd) {
     int pixel = str_int(cmd, 1);
     Serial.println(pixel);
@@ -158,4 +119,36 @@ bool processCmd_setPixel(String cmd) {
     CRGB color = led_color(color_str);
     set_pixel(pixel, color);
     return send_msg("pixel " + String (pixel) + " set to " + color_str);
+}
+
+// Runs on Core 1
+bool OnApiCommand(String cmd) {
+  PrintCore("ProcessCommand: " + cmd);
+  String first_word = str_split(cmd, 0);
+  
+  if (first_word == "p") {
+    int x = str_int(cmd, 1);
+    int y = str_int(cmd, 2);
+    set_pixel(x, y);
+  }
+
+  if (first_word == "mode") {
+    int m = str_int(cmd, 1);
+    if (m > -1) {
+      set_pin(50, Integer, m);
+      return send_msg("mode changed to " + String(m));
+    }
+    return send_msg("invalid mode value");
+  }
+
+  if (first_word == "clear") {
+    led_clear();
+    return send_msg("cleared");
+  }
+  
+  if (first_word == "pixel") {
+    return processCmd_setPixel(cmd);
+  }
+
+  return false;
 }

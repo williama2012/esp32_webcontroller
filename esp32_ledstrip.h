@@ -15,10 +15,10 @@ CRGB leds[NUM_LEDS];
 
 
 uint8_t flip = 1;
-uint8_t color_weight = 1;
-uint8_t color_r = 0;
-uint8_t color_g = 0;
-uint8_t color_b = 0;
+uint16_t color_weight = 1;
+uint16_t color_r = 0;
+uint16_t color_g = 0;
+uint16_t color_b = 0;
 bool color_up = true;
 
 

@@ -127,7 +127,6 @@ void IntegerPost(int pin, int value) {
   String response = "{";
   response += jsonField("pin", String(pin), true);
   response += jsonField("value", String(value), false);
-
   response += "}";
   doBlink = true;
 
@@ -527,6 +526,8 @@ void handleSweepPost() {
   server.send(200, "application/json", response);
 }
 
+#pragma endregion Post_Handlers
+
 void handleApiPost() {
   PrintCore("handleApiPost");
   String cmd = server.arg("cmd");
@@ -539,22 +540,14 @@ void handleApiPost() {
   if (first_word == "reset") {
     ResetPins();
     server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
-  } else if (first_word == "color") {
-    
-    //handleIntegerPost();
-  } else if (first_word == "integer") {
+  } else if (first_word == "int") {
 
-    //handleIntegerPost();
-  } else if (first_word == "analogout") {
+    IntegerPost(str_int(cmd, 1), str_int(cmd, 2));
 
-    //handleAnalogWritePost();
-  } else if (first_word == "digitalout") {
-
-    //handleDigitalWritePost();
   } else if (first_word == "servo") {
 
     //handleServoWritePost();
-  } else if (first_word == "analogin") {
+  } else if (first_word == "analog") {
 
     //handleAnalogReadPost();
   } else if (first_word == "tone") {
@@ -576,7 +569,6 @@ void handleApiPost() {
   }
 }
 
-#pragma endregion Post_Handlers
 
 #pragma region Setup
 
