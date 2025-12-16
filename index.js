@@ -43,11 +43,11 @@ const GRID_X = 22;
 const GRID_Y = 22;
 
 function matrix_box(x, y) {
-    return $(`<div id='matrix-box-${x}-${y}' class='matrix-box'></div>`);
+    return $(`<div id='matrix-box-${x}-${y}' x-row='${y}' x-col='${x}' class='matrix-box'></div>`);
 }
 
 function matrix_row(y) {
-    const row = $(`<div id='matrix-row-${y}' class='matrix-row'></div>`);
+    const row = $(`<div id='matrix-row-${y}' x-row='${y}' class='matrix-row'></div>`);
 
     for(var x = 0; x < GRID_X; x++) {
         row.append(matrix_box(x,y));
@@ -57,20 +57,35 @@ function matrix_row(y) {
 }
 
 function matrix_box_onclick(evt) {
-    
+    console.log(evt);
+
+    const y = evt.target.getAttribute('x-row');
+    const x = evt.target.getAttribute('x-col');
+
+    PostApiCommand(`p ${x} ${y}`, function(response) {
+
+    });
+
+
 }
 
+function build_matrix(root_element) {
+    for(var y = 0; y < GRID_Y; y++) {
+        root_element.append(matrix_row(y));
+    }
+
+    document.querySelectorAll(".matrix-box").forEach(element => {
+        element.addEventListener("click", matrix_box_onclick); 
+    });
+}
 
 $(function () {
     
     var matrix = document.getElementById("matrix");
     if (matrix) {
-        matrix = $("#matrix");
+        matrix = $(matrix);
 
-
-        for(var y = 0; y < GRID_Y; y++) {
-            matrix.append(matrix_row(y));
-        }
+        build_matrix(matrix);
 
     }
 
