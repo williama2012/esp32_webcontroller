@@ -642,7 +642,7 @@ function CreateSliderContainer(pin) {
         <div class="slider-details flex">
             <span class="slider-details-pin"></span>
             <span class="slider-details-val ${css_normal}">0</span>
-            <span>
+            <span class="slider-details-mode" >
                 <select id="slider-mode-${pin}" name="slider-mode-${pin}" class="slider-mode" title="Set mode">
                     <option value="analogout">Analog Write</option>
                     <option value="digitalout">Digital Write</option>
