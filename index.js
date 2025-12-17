@@ -59,19 +59,25 @@ function matrix_row(y) {
 function matrix_set(x, y, on) {
 
     const color_input = $("#matrix-color").val();
-
-    const color = on ? color_input : 'Black';
-
-    PostApiCommand(`p ${x} ${y} ${color}`, function(response) {
+    
+    let r = 255;
+    let g = 255;
+    let b = 255;
+    
+    PostMatrixCommand(x, y, r, g, b, function(response) {
+        console.log("response", response);
 
         const box = $(`#matrix-box-${response.x}-${response.y}`);
-        
+
+        box.css("background-image", `radial-gradient(rgba(${response.r}, ${response.g}, ${response.b}, 0.75), black 120%)`);
+    
         if (response.color == "black") {
-            box.removeClass("matrix-box-on");
-            box.addClass("matrix-box-off");
+            //box.removeClass("matrix-box-on");
+            //box.addClass("matrix-box-off");
         } else {
-            box.removeClass("matrix-box-off");
-            box.addClass("matrix-box-on");
+
+            //box.removeClass("matrix-box-off");
+            //box.addClass("matrix-box-on");
         }
 
     });
@@ -488,6 +494,24 @@ function activity_click(evt) {
 }
 
 //#region === API ===
+
+function PostMatrixCommand(x, y, r, g, b, onComplete) {
+    var url = BASE_URL + "/mat";
+
+    var data = { x, y, r, g, b };
+
+    OutActivity({ url, ...data }, true);
+
+    $.post(url, data, function (response) {
+        InActivity(response);
+        if (typeof(onComplete) == 'function') {
+            onComplete(response);
+        }
+    }).fail(function (jqxhr, textStatus, errorThrown) {
+        errActivity(jqxhr.statusCode());
+    }).always(function() {});
+}
+
 
 function PostApiCommand(command, onComplete) {
     var url = BASE_URL + "/api";

@@ -12,6 +12,7 @@
 #include <LiquidCrystal_I2C.h>
 #include "esp32_timer.h"
 #include "esp32_helpers.h"
+#include "esp32_ledstrip.h"
 
 #define SERIAL_BAUDRATE 115200
 
@@ -95,28 +96,20 @@ bool send_500(String msg) {
 
 #pragma region Actions
 
-void PulsePost(int pin, int value, int time) {
-  PrintCore("PulsePost");
-
-  set_pin(pin, Pulse, value);
-  //ClearServo(pin);
-
-  pinMode(pin, OUTPUT);
-
-  analogWrite(pin, value);
-  delayMicroseconds(time);
-  analogWrite(pin, 0);
-
-  String response = "{";
-  response += jsonField("pin", String(pin), true);
-  response += jsonField("value", String(value), true);
-  response += jsonField("time", String(time), false);
-  response += "}";
-
+void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint16_t b = 255) {
+  PrintCore("MatrixPost");
   doBlink = true;
 
-  server.send(200, "application/json", response);
+  set_pixel(x, y, CRGB(r, g, b));
+
+  send_body(
+    jsonField("x", String(x), true)
+    + jsonField("y", String(y), true)
+    + jsonField("r", String(r), true)
+    + jsonField("g", String(g), true)
+    + jsonField("b", String(b), false));
 }
+
 
 void IntegerPost(int pin, int value) {
   PrintCore("IntegerPost");
@@ -260,6 +253,29 @@ void ToneWritePost(int pin, unsigned int value) {
   server.send(200, "application/json", response);
 }
 
+void PulsePost(int pin, int value, int time) {
+  PrintCore("PulsePost");
+
+  set_pin(pin, Pulse, value);
+  //ClearServo(pin);
+
+  pinMode(pin, OUTPUT);
+
+  analogWrite(pin, value);
+  delayMicroseconds(time);
+  analogWrite(pin, 0);
+
+  String response = "{";
+  response += jsonField("pin", String(pin), true);
+  response += jsonField("value", String(value), true);
+  response += jsonField("time", String(time), false);
+  response += "}";
+
+  doBlink = true;
+
+  server.send(200, "application/json", response);
+}
+
 #pragma endregion Actions
 
 #pragma region lcd
@@ -379,22 +395,16 @@ void handleNotFound() {
 
 #pragma region Post_Handlers
 
-void handlePulsePost() {
-  PrintCore("handlePulsePost");
+void handleMatrixPost() {
+  PrintCore("handleMatrixPost");
+  int x = server.arg("x").toInt();
+  int y = server.arg("y").toInt();
 
-  String pinStr = "";
-  pinStr = server.arg("pin");
-  int pin = pinStr.toInt();
-
-  String valueStr = "";
-  valueStr = server.arg("value");
-  int value = valueStr.toInt();
-
-  String timeStr = "";
-  timeStr = server.arg("time");
-  int time = timeStr.toInt();
-
-  PulsePost(pin, value, time);
+  int r = server.arg("r").toInt();
+  int g = server.arg("g").toInt();
+  int b = server.arg("b").toInt();
+  
+  MatrixPost(x, y, r, g, b);
 }
 
 void handleIntegerPost() {
@@ -531,6 +541,24 @@ void handleSweepPost() {
   server.send(200, "application/json", response);
 }
 
+void handlePulsePost() {
+  PrintCore("handlePulsePost");
+
+  String pinStr = "";
+  pinStr = server.arg("pin");
+  int pin = pinStr.toInt();
+
+  String valueStr = "";
+  valueStr = server.arg("value");
+  int value = valueStr.toInt();
+
+  String timeStr = "";
+  timeStr = server.arg("time");
+  int time = timeStr.toInt();
+
+  PulsePost(pin, value, time);
+}
+
 #pragma endregion Post_Handlers
 
 void handleApiPost() {
@@ -591,6 +619,7 @@ void SetupServer() {
   server.on("/index.js", HTTP_GET, handleGetJavascript);
   server.on("/index.css", HTTP_GET, handleGetStylesheet);
 
+  server.on("/mat", HTTP_POST, handleMatrixPost);
   server.on("/color", HTTP_POST, handleIntegerPost);
   server.on("/integer", HTTP_POST, handleIntegerPost);
   server.on("/analogout", HTTP_POST, handleAnalogWritePost);
