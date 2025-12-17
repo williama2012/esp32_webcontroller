@@ -129,7 +129,13 @@ bool OnApiCommand(String cmd) {
   if (first_word == "p") {
     int x = str_int(cmd, 1);
     int y = str_int(cmd, 2);
-    set_pixel(x, y);
+    String color_str = str_split(cmd, 3);
+    if (color_str != "") {
+      CRGB color = led_color(color_str);
+      set_pixel(x, y, color);
+    } else {
+      set_pixel(x, y);
+    }
   }
 
   if (first_word == "color") {

@@ -95,8 +95,6 @@ void set_pixel(uint16_t i, CRGB color) {
   if (i >= LED_COUNT) {
     i = LED_COUNT - 1;
   }
-  
-  Println("set_pixel:" + String(i));
 
   leds[i] = color;
   FastLED.show();
@@ -126,6 +124,9 @@ CRGB led_color(String color) {
   }
   if (color == "blue") {
     return CRGB::Blue;
+  }
+  if (color == "Black") {
+    return CRGB::Black;
   }
 
   return CRGB::Black;
@@ -172,61 +173,5 @@ void setAllColorSequence(uint16_t red, uint16_t green, uint16_t blue, uint32_t w
     delay(wait);
   }
 }
-
-
-void setLEDMatrix(uint32_t pixels[]) {
-  uint32_t length = sizeof(pixels) / sizeof(pixels[0]);
-
-  Println("Matrix - " + String(length));
-
-  for(int i = 0; i < LED_COUNT; i++) {
-    uint32_t color = pixels[i];
-    //strip.setPixelColor(i, color);
-  }  
-  //strip.show();
-}
-
-
-
-
-
-
-#pragma region Effects
-
-// void snowflakes(uint8_t wait) {
-//   // Setup the pixel array
-//   int pixel[LED_COUNT];
-//   for(int p = 0; p < LED_COUNT; p++){
-//     pixel[p] = random(0, 255); 
-//   }
-  
-//   // Run some snowflake cycles
-//   for (int j=0; j < 200; j++) {
-//     // Every five cycles, light a new pixel
-//     if((j%5)==0){
-//       strip.setPixelColor(random(0,60), 255,255,255);
-//     }
-    
-//     // Dim all pixels by 10
-//     for(int p=0; p < LED_COUNT; p++){
-//       strip.setPixelColor(p, pixel[p],pixel[p],pixel[p] );
-//       pixel[p] =  pixel[p] - 10;
-//     }
-//     strip.show();
-//     delay(wait);
-//   }
-// }
-
-// void rainbow(int wait) {
-//   // 5 cycles of all colors on wheel
-//   for(long firstPixelHue = 0; firstPixelHue < 5*65536; firstPixelHue += 256) {
-//     strip.rainbow(firstPixelHue);
-//     strip.show(); // Update strip with new contents
-//     delay(wait);  // Pause for a moment
-//   }
-// }
-
-#pragma endregion Effects
-
 
 #endif

@@ -600,6 +600,12 @@ footer {
 
 }
 
+.matrix-controls {
+    border-radius: 5px;
+    border: 2px solid black;
+    padding: 0.25em;
+}
+
 .matrix-frame {
     display: flex;
     flex-direction: column;

@@ -56,16 +56,45 @@ function matrix_row(y) {
     return row;
 }
 
+function matrix_set(x, y, on) {
+    console.log('matrix_set', x, y, on);
+
+    const color = on ? 'White' : 'Black';
+
+    PostApiCommand(`p ${x} ${y} ${color}`, function(response) {
+
+    });
+
+}
+
 function matrix_box_onclick(evt) {
     console.log(evt);
 
     const y = evt.target.getAttribute('x-row');
     const x = evt.target.getAttribute('x-col');
 
-    PostApiCommand(`p ${x} ${y}`, function(response) {
+    // PostApiCommand(`p ${x} ${y}`, function(response) {
 
-    });
+    // });
 
+}
+
+function matrix_box_mouseover(evt) {
+    console.log(evt.ctrlKey, evt.shiftKey, evt.altKey);
+
+    if (evt.shiftKey) {
+        const y = evt.target.getAttribute('x-row');
+        const x = evt.target.getAttribute('x-col');
+        matrix_set(x, y, true);
+        return;
+    }
+
+    if (evt.ctrlKey) {
+        const y = evt.target.getAttribute('x-row');
+        const x = evt.target.getAttribute('x-col');
+        matrix_set(x, y, false);
+        return;
+    }
 
 }
 
@@ -77,9 +106,13 @@ function build_matrix(root_element) {
     document.querySelectorAll(".matrix-box").forEach(element => {
         element.addEventListener("click", matrix_box_onclick); 
     });
+    document.querySelectorAll(".matrix-box").forEach(element => {
+        element.addEventListener("mouseover", matrix_box_mouseover); 
+    });
+
 }
 
-$(function () {
+$(function(){
     
     var matrix = document.getElementById("matrix");
     if (matrix) {
@@ -87,8 +120,16 @@ $(function () {
 
         build_matrix(matrix);
 
+        document
+            .getElementById("matrix-clear")
+            .addEventListener("click", (evt) => {
+                PostApiCommand(`clear`);
+            });
     }
 
+});
+
+$(function () {
 
     const urlInput = document.getElementById("hosturl-input");
     if (urlInput) {
