@@ -19,7 +19,7 @@ PinSet prev_mode;
 void loop(void) {
 
   if (doBlink) {
-    Blink();
+    //Blink();
     doBlink = false;
   }
 
@@ -48,6 +48,7 @@ void loop(void) {
   }
 
   prev_mode = mode;
+  Indicator(true);
 }
 
 PinSet prev_brightness;
