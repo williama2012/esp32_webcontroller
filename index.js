@@ -60,25 +60,28 @@ function matrix_set(x, y, on) {
 
     const color_input = $("#matrix-color").val();
     
-    let r = 255;
-    let g = 255;
-    let b = 255;
+    let r = 0;
+    let g = 0;
+    let b = 0;
     
+    if (on) {
+        r = $("#matrix-color-r").val();
+        g = $("#matrix-color-g").val();
+        b = $("#matrix-color-b").val();
+    }
+
     PostMatrixCommand(x, y, r, g, b, function(response) {
         console.log("response", response);
 
         const box = $(`#matrix-box-${response.x}-${response.y}`);
 
-        box.css("background-image", `radial-gradient(rgba(${response.r}, ${response.g}, ${response.b}, 0.75), black 120%)`);
-    
-        if (response.color == "black") {
-            //box.removeClass("matrix-box-on");
-            //box.addClass("matrix-box-off");
-        } else {
-
-            //box.removeClass("matrix-box-off");
-            //box.addClass("matrix-box-on");
+        if (response.r == "0" && response.g == "0" && response.b == "0") {
+            response.r = 0;
+            response.g = 150;
+            response.b = 0;
         }
+
+        box.css("background-image", `radial-gradient(rgba(${response.r}, ${response.g}, ${response.b}, 0.75), black 120%)`);
 
     });
 
@@ -86,35 +89,32 @@ function matrix_set(x, y, on) {
 
 function matrix_box_onclick(evt) {
     console.log(evt);
-
     const y = evt.target.getAttribute('x-row');
     const x = evt.target.getAttribute('x-col');
 
-    // PostApiCommand(`p ${x} ${y}`, function(response) {
-    // });
 
 }
 
 function matrix_box_mouseover(evt) {
-    //console.log(evt.ctrlKey, evt.shiftKey, evt.altKey);
+    console.log(evt, evt.button, evt.buttons);
 
-    if (evt.shiftKey) {
+    if (evt.shiftKey || evt.buttons == 1) {
         const y = evt.target.getAttribute('x-row');
         const x = evt.target.getAttribute('x-col');
         matrix_set(x, y, true);
         return;
     }
 
-    if (evt.ctrlKey) {
+    if (evt.ctrlKey|| evt.buttons == 2) {
         const y = evt.target.getAttribute('x-row');
         const x = evt.target.getAttribute('x-col');
         matrix_set(x, y, false);
         return;
     }
-
 }
 
 function build_matrix(root_element) {
+
     for(var y = 0; y < GRID_Y; y++) {
         root_element.append(matrix_row(y));
     }
@@ -129,7 +129,10 @@ function build_matrix(root_element) {
 }
 
 $(function(){
-    
+    document.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+    });
+
     var matrix = document.getElementById("matrix");
     if (matrix) {
         matrix = $(matrix);
@@ -139,10 +142,10 @@ $(function(){
         document
             .getElementById("matrix-clear")
             .addEventListener("click", (evt) => {
-                PostApiCommand(`clear`);
+                PostApiCommand("clear");
+                matrix.empty();
+                build_matrix(matrix);
 
-                $(".matrix-box").removeClass("matrix-box-on");
-                $(".matrix-box").addClass("matrix-box-off");
             });
     }
 

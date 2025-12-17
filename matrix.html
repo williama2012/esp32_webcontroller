@@ -43,14 +43,23 @@
     </div>
     <div class="matrix-controls">
       <div>
-        <button type="button" id="matrix-clear">CLEAR</button>
+        <button type="button" class="form-control" id="matrix-clear">CLEAR</button>
       </div>
-      <div>
-        <input type="text" id="matrix-color" value="White"/>
+      <div class="matrix-color-container">
+        <div class="matrix-color-p">
+            <input type='range' step='1' min='0' max='255' value='255' class='matrix-color matrix-color-r slider-range' id='matrix-color-r'>
+        </div>
+        <div class="matrix-color-p">
+            <input type='range' step='1' min='0' max='255' value='0' class='matrix-color matrix-color-g slider-range' id='matrix-color-g'>
+        </div>
+        <div class="matrix-color-p">
+            <input type='range' step='1' min='0' max='255' value='0' class='matrix-color matrix-color-b slider-range' id='matrix-color-b'>
+        </div>   
+        <div class="matrix-color-p">
+            <div class="matrix-color-sample"></div>
+        </div>  
       </div>      
     </div>
   </div>
-
-
 </body>
 </html>

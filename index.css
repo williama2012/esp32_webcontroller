@@ -12,6 +12,11 @@
     --input-focus-s: 100%;
     --input-focus-l: 42%;
     --select-arrow: var(--select-border);
+
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer/Edge */
+    user-select: none;         /* Standard syntax */    
 }
 
 body {
@@ -604,7 +609,7 @@ footer {
     border-radius: 5px;
     border: 2px solid black;
     padding: 0.25em;
-    max-width:100px;
+    margin: 0 0 0 0.25em;
 }
 
 .matrix-frame {
@@ -638,16 +643,18 @@ footer {
     );
 }
 
-.matrix-box-off {
-    background-color: black;
-    background-image: radial-gradient(
-    rgba(0, 150, 0, 0.75), black 120%
-    );
+.matrix-color-p {
+    padding: 0.25em 0 0 0;
 }
 
-.matrix-box-on {
-    background-color: black;
-    background-image: radial-gradient(
-    rgba(255, 255, 255, 0.75), black 120%
-    );
+.matrix-color-r::-webkit-slider-thumb {
+    background: red;
+}
+
+.matrix-color-g::-webkit-slider-thumb {
+    background: green;
+}
+
+.matrix-color-b::-webkit-slider-thumb {
+    background: blue;
 }
