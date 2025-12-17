@@ -91,12 +91,10 @@ function matrix_box_onclick(evt) {
     console.log(evt);
     const y = evt.target.getAttribute('x-row');
     const x = evt.target.getAttribute('x-col');
-
-
 }
 
 function matrix_box_mouseover(evt) {
-    console.log(evt, evt.button, evt.buttons);
+    //console.log(evt, evt.buttons);
 
     if (evt.shiftKey || evt.buttons == 1) {
         const y = evt.target.getAttribute('x-row');
@@ -160,7 +158,10 @@ $(function () {
                 BASE_URL = evt.target.value;
                 localStorage.setItem("hosturl-input", BASE_URL);
             });
-        BASE_URL = localStorage.getItem("hosturl-input");
+        const stored_url = localStorage.getItem("hosturl-input");
+        
+        BASE_URL = stored_url || "";
+
         urlInput.value = BASE_URL;
     }
 
