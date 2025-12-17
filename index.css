@@ -577,8 +577,6 @@ footer {
 }
 
 .matrix-input {
-    min-height:8vh;
-    max-height:8vh;
     border-radius: 0 0 5px 5px;
     
     border: 2px solid black;

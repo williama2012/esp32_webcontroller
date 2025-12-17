@@ -22,6 +22,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 2);
 
 INCTXT(WebPage, "index.html");
 INCTXT(TerminalWebPage, "terminal.html");
+INCTXT(MatrixWebPage, "matrix.html");
 INCTXT(WebJavascript, "index.js");
 INCTXT(WebStylesheet, "index.css");
 
@@ -343,6 +344,12 @@ void handleGetTerminal() {
   server.send(200, "text/html", gTerminalWebPageData);
 }
 
+void handleGetMatrix() {
+  PrintCore("handleGetTerminal");
+  server.send(200, "text/html", gMatrixWebPageData);
+}
+
+
 void handleGetJavascript() {
   PrintCore("handleGetJavascript");
   server.send(200, "text/javascript", gWebJavascriptData);
@@ -581,6 +588,7 @@ void SetupServer() {
   server.enableCrossOrigin(true);
 
   server.on("/", HTTP_GET, handleGetIndex);
+  server.on("/matrix", HTTP_GET, handleGetMatrix);
   server.on("/terminal", HTTP_GET, handleGetTerminal);
   server.on("/index.js", HTTP_GET, handleGetJavascript);
   server.on("/index.css", HTTP_GET, handleGetStylesheet);

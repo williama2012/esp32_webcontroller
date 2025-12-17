@@ -57,7 +57,6 @@ function matrix_row(y) {
 }
 
 function matrix_set(x, y, on) {
-    console.log('matrix_set', x, y, on);
 
     const color = on ? 'White' : 'Black';
 
@@ -80,7 +79,7 @@ function matrix_box_onclick(evt) {
 }
 
 function matrix_box_mouseover(evt) {
-    console.log(evt.ctrlKey, evt.shiftKey, evt.altKey);
+    //console.log(evt.ctrlKey, evt.shiftKey, evt.altKey);
 
     if (evt.shiftKey) {
         const y = evt.target.getAttribute('x-row');
@@ -179,7 +178,7 @@ $(function () {
 
         document
             .getElementById("command-input")
-            .addEventListener("keydown", handleCommandKeypress);
+            .addEventListener("keydown", handleTerminalKeypress);
 
         document
             .getElementById("refreshBtn")
@@ -210,36 +209,51 @@ const command_history = [];
 let history_selected = 0;
 
 
-function terminalSubmit() {
-    const command = $("#terminal-input").val();
+function terminalSubmit(target) {
+    const command = target.value;
     command_history.unshift(command);
     history_selected = 0;
 
     const commands = command.split("\n");
-    console.log("commands", commands);
 
     commands.forEach(cmd => {
         if (cmd != "") {
             PostApiCommand(cmd, function(response) {
-                $("#terminal-input").val("");
+                target.value = "";
             });
         }
     });
 }
 
 function handleTerminalKeypress(evt) {
-    if (evt.ctrlKey && evt.keyCode == 38) {
-        const hist = command_history[history_selected];
-        
-        $("#terminal-input").val(hist);
-        history_selected++;
-        if (history_selected > command_history.length) {
-            history_selected = 0;
-        }
-    }
+    var use_ctrl = evt.target.type === "textarea";
 
-    if (evt.ctrlKey && evt.keyCode == 13) {
-        terminalSubmit();
+    if (use_ctrl) {
+        if (evt.ctrlKey && evt.keyCode == 38) {
+            const hist = command_history[history_selected];
+            evt.target.value = hist;
+            history_selected++;
+            if (history_selected > command_history.length) {
+                history_selected = 0;
+            }
+        }
+
+        if (evt.ctrlKey && evt.keyCode == 13) {
+            terminalSubmit(evt.target);
+        }
+    } else {
+        if (evt.keyCode == 38) {
+            const hist = command_history[history_selected];
+            evt.target.value = hist;
+            history_selected++;
+            if (history_selected > command_history.length) {
+                history_selected = 0;
+            }
+        }
+
+        if (evt.keyCode == 13) {
+            terminalSubmit(evt.target);
+        }
     }
 }
 
