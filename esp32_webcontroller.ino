@@ -133,8 +133,10 @@ bool OnApiCommand(String cmd) {
     if (color_str != "") {
       CRGB color = led_color(color_str);
       set_pixel(x, y, color);
+      return send_body(jsonField("x", String(x), true) + jsonField("y", String(y), true) + jsonField("color", color_str, false));
     } else {
       set_pixel(x, y);
+      return send_body(jsonField("x", String(x), true) + jsonField("y", String(y), true) + jsonField("color", "white", false));
     }
   }
 

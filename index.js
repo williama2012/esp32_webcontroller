@@ -43,7 +43,7 @@ const GRID_X = 22;
 const GRID_Y = 22;
 
 function matrix_box(x, y) {
-    return $(`<div id='matrix-box-${x}-${y}' x-row='${y}' x-col='${x}' class='matrix-box'></div>`);
+    return $(`<div id='matrix-box-${x}-${y}' x-row='${y}' x-col='${x}' class='matrix-box matrix-box-off'></div>`);
 }
 
 function matrix_row(y) {
@@ -58,9 +58,21 @@ function matrix_row(y) {
 
 function matrix_set(x, y, on) {
 
-    const color = on ? 'White' : 'Black';
+    const color_input = $("#matrix-color").val();
+
+    const color = on ? color_input : 'Black';
 
     PostApiCommand(`p ${x} ${y} ${color}`, function(response) {
+
+        const box = $(`#matrix-box-${response.x}-${response.y}`);
+        
+        if (response.color == "black") {
+            box.removeClass("matrix-box-on");
+            box.addClass("matrix-box-off");
+        } else {
+            box.removeClass("matrix-box-off");
+            box.addClass("matrix-box-on");
+        }
 
     });
 
@@ -73,7 +85,6 @@ function matrix_box_onclick(evt) {
     const x = evt.target.getAttribute('x-col');
 
     // PostApiCommand(`p ${x} ${y}`, function(response) {
-
     // });
 
 }
@@ -123,6 +134,9 @@ $(function(){
             .getElementById("matrix-clear")
             .addEventListener("click", (evt) => {
                 PostApiCommand(`clear`);
+
+                $(".matrix-box").removeClass("matrix-box-on");
+                $(".matrix-box").addClass("matrix-box-off");
             });
     }
 

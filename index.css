@@ -599,9 +599,12 @@ footer {
 }
 
 .matrix-controls {
+    display:flex;
+    flex-direction: column;
     border-radius: 5px;
     border: 2px solid black;
     padding: 0.25em;
+    max-width:100px;
 }
 
 .matrix-frame {
@@ -630,9 +633,18 @@ footer {
     width: 25px;
     height: 25px;
 
+}
+
+.matrix-box-off {
     background-color: black;
     background-image: radial-gradient(
     rgba(0, 150, 0, 0.75), black 120%
     );
+}
 
+.matrix-box-on {
+    background-color: black;
+    background-image: radial-gradient(
+    rgba(255, 255, 255, 0.75), black 120%
+    );
 }
