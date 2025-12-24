@@ -619,8 +619,8 @@ void SetupServer() {
   server.on("/", HTTP_GET, handleGetMatrix);
   server.on("/ctrl", HTTP_GET, handleGetIndex);
   server.on("/matrix", HTTP_GET, handleGetMatrix);
-
   server.on("/terminal", HTTP_GET, handleGetTerminal);
+
   server.on("/index.js", HTTP_GET, handleGetJavascript);
   server.on("/index.css", HTTP_GET, handleGetStylesheet);
 

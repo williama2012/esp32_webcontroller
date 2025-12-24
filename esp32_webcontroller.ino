@@ -14,31 +14,17 @@ void SetupTimers() {
   BeginStrip();
 }
 
-PinSet prev_mode;
-
+// Runs on Core 1
 void loop(void) {
 
   if (doBlink) {
-    //Blink();
+    Blink();
     doBlink = false;
   }
 
-  //CheckApiCommand();
-
-  PinSet mode = get_pin(50);
-
-  bool mode_changed = mode.value != prev_mode.value;
-
-  if (mode_changed) {
-    PrintCore("Mode Changed: " + String(mode.value));
-  }
-
-  switch (mode.value) {
+  switch (mode) {
     case 1:
       mode1process();
-      break;
-    case 2:
-      mode2process();
       break;
     case 3:
       mode3process();
@@ -47,40 +33,13 @@ void loop(void) {
       break;
   }
 
-  prev_mode = mode;
-  Indicator(true);
 }
 
 PinSet prev_brightness;
 
 void mode3process() {
-  PinSet brightness = get_pin(54);
-  if (brightness.value != prev_brightness.value) {
-    set_brightness(brightness.value);
-    prev_brightness = brightness;
-  }
-
-  PinSet red_set = get_pin(51);
-  PinSet green_set = get_pin(52);
-  PinSet blue_set = get_pin(53);
   led_clear();
-  setAllColorSequence(red_set.value, green_set.value, blue_set.value);
-  
-}
-
-
-void mode2process() {
-  PinSet brightness = get_pin(54);
-  if (brightness.value != prev_brightness.value) {
-    set_brightness(brightness.value);
-    prev_brightness = brightness;
-  }
-
-  PinSet red_set = get_pin(51);
-  PinSet green_set = get_pin(52);
-  PinSet blue_set = get_pin(53);
-  setAllColor(red_set.value, green_set.value, blue_set.value);
-  
+  setAllColorSequence(color_r, color_g, color_b);
 }
 
 void mode1process() {
@@ -101,27 +60,7 @@ void mode1process() {
   }
 }
 
-
-bool processCmd_setPixel(String cmd) {
-    int pixel = str_int(cmd, 1);
-    Serial.println(pixel);
-
-    if (pixel < 0) {
-      return send_500("format: pixel {pixel#} {color}");
-    }
-    String color_str = str_split(cmd, 2);
-    if (color_str == "") {
-
-      set_pixel(pixel, CRGB(255, 255, 255));
-
-      return send_msg("pixel " + String (pixel) + " set to WHITE");
-    }
-    CRGB color = led_color(color_str);
-    set_pixel(pixel, color);
-    return send_msg("pixel " + String (pixel) + " set to " + color_str);
-}
-
-// Runs on Core 1
+// Runs on Core 0
 bool OnApiCommand(String cmd) {
   PrintCore("ProcessCommand: " + cmd);
   String first_word = str_split(cmd, 0);
@@ -141,16 +80,23 @@ bool OnApiCommand(String cmd) {
   }
 
   if (first_word == "color") {
-      set_pin(51, Integer, str_int(cmd, 1));
-      set_pin(52, Integer, str_int(cmd, 2));
-      set_pin(53, Integer, str_int(cmd, 3));
+      color_r = str_int(cmd, 1);
+      color_g = str_int(cmd, 2);
+      color_b = str_int(cmd, 3);
+      uint16_t brightness = str_int(cmd, 4);
+
+  }
+
+  if (first_word == "brightness") {
+      uint16_t brightness = str_int(cmd, 1);
+
   }
 
   if (first_word == "mode") {
     int m = str_int(cmd, 1);
     if (m > -1) {
-      set_pin(50, Integer, m);
-      return send_msg("mode changed to " + String(m));
+      mode = m;
+      return send_msg("mode changed to " + String(mode));
     }
     return send_msg("invalid mode value");
   }
@@ -158,10 +104,6 @@ bool OnApiCommand(String cmd) {
   if (first_word == "clear") {
     led_clear();
     return send_msg("cleared");
-  }
-  
-  if (first_word == "pixel") {
-    return processCmd_setPixel(cmd);
   }
 
   return false;
