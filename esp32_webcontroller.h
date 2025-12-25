@@ -18,8 +18,6 @@
 
 TaskHandle_t Task1;
 WebServer server(80);
-//Servo servo_ctrl;
-LiquidCrystal_I2C lcd(0x27, 20, 2);
 
 INCTXT(WebPage, "index.html");
 INCTXT(TerminalWebPage, "terminal.html");
@@ -27,38 +25,11 @@ INCTXT(MatrixWebPage, "matrix.html");
 INCTXT(WebJavascript, "index.js");
 INCTXT(WebStylesheet, "index.css");
 
-String api_cmd = "";
 String url;
 bool doBlink = false;
 int servo_pin = 0;
 
-String lcd_row1;
-String lcd_row2;
-String lcd_row3;
-String lcd_row4;
-
-String _lcd_row1_printed;
-String _lcd_row2_printed;
-String _lcd_row3_printed;
-String _lcd_row4_printed;
-
 bool OnApiCommand(String cmd);
-
-void ResetPins() {
-  api_cmd = "";
-  servo_pin = 0;
-  for (int i = 2; i <= 24; i++) {
-    //servo_ctrl.detach(i);
-    pinMode(i, OUTPUT);
-    analogWrite(i, 0);
-    pinMode(i, INPUT);
-    int val = analogRead(i);
-    set_pin(i, AnalogRead, val);
-    Println("reset pin - " + String(i));
-  }
-  lcd_row2 = "All reset";
-  lcd_row3 = "";
-}
 
 #pragma region server
 
@@ -109,7 +80,6 @@ void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint
     + jsonField("g", String(g), true)
     + jsonField("b", String(b), false));
 }
-
 
 void IntegerPost(int pin, int value) {
   PrintCore("IntegerPost");
@@ -277,49 +247,6 @@ void PulsePost(int pin, int value, int time) {
 }
 
 #pragma endregion Actions
-
-#pragma region lcd
-
-void LcdUpdateRows() {
-
-  if (lcd_row1 != _lcd_row1_printed
-      || lcd_row2 != _lcd_row2_printed
-      || lcd_row3 != _lcd_row3_printed
-      || lcd_row4 != _lcd_row4_printed) {
-
-    lcd.clear();
-    _lcd_row1_printed = "";
-    _lcd_row2_printed = "";
-    _lcd_row3_printed = "";
-    _lcd_row4_printed = "";
-  }
-
-  if (lcd_row1 != _lcd_row1_printed) {
-    lcd.setCursor(0, 0);
-    lcd.print(lcd_row1);
-    _lcd_row1_printed = lcd_row1;
-  }
-
-  if (lcd_row2 != _lcd_row2_printed) {
-    lcd.setCursor(0, 1);
-    lcd.print(lcd_row2);
-    _lcd_row2_printed = lcd_row2;
-  }
-
-  if (lcd_row3 != _lcd_row3_printed) {
-    lcd.setCursor(0, 2);
-    lcd.print(lcd_row3);
-    _lcd_row3_printed = lcd_row3;
-  }
-
-  if (lcd_row4 != _lcd_row4_printed) {
-    lcd.setCursor(0, 3);
-    lcd.print(lcd_row4);
-    _lcd_row4_printed = lcd_row4;
-  }
-}
-
-#pragma endregion lcd
 
 #pragma region servo
 
@@ -574,9 +501,8 @@ void handleApiPost() {
     ResetPins();
     server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
   } else if (first_word == "int") {
-
+    
     IntegerPost(str_int(cmd, 1), str_int(cmd, 2));
-
   } else if (first_word == "servo") {
 
     //handleServoWritePost();
@@ -595,13 +521,11 @@ void handleApiPost() {
   } else {
     bool response_handled = OnApiCommand(cmd);
     if (!response_handled) {
-      api_cmd = cmd;
-      send_rec(api_cmd);
+      send_rec(cmd);
     }
     
   }
 }
-
 
 #pragma region Setup
 
@@ -640,13 +564,6 @@ void SetupServer() {
   server.begin();
 
   Println("HTTP server started");
-}
-
-void SetupLCD() {
-  // lcd.init();
-  // lcd.backlight();
-  // lcd.noBlink();
-  // lcd.clear();
 }
 
 void SetupTimers();
@@ -689,7 +606,6 @@ void setup(void) {
   SetupServer();
   SetupPins();
   SetupTimers();
-  SetupLCD();
 
   xTaskCreatePinnedToCore(
     Core0Processor,   /* Function to implement the task */
@@ -700,8 +616,6 @@ void setup(void) {
     &Task1,           /* Task handle. */
     0);               /* Core where the task should run */
 
-  lcd_row1 = url;
-  
 }
 
 #pragma endregion Setup
