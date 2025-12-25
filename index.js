@@ -58,8 +58,6 @@ function matrix_row(y) {
 
 function matrix_set(x, y, on) {
 
-    const color_input = $("#matrix-color").val();
-    
     let r = 0;
     let g = 0;
     let b = 0;
@@ -91,6 +89,7 @@ function matrix_box_onclick(evt) {
     console.log(evt);
     const y = evt.target.getAttribute('x-row');
     const x = evt.target.getAttribute('x-col');
+    matrix_set(x, y, true);
 }
 
 function matrix_box_mouseover(evt) {
@@ -123,12 +122,19 @@ function build_matrix(root_element) {
     document.querySelectorAll(".matrix-box").forEach(element => {
         element.addEventListener("mouseover", matrix_box_mouseover); 
     });
+    document.querySelectorAll(".matrix-box").forEach(element => {
+        element.addEventListener("mouseover", matrix_box_mouseover); 
+    });
+
 
 }
 
 $(function(){
     document.addEventListener('contextmenu', (event) => {
         event.preventDefault();
+        const y = evt.target.getAttribute('x-row');
+        const x = evt.target.getAttribute('x-col');
+        matrix_set(x, y, false);
     });
 
     var matrix = document.getElementById("matrix");
@@ -145,6 +151,17 @@ $(function(){
                 build_matrix(matrix);
 
             });
+
+
+
+        document
+            .getElementById("matrix-color-a")
+            .addEventListener("change", (evt) => {
+                const a = $("#matrix-color-a").val();
+                PostApiCommand(`brightness ${a}`);
+            });
+
+        
     }
 
 });

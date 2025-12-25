@@ -27,32 +27,37 @@
 
 <body class="matrix-body">
 
-
-
   <div class="matrix-container-body">
     <div class="matrix-container">
       <div class="matrix-frame" id="matrix"></div>
     </div>
-    <div class="matrix-controls">
-      <div>
-        <button type="button" class="form-control" id="matrix-clear">CLEAR</button>
-      </div>
-      <div class="matrix-color-container">
-        <div class="matrix-color-p">
-            <input type='range' step='1' min='0' max='255' value='255' class='matrix-color matrix-color-r slider-range' id='matrix-color-r'>
-        </div>
-        <div class="matrix-color-p">
-            <input type='range' step='1' min='0' max='255' value='0' class='matrix-color matrix-color-g slider-range' id='matrix-color-g'>
-        </div>
-        <div class="matrix-color-p">
-            <input type='range' step='1' min='0' max='255' value='0' class='matrix-color matrix-color-b slider-range' id='matrix-color-b'>
-        </div>   
-        <div class="matrix-color-p">
-            <div class="matrix-color-sample"></div>
-        </div>  
-      </div>      
-    </div>
+
   </div>
+  <div class="matrix-controls">
+    <div>
+      <button type="button" class="form-control" id="matrix-clear">CLEAR</button>
+    </div>
+    <div class="matrix-color-container">
+      <div class="matrix-color-p">
+          <input type='range' step='1' min='0' max='255' value='255' class='matrix-color matrix-color-r slider-range' id='matrix-color-r'>
+      </div>
+      <div class="matrix-color-p">
+          <input type='range' step='1' min='0' max='255' value='0' class='matrix-color matrix-color-g slider-range' id='matrix-color-g'>
+      </div>
+      <div class="matrix-color-p">
+          <input type='range' step='1' min='0' max='255' value='0' class='matrix-color matrix-color-b slider-range' id='matrix-color-b'>
+      </div>
+      <div class="matrix-color-p">
+          <input type='range' step='1' min='0' max='255' value='0' class='matrix-color matrix-color-a slider-range' id='matrix-color-a'>
+      </div>
+
+      <div class="matrix-color-p">
+          <div class="matrix-color-sample"></div>
+      </div>  
+    </div>      
+  </div>
+
+
   <div class="matrix-history-container-body">
     <div class="matrix-history-container">
       <table id="terminal-history" class="matrix-history"></table>

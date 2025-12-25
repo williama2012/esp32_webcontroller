@@ -662,3 +662,7 @@ footer {
 .matrix-color-b::-webkit-slider-thumb {
     background: blue;
 }
+
+.matrix-color-a::-webkit-slider-thumb {
+    background: white;
+}
