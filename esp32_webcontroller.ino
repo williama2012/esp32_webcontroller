@@ -35,8 +35,6 @@ void loop(void) {
 
 }
 
-PinSet prev_brightness;
-
 void mode3process() {
   led_clear();
   setAllColorSequence(color_r, color_g, color_b);
@@ -84,19 +82,24 @@ bool OnApiCommand(String cmd) {
       color_g = str_int(cmd, 2);
       color_b = str_int(cmd, 3);
       uint16_t brightness = str_int(cmd, 4);
-
+      if (brightness > -1) {
+        set_brightness(brightness);
+      }
   }
 
   if (first_word == "brightness") {
       uint16_t brightness = str_int(cmd, 1);
-
+      if (brightness > -1) {
+        set_brightness(brightness);
+        return send_body(jsonField("brightness", String(brightness), false));
+      }
   }
 
   if (first_word == "mode") {
     int m = str_int(cmd, 1);
     if (m > -1) {
       mode = m;
-      return send_msg("mode changed to " + String(mode));
+      return send_body(jsonField("mode", String(mode), false));
     }
     return send_msg("invalid mode value");
   }
