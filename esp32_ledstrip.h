@@ -65,16 +65,10 @@ uint16_t XY( uint8_t x, uint8_t y)
 }
 
 
-
-
-
-
-
 void led_clear() {
   fill_solid(leds, NUM_LEDS, CRGB(0,0,0));
-  FastLED.show();  
+  FastLED.show();
 }
-
 
 void BeginStrip() {
     FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
@@ -84,11 +78,13 @@ void BeginStrip() {
 
 void set_brightness(uint16_t brightness) {
   FastLED.setBrightness(brightness);
+  FastLED.show();
 }
 
 void set_brightnessP(uint16_t percent) {
   uint16_t val = map(percent, 0, 100, 0, 255);
   FastLED.setBrightness(val);
+  FastLED.show();
 }
 
 void set_pixel(uint16_t i, CRGB color) {
