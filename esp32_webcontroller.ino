@@ -1,7 +1,7 @@
 #include "esp32_webcontroller.h"
 
 Timer timers;
-uint8_t mode = 1;
+uint8_t mode = 0;
 
 void SetupPins() {
   pinMode(23, OUTPUT);

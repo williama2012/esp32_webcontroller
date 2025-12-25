@@ -598,13 +598,13 @@ footer {
     outline: none;
 }
 
-.matrix-container-body {
+.matrix-container {
     display: flex;
     flex-direction: row;
 }
 
-.matrix-container {
-
+.matrix-frame-body {
+    
 }
 
 .matrix-controls {

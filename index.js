@@ -152,8 +152,6 @@ $(function(){
 
             });
 
-
-
         document
             .getElementById("matrix-color-a")
             .addEventListener("change", (evt) => {
@@ -161,7 +159,6 @@ $(function(){
                 PostApiCommand(`brightness ${a}`);
             });
 
-        
     }
 
 });

@@ -27,14 +27,16 @@ typedef struct {
   PinModeEnum mode;
 } PinSet;
 
+/**
+  Max 32 parameters
+*/
 String str_split(String str, uint8_t position) {
   String strs[32];
   int StringCount = 0;
 
-  // Split the string into substrings
   while (str.length() > 0) {
     int index = str.indexOf(' ');
-    if (index == -1) { // No space found, last part
+    if (index == -1) {
       strs[StringCount++] = str;
       break;
     } else {
@@ -81,6 +83,15 @@ PinSet get_pin(uint8_t pin) {
     pin = MAX_PIN;
   }
   return PIN_SET[pin];
+}
+
+void ResetPins() {
+  for (int i = 2; i <= 24; i++) {
+    pinMode(i, OUTPUT);
+    analogWrite(i, 0);
+    pinMode(i, INPUT);
+    int val = analogRead(i);
+  }
 }
 
 #pragma endregion Pins
