@@ -28,10 +28,10 @@ typedef struct {
 } PinSet;
 
 /**
-  Max 32 parameters
+  Max 16 parameters
 */
 String str_split(String str, uint8_t position) {
-  String strs[32];
+  String strs[16];
   int StringCount = 0;
 
   while (str.length() > 0) {
