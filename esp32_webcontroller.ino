@@ -58,11 +58,24 @@ void mode1process() {
   }
 }
 
+bool OnSetParameter(String cmd) {
+  PrintCore("OnSetParameter: " + cmd);
+  
+  String param = str_split(cmd, 1);
+  String value = str_split(cmd, 2);
+
+  return send_body(jsonField("param", String(param), true) + jsonField("value", String(value)));
+}
+
 // Runs on Core 0
 bool OnApiCommand(String cmd) {
   PrintCore("ProcessCommand: " + cmd);
   String first_word = str_split(cmd, 0);
   
+  if (first_word == "set") {
+    return OnSetParameter(cmd);
+  }
+
   if (first_word == "p") {
     int x = str_int(cmd, 1);
     int y = str_int(cmd, 2);
@@ -108,6 +121,7 @@ bool OnApiCommand(String cmd) {
     led_clear();
     return send_msg("cleared");
   }
+
 
   return false;
 }
