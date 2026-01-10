@@ -30,12 +30,12 @@ typedef struct {
 /**
   Max 16 parameters
 */
-String str_split(String str, uint8_t position) {
+String str_split(String str, uint8_t position, char separator = ' ') {
   String strs[16];
   int StringCount = 0;
 
   while (str.length() > 0) {
-    int index = str.indexOf(' ');
+    int index = str.indexOf(separator);
     if (index == -1) {
       strs[StringCount++] = str;
       break;
@@ -98,7 +98,7 @@ void ResetPins() {
 
 #pragma region Json
 
-String jsonField(String field, String value, bool addMore) {
+String jsonField(String field, String value, bool addMore = false) {
   return "\"" + field + "\":" + "\"" + value + "\"" + (addMore ? "," : "");
 }
 
