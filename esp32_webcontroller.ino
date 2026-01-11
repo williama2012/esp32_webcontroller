@@ -73,8 +73,6 @@ bool OnSetParameter(String cmd) {
 bool HandleLcdCommand(String cmd) {
   String cmd_1 = str_split(cmd, 1);
   String cmd_2 = str_split(cmd, 2);
-  String cmd_3 = str_split(cmd, 3);
-  String cmd_4 = str_split(cmd, 4);
 
   if (cmd_1 == "init") {
     LcdInit();
@@ -95,6 +93,7 @@ bool HandleLcdCommand(String cmd) {
   }
 
   if (cmd_1 == "print") {
+
     LcdPrint(cmd_2);
   }
 

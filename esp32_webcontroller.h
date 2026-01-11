@@ -1,69 +1,19 @@
 #ifndef ESP32_CONTROLLER
 #define ESP32_CONTROLLER_H
 #include <Arduino.h>
-#include "secrets.h"
-//#include "Servo.h"
-#include "incbin.h"
-#include "Wire.h"
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <WebServer.h>
-#include <ESPmDNS.h>
+#include "esp32_server.h"
 #include "esp32_timer.h"
-#include "esp32_helpers.h"
 #include "esp32_ledstrip.h"
 #include "esp32_lcd.h"
 
 #define SERIAL_BAUDRATE 115200
 
 TaskHandle_t Task1;
-WebServer server(80);
 
-INCTXT(WebPage, "index.html");
-INCTXT(TerminalWebPage, "terminal.html");
-INCTXT(MatrixWebPage, "matrix.html");
-INCTXT(WebJavascript, "index.js");
-INCTXT(WebStylesheet, "index.css");
-
-String url;
 bool doBlink = false;
 int servo_pin = 0;
 
 bool OnApiCommand(String cmd);
-
-#pragma region server
-
-int intArg(String name) {
-  String strVal = server.arg(name);
-  int val = strVal.toInt();
-  return val;
-}
-
-bool send_body(String body) {
-  server.send(200, "application/json", "{" + body + "}");
-  return true;
-}
-
-bool send_rec(String cmd) {
-  send_body(jsonField("received", cmd, false));
-  return true;
-}
-
-bool send_rec() {
-  send_rec(jsonField("received", "command", false));
-  return true;
-}
-
-bool send_msg(String msg) {
-  send_body(jsonField("msg", msg, false));
-  return true;
-}
-
-bool send_500(String msg) {
-  return send_body(jsonField("status", "500", true) + jsonField("msg", msg, false));
-}
-
-#pragma endregion server
 
 #pragma region Actions
 
