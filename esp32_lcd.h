@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 
-LiquidCrystal_I2C lcd(0x27, 16, 4);
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 void LcdInit() {
   lcd.init();
@@ -15,7 +15,7 @@ void LcdClear() {
 }
 
 void LcdPrint(String txt, uint8_t row = 0, uint8_t col = 0) {
-  lcd.setCursor(row, col);
+  lcd.setCursor(col, row);
   lcd.print(txt);
 }
 
