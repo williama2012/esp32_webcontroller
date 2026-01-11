@@ -3,6 +3,11 @@
 Timer timers;
 uint8_t mode = 0;
 
+void PreSetup() {
+  BeginStrip();
+  LcdInit();
+}
+
 void SetupPins() {
   pinMode(23, OUTPUT);
 }
@@ -10,8 +15,6 @@ void SetupPins() {
 void SetupTimers() {
   timers.AddTimer(0, 1);
   timers.AddTimer(1, 10000);
-
-  BeginStrip();
 }
 
 // Runs on Core 1
@@ -67,6 +70,46 @@ bool OnSetParameter(String cmd) {
   return send_body(jsonField("param", String(param), true) + jsonField("value", String(value)));
 }
 
+bool HandleLcdCommand(String cmd) {
+  String cmd_1 = str_split(cmd, 1);
+  String cmd_2 = str_split(cmd, 2);
+  String cmd_3 = str_split(cmd, 3);
+  String cmd_4 = str_split(cmd, 4);
+
+  if (cmd_1 == "init") {
+    LcdInit();
+  }
+
+  if (cmd_1 == "clear") {
+    LcdClear();
+  }
+
+  // backlight
+  if (cmd_1 == "bl") {
+    if (cmd_2 == "on") {
+      lcd.backlight();
+    }
+    if (cmd_2 == "off") {
+      lcd.noBacklight();
+    }
+  }
+
+  if (cmd_1 == "print") {
+    LcdPrint(cmd_2);
+  }
+
+  if (cmd_1 == "show") {
+    if (cmd_2 == "url") {
+      LcdPrint(url);
+    }
+    if (cmd_2 == "mac") {
+      LcdPrint(String(WiFi.macAddress()));
+    }
+  }
+
+  return send_body(jsonField("msg",  "received"));
+}
+
 // Runs on Core 0
 bool OnApiCommand(String cmd) {
   PrintCore("ProcessCommand: " + cmd);
@@ -74,6 +117,10 @@ bool OnApiCommand(String cmd) {
   
   if (first_word == "set") {
     return OnSetParameter(cmd);
+  }
+
+  if (first_word == "lcd") {
+    return HandleLcdCommand(cmd);
   }
 
   // Analog Output (pin, value)
@@ -99,8 +146,6 @@ bool OnApiCommand(String cmd) {
     ToneWritePost(pin,val);
     return true;
   }
-
-
 
   if (first_word == "p") {
     int x = str_int(cmd, 1);
