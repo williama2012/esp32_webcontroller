@@ -521,20 +521,27 @@ void SetupServer() {
 }
 
 void SetupWifi() {
-  LcdPrint("Starting Wifi");
   PrintCore("SetupWifi");
+
+  LcdPrint("SSID:" + String(ssid), 0);
+
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
+  LcdPrint("Connecting..", 1);
+
   bool o = false;
+
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Print(".");
-
     o = o ? false : true;
-    LcdPrint(o ? "|" : "-", 3, 19);
+    LcdPrint(o ? "|" : "-", 1, 12);
+    LcdPrint("Status:" + String(WiFi.status()), 2);
   }
+  LcdPrint("Status:" + String(WiFi.status()), 2);
+  
   Println("");
   Print("Connected to ");
   Println(ssid);
