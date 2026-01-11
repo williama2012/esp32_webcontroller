@@ -7,6 +7,7 @@
 #include "esp32_lcd.h"
 
 #define SERIAL_BAUDRATE 115200
+#define VERSION 20260111.01
 
 TaskHandle_t Task1;
 
