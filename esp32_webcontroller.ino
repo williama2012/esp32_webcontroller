@@ -76,6 +76,32 @@ bool OnApiCommand(String cmd) {
     return OnSetParameter(cmd);
   }
 
+  // Analog Output (pin, value)
+  if (first_word == "an" || first_word == "analog") {
+    int pin = str_int(cmd, 1);
+    int val = str_int(cmd, 2);
+    AnalogWritePost(pin,val);
+    return true;
+  }
+
+  // Digital Output (pin, value)
+  if (first_word == "di" || first_word == "digital") {
+    int pin = str_int(cmd, 1);
+    int val = str_int(cmd, 2);
+    DigitalWritePost(pin,val);
+    return true;
+  }
+
+  // Tone Output (pin, value)
+  if (first_word == "to" || first_word == "tone") {
+    int pin = str_int(cmd, 1);
+    int val = str_int(cmd, 2);
+    ToneWritePost(pin,val);
+    return true;
+  }
+
+
+
   if (first_word == "p") {
     int x = str_int(cmd, 1);
     int y = str_int(cmd, 2);
