@@ -515,16 +515,25 @@ void SetupServer() {
   server.begin();
 
   Println("HTTP server started");
+  LcdClear();
+  LcdPrint("HTTP server started");
+  LcdPrint(url, 1);
 }
 
 void SetupWifi() {
+  LcdPrint("Starting Wifi");
   PrintCore("SetupWifi");
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
+  bool o = false;
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Print(".");
+
+    o = o ? false : true;
+    LcdPrint(o ? "|" : "-", 3, 19);
   }
   Println("");
   Print("Connected to ");
