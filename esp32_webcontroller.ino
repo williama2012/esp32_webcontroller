@@ -70,7 +70,7 @@ bool OnSetParameter(String cmd) {
   return send_body(jsonField("param", String(param), true) + jsonField("value", String(value)));
 }
 
-bool HandleLcdCommand(String cmd) {
+void HandleLcdCommand(String cmd) {
   String cmd_1 = str_split(cmd, 1);
   String cmd_2 = str_split(cmd, 2);
 
@@ -93,7 +93,16 @@ bool HandleLcdCommand(String cmd) {
   }
 
   if (cmd_1 == "print") {
-
+    int row = str_int(cmd, 3);
+    int col = str_int(cmd, 4);
+    if (row > -1) {
+      if(col > -1) {
+        LcdPrint(cmd_2, row, col);
+        return;
+      }
+      LcdPrint(cmd_2, row);
+      return;
+    }
     LcdPrint(cmd_2);
   }
 
@@ -104,9 +113,11 @@ bool HandleLcdCommand(String cmd) {
     if (cmd_2 == "mac") {
       LcdPrint(String(WiFi.macAddress()));
     }
+    if (cmd_2 == "version") {
+      LcdPrint(String(VERSION));
+    }
   }
 
-  return send_body(jsonField("msg",  "received"));
 }
 
 // Runs on Core 0
@@ -119,7 +130,8 @@ bool OnApiCommand(String cmd) {
   }
 
   if (first_word == "lcd") {
-    return HandleLcdCommand(cmd);
+    HandleLcdCommand(cmd);
+    return send_body(jsonField("msg",  "rcv"));
   }
 
   // Analog Output (pin, value)
