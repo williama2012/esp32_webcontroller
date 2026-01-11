@@ -1,5 +1,5 @@
 const MAX_PWM = 4095;
-const MAX_TONE = 40000; //4294967295;
+const MAX_TONE = 78000; // Manually tested with scope, esp32 stops at 78khz.
 const MAX_SERVO = 180;
 const MAX_COLOR = 255;
 
