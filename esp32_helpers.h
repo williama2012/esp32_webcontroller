@@ -52,13 +52,15 @@ String str_split(String str, uint8_t position, char separator = ' ') {
   return strs[position];
 }
 
-int str_int(String str, uint8_t position) {
-  String valueStr = str_split(str, position);
+int str_int(String str, uint8_t position, char separator = ' ') {
+  String valueStr = str_split(str, position, separator);
   if (valueStr == "") {
     return -1;
   }
   return valueStr.toInt();
 }
+
+
 
 #pragma region Pins
 
