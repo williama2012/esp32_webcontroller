@@ -9,10 +9,10 @@
 #include <WiFiClient.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
-#include <LiquidCrystal_I2C.h>
 #include "esp32_timer.h"
 #include "esp32_helpers.h"
 #include "esp32_ledstrip.h"
+#include "esp32_lcd.h"
 
 #define SERIAL_BAUDRATE 115200
 
@@ -566,8 +566,6 @@ void SetupServer() {
   Println("HTTP server started");
 }
 
-void SetupTimers();
-
 void SetupWifi() {
   PrintCore("SetupWifi");
   WiFi.mode(WIFI_STA);
@@ -592,7 +590,9 @@ void Core0Processor(void *parameter) {
   }
 }
 
+void PreSetup();
 void SetupPins();
+void SetupTimers();
 
 void setup(void) {
   Serial.begin(SERIAL_BAUDRATE);
@@ -602,10 +602,12 @@ void setup(void) {
   analogReadResolution(12);
   analogWriteResolution(23, 12);
 
-  SetupWifi();
-  SetupServer();
+  PreSetup();
   SetupPins();
   SetupTimers();
+
+  SetupWifi();
+  SetupServer();
 
   xTaskCreatePinnedToCore(
     Core0Processor,   /* Function to implement the task */
