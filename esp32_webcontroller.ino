@@ -1,16 +1,31 @@
 #include "esp32_webcontroller.h"
+#include <DHT22.h>
+
+#define DHTPIN 13
+DHT22 dht22(DHTPIN);
 
 uint8_t mode = 0;
 
 bool show_rssi = true;
+bool show_temp = true;
+
+const int trigPin = 34;  
+const int echoPin = 35;
+float duration, distance;
 
 void PreSetup() {
   BeginStrip();
   lcd_init();
+
+
 }
 
 void SetupPins() {
+  pinMode(13, INPUT);
   pinMode(23, OUTPUT);
+	pinMode(trigPin, OUTPUT);  
+	pinMode(echoPin, INPUT);
+
 }
 
 void SetupTimers() {
@@ -20,6 +35,14 @@ void SetupTimers() {
 
 // Runs on Core 1
 void loop(void) {
+	digitalWrite(trigPin, LOW);  
+	delayMicroseconds(2);  
+	digitalWrite(trigPin, HIGH);  
+	delayMicroseconds(10);  
+	digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+  distance = (duration*.0343)/2;
 
   if (doBlink) {
     Blink();
@@ -38,10 +61,18 @@ void loop(void) {
   }
 
   if (timers.CheckTimer(0)) {
+
+    lcd_print("D:" + String(distance), 1);
+
     if (show_rssi) {
       lcd_print_r(String(WiFi.RSSI()), 3);
     }
-    
+
+    if (show_temp) {
+      float temp = dht22.getTemperature(false);
+      float hum = dht22.getHumidity();
+      lcd_print(String(temp) + "'F " + String(hum) + "%", 3);
+    }
 
   }
 
@@ -247,6 +278,8 @@ bool OnApiCommand(String cmd) {
   PrintCore("ProcessCommand: " + cmd);
   String first_word = str_split(cmd, 0);
   
+  lcd_print(cmd, 2);
+
   if (first_word == "set") {
     return OnSetParameter(cmd);
   }
