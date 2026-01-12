@@ -87,7 +87,7 @@ void set_brightnessP(uint16_t percent) {
   FastLED.show();
 }
 
-void set_pixel(uint16_t i, CRGB color) {
+void set_pixel_i(uint16_t i, CRGB color) {
   if (i >= LED_COUNT) {
     i = LED_COUNT - 1;
   }
@@ -96,13 +96,17 @@ void set_pixel(uint16_t i, CRGB color) {
   FastLED.show();
 }
 
+void set_pixel_i(uint16_t i, uint16_t r, uint16_t g, uint16_t b) {
+  set_pixel_i(i, CRGB(r, g, b));
+}
+
 void set_pixel(uint16_t x, uint16_t y, CRGB color = CRGB::White) {
 
   uint16_t i = XY(x, y);
 
   Println(String(x) + "," + String(y) + ":" + String(i));
 
-  set_pixel(i, color);
+  set_pixel_i(i, color);
 }
 
 void set_pixel(uint16_t x, uint16_t y, uint16_t r, uint16_t g, uint16_t b) {
