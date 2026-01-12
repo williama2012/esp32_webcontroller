@@ -10,15 +10,15 @@
 #include <ESPmDNS.h>
 #include "esp32_helpers.h"
 
-WebServer server(80);
+#define HTTP_PORT 80
+
+WebServer server(HTTP_PORT);
 
 INCTXT(WebPage, "index.html");
 INCTXT(TerminalWebPage, "terminal.html");
 INCTXT(MatrixWebPage, "matrix.html");
 INCTXT(WebJavascript, "index.js");
 INCTXT(WebStylesheet, "index.css");
-
-String url;
 
 #pragma region server
 
