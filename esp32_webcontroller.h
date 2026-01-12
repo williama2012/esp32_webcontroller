@@ -9,10 +9,12 @@
 #define SERIAL_BAUDRATE 115200
 #define VERSION 20260111.01
 
+Timer timers;
 TaskHandle_t Task1;
 
 bool doBlink = false;
-int servo_pin = 0;
+String IPADDRESS;
+
 
 bool OnApiCommand(String cmd);
 
@@ -364,13 +366,13 @@ void handleSweepPost() {
   set_pin(servoPin, Servo, count);
   set_pin(pwmPin, AnalogWrite, value);
 
-  if (servoPin != servo_pin) {
-    if (servo_pin != 0) {
-      //servo_ctrl.detach(servo_pin);
-    }
-    //servo_ctrl.attach(servoPin);
-    servo_pin = servoPin;
-  }
+  // if (servoPin != servo_pin) {
+  //   if (servo_pin != 0) {
+  //     //servo_ctrl.detach(servo_pin);
+  //   }
+  //   //servo_ctrl.attach(servoPin);
+  //   servo_pin = servoPin;
+  // }
 
   int pos = low;
   //servo_ctrl.write(pos);
@@ -515,38 +517,37 @@ void SetupServer() {
   server.begin();
 
   Println("HTTP server started");
-  LcdClear();
-  LcdPrint("HTTP server started");
-  LcdPrint(url, 1);
+  lcd_clear();
+  lcd_print("HTTP server started");
+  lcd_print(IPADDRESS, 1);
 }
 
 void SetupWifi() {
   PrintCore("SetupWifi");
 
-  LcdPrint("SSID:" + String(ssid), 0);
+  lcd_print("SSID:" + String(ssid), 0);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  LcdPrint("Connecting..", 1);
+  lcd_print("Connecting..", 1);
 
   bool o = false;
-
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Print(".");
     o = o ? false : true;
-    LcdPrint(o ? "|" : "-", 1, 12);
-    LcdPrint("Status:" + String(WiFi.status()), 2);
+    lcd_print(o ? "|" : "-", 1, 12);
+    lcd_print("Status:" + String(WiFi.status()), 2);
   }
-  LcdPrint("Status:" + String(WiFi.status()), 2);
-  
+  lcd_print("Status:" + String(WiFi.status()), 2);
+
   Println("");
   Print("Connected to ");
   Println(ssid);
-  url = "http://" + WiFi.localIP().toString();
-  Println("URL: " + url);
+  IPADDRESS = WiFi.localIP().toString() + ":" + String(HTTP_PORT);
+  Println("URL: http://" + IPADDRESS);
 }
 
 void Core0Processor(void *parameter) {
