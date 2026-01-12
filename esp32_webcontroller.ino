@@ -120,6 +120,22 @@ bool HandleLcdCommand(String cmd) {
     return send_msg("print " + cmd_2);
   }
 
+  if (cmd_1 == "printr") {
+    int row = str_int(cmd, 3);
+    int col = str_int(cmd, 4);
+    if (row > -1) {
+      if(col > -1) {
+        lcd_print_r(cmd_2, row, col);
+      } else {
+        lcd_print_r(cmd_2, row);
+      }
+    } else {
+      lcd_print_r(cmd_2);
+    }
+    return send_msg("print " + cmd_2);
+  }
+
+
   if (cmd_1 == "show") {
     if (cmd_2 == "ip") {
       lcd_print(IPADDRESS);
@@ -149,26 +165,79 @@ bool HandleLedCommand(String cmd) {
   }
 
   if (cmd_1 == "color") {
-      uint16_t color_r = str_int(cmd, 2);
-      uint16_t color_g = str_int(cmd, 3);
-      uint16_t color_b = str_int(cmd, 4);
-      uint16_t brightness = str_int(cmd, 5);
+      String color_str = str_split(cmd, 2);
+      int color_r = str_int(color_str, 0, ',');
+      int color_g = str_int(color_str, 1, ',');
+      int color_b = str_int(color_str, 2, ',');
+      int brightness = str_int(color_str, 3, ',');
       if (brightness > -1) {
         set_brightness(brightness);
       }
+
       setAllColor(color_r, color_g, color_b);
-      return send_msg("color set");
+
+      return send_body(
+        jsonField("color_r", String(color_r), true) 
+        + jsonField("color_g", String(color_g), true)
+        + jsonField("color_b", String(color_b), true)
+        + jsonField("brightness", String(brightness), false)
+      );
+  }
+
+  if (cmd_1 == "set") {
+      String pos_str = str_split(cmd, 2);
+      int x = str_int(pos_str, 0, ',');
+      int y = str_int(pos_str, 1, ',');
+
+      String color_str = str_split(cmd, 3);
+      int color_r = str_int(color_str, 0, ',');
+      int color_g = str_int(color_str, 1, ',');
+      int color_b = str_int(color_str, 2, ',');
+      int brightness = str_int(color_str, 3, ',');
+      if (brightness > -1) {
+        set_brightness(brightness);
+      }
+      set_pixel(x, y, color_r, color_g, color_b);
+
+      return send_body(
+        jsonField("x", String(x), true)
+        + jsonField("y", String(y), true)
+        + jsonField("color_r", String(color_r), true)
+        + jsonField("color_g", String(color_g), true)
+        + jsonField("color_b", String(color_b), true)
+        + jsonField("brightness", String(brightness), false)
+      );
+  }
+
+  if (cmd_1 == "seti") {
+      int i = str_int(cmd, 2);
+
+      String color_str = str_split(cmd, 3);
+      int color_r = str_int(color_str, 0, ',');
+      int color_g = str_int(color_str, 1, ',');
+      int color_b = str_int(color_str, 2, ',');
+      int brightness = str_int(color_str, 3, ',');
+      if (brightness > -1) {
+        set_brightness(brightness);
+      }
+      set_pixel_i(i, color_r, color_g, color_b);
+
+      return send_body(
+        jsonField("i", String(i), true)
+        + jsonField("color_r", String(color_r), true)
+        + jsonField("color_g", String(color_g), true)
+        + jsonField("color_b", String(color_b), true)
+        + jsonField("brightness", String(brightness), false)
+      );
   }
 
   if (cmd_1 == "brightness") {
-      uint16_t brightness = str_int(cmd, 1);
+      uint16_t brightness = str_int(cmd, 2);
       if (brightness > -1) {
         set_brightness(brightness);
         return send_body(jsonField("brightness", String(brightness), false));
       }
   }
-
-
 
   return send_msg("received");
 }
