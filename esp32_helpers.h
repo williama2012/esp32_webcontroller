@@ -4,6 +4,7 @@
 
 #define BLINK_DELAY 50
 #define MAX_PIN 64
+#define MAX_PARAM 16
 
 typedef struct {
   char *name;
@@ -27,11 +28,9 @@ typedef struct {
   PinModeEnum mode;
 } PinSet;
 
-/**
-  Max 16 parameters
-*/
+
 String str_split(String str, uint8_t position, char separator = ' ') {
-  String strs[16];
+  String strs[MAX_PARAM];
   int StringCount = 0;
 
   while (str.length() > 0) {
