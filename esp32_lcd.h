@@ -3,22 +3,29 @@
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>
 
-LiquidCrystal_I2C lcd(0x27, 20, 4);
+#define LCD_ROWS 4
+#define LCD_COLS 20
 
-void LcdInit() {
+LiquidCrystal_I2C lcd(0x27, LCD_COLS, LCD_ROWS);
+
+void lcd_init() {
   lcd.init();
   lcd.backlight();
 }
 
-void LcdClear() {
+void lcd_clear() {
   lcd.clear();
 }
 
-void LcdPrint(String txt, uint8_t row = 0, uint8_t col = 0) {
+void lcd_print(String txt, uint8_t row = 0, uint8_t col = 0) {
   lcd.setCursor(col, row);
   lcd.print(txt);
 }
 
+void lcd_print_r(String txt, uint8_t row = 0, uint8_t offset = 0) {
+  lcd.setCursor(LCD_COLS - txt.length(), row);
+  lcd.print(txt);
+}
 
 
 #endif
