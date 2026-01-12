@@ -1,11 +1,12 @@
 #include "esp32_webcontroller.h"
 
-Timer timers;
 uint8_t mode = 0;
+
+bool show_rssi = true;
 
 void PreSetup() {
   BeginStrip();
-  LcdInit();
+  lcd_init();
 }
 
 void SetupPins() {
@@ -13,7 +14,7 @@ void SetupPins() {
 }
 
 void SetupTimers() {
-  timers.AddTimer(0, 1);
+  timers.AddTimer(0, 3000);
   timers.AddTimer(1, 10000);
 }
 
@@ -34,6 +35,14 @@ void loop(void) {
       break;
     default:
       break;
+  }
+
+  if (timers.CheckTimer(0)) {
+    if (show_rssi) {
+      lcd_print_r(String(WiFi.RSSI()), 3);
+    }
+    
+
   }
 
 }
@@ -70,25 +79,29 @@ bool OnSetParameter(String cmd) {
   return send_body(jsonField("param", String(param), true) + jsonField("value", String(value)));
 }
 
-void HandleLcdCommand(String cmd) {
+bool HandleLcdCommand(String cmd) {
   String cmd_1 = str_split(cmd, 1);
   String cmd_2 = str_split(cmd, 2);
 
   if (cmd_1 == "init") {
-    LcdInit();
+    lcd_init();
+    return send_msg("initialized");
   }
 
   if (cmd_1 == "clear") {
-    LcdClear();
+    lcd_clear();
+    return send_msg("cleared");
   }
 
   // backlight
   if (cmd_1 == "bl") {
     if (cmd_2 == "on") {
       lcd.backlight();
+      return send_msg("backlight on");
     }
     if (cmd_2 == "off") {
       lcd.noBacklight();
+      return send_msg("backlight off");
     }
   }
 
@@ -97,27 +110,67 @@ void HandleLcdCommand(String cmd) {
     int col = str_int(cmd, 4);
     if (row > -1) {
       if(col > -1) {
-        LcdPrint(cmd_2, row, col);
-        return;
+        lcd_print(cmd_2, row, col);
+      } else {
+        lcd_print(cmd_2, row);
       }
-      LcdPrint(cmd_2, row);
-      return;
+    } else {
+      lcd_print(cmd_2);
     }
-    LcdPrint(cmd_2);
+    return send_msg("print " + cmd_2);
   }
 
   if (cmd_1 == "show") {
-    if (cmd_2 == "url") {
-      LcdPrint(url);
+    if (cmd_2 == "ip") {
+      lcd_print(IPADDRESS);
     }
     if (cmd_2 == "mac") {
-      LcdPrint(String(WiFi.macAddress()));
+      lcd_print(String(WiFi.macAddress()));
     }
     if (cmd_2 == "version") {
-      LcdPrint(String(VERSION));
+      lcd_print(String(VERSION));
     }
+    if (cmd_2 == "rssi") {
+      show_rssi = show_rssi ? false : true;
+    }
+
+    return send_msg("show " + cmd_2);
   }
 
+  return send_msg("received");
+}
+
+bool HandleLedCommand(String cmd) {
+  String cmd_1 = str_split(cmd, 1);
+
+  if (cmd_1 == "clear") {
+    led_clear();
+    return send_msg("cleared");
+  }
+
+  if (cmd_1 == "color") {
+      uint16_t color_r = str_int(cmd, 2);
+      uint16_t color_g = str_int(cmd, 3);
+      uint16_t color_b = str_int(cmd, 4);
+      uint16_t brightness = str_int(cmd, 5);
+      if (brightness > -1) {
+        set_brightness(brightness);
+      }
+      setAllColor(color_r, color_g, color_b);
+      return send_msg("color set");
+  }
+
+  if (cmd_1 == "brightness") {
+      uint16_t brightness = str_int(cmd, 1);
+      if (brightness > -1) {
+        set_brightness(brightness);
+        return send_body(jsonField("brightness", String(brightness), false));
+      }
+  }
+
+
+
+  return send_msg("received");
 }
 
 // Runs on Core 0
@@ -130,8 +183,11 @@ bool OnApiCommand(String cmd) {
   }
 
   if (first_word == "lcd") {
-    HandleLcdCommand(cmd);
-    return send_body(jsonField("msg",  "rcv"));
+    return HandleLcdCommand(cmd);
+  }
+
+  if (first_word == "led") {
+    return HandleLedCommand(cmd);
   }
 
   // Analog Output (pin, value)
