@@ -15,6 +15,8 @@ TaskHandle_t Task1;
 bool doBlink = false;
 String IPADDRESS;
 
+bool show_actions = true;
+uint32_t action_count = 0;
 
 bool OnApiCommand(String cmd);
 
@@ -22,6 +24,8 @@ bool OnApiCommand(String cmd);
 
 void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint16_t b = 255) {
   PrintCore("MatrixPost");
+  action_count++;
+
   doBlink = true;
 
   set_pixel(x, y, CRGB(r, g, b));
@@ -36,6 +40,7 @@ void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint
 
 void IntegerPost(int pin, int value) {
   PrintCore("IntegerPost");
+  action_count++;
 
   set_pin(pin, Integer, value);
 
@@ -50,6 +55,7 @@ void IntegerPost(int pin, int value) {
 
 void AnalogWritePost(int pin, int value) {
   PrintCore("AnalogWritePost");
+  action_count++;
 
   //ClearServo(pin);
   set_pin(pin, AnalogWrite, value);
@@ -69,6 +75,7 @@ void AnalogWritePost(int pin, int value) {
 
 void DigitalWritePost(int pin, int value) {
   PrintCore("DigitalWritePost");
+  action_count++;
 
   //ClearServo(pin);
   set_pin(pin, DigitalWrite, value);
@@ -88,6 +95,7 @@ void DigitalWritePost(int pin, int value) {
 
 void ServoWritePost(int pin, int value) {
   PrintCore("ServoWritePost");
+  action_count++;
 
   int pos = value;
   //int pos = map(value, 0, 4095, 0, 180);
@@ -155,6 +163,7 @@ void AnalogReadPost() {
 
 void ToneWritePost(int pin, unsigned int value) {
   PrintCore("ToneWritePost");
+  action_count++;
 
   set_pin(pin, Tone, value);
 
@@ -178,7 +187,8 @@ void ToneWritePost(int pin, unsigned int value) {
 
 void PulsePost(int pin, int value, int time) {
   PrintCore("PulsePost");
-
+  action_count++;
+  
   set_pin(pin, Pulse, value);
   //ClearServo(pin);
 
