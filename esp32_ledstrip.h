@@ -105,6 +105,12 @@ void set_pixel(uint16_t x, uint16_t y, CRGB color = CRGB::White) {
   set_pixel(i, color);
 }
 
+void set_pixel(uint16_t x, uint16_t y, uint16_t r, uint16_t g, uint16_t b) {
+  set_pixel(x, y, CRGB(r, g, b));
+}
+
+
+
 CRGB led_color(String color) {
   Serial.println(color);
   color.toLowerCase();
