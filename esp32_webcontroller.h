@@ -527,20 +527,20 @@ void SetupServer() {
   server.begin();
 
   Println("HTTP server started");
-  lcd_clear();
-  lcd_print("HTTP server started");
-  lcd_print(IPADDRESS, 1);
+  //lcd_clear();
+  //lcd_print("HTTP server started");
+  //lcd_print(IPADDRESS, 1);
 }
 
 void SetupWifi() {
   PrintCore("SetupWifi");
 
-  lcd_print("SSID:" + String(ssid), 0);
+  //lcd_print("SSID:" + String(ssid), 0);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  lcd_print("Connecting..", 1);
+  //lcd_print("Connecting..", 1);
 
   bool o = false;
 
@@ -548,10 +548,10 @@ void SetupWifi() {
     delay(500);
     Print(".");
     o = o ? false : true;
-    lcd_print(o ? "|" : "-", 1, 12);
-    lcd_print("Status:" + String(WiFi.status()), 2);
+    //lcd_print(o ? "|" : "-", 1, 12);
+    //lcd_print("Status:" + String(WiFi.status()), 2);
   }
-  lcd_print("Status:" + String(WiFi.status()), 2);
+  //lcd_print("Status:" + String(WiFi.status()), 2);
 
   Println("");
   Print("Connected to ");

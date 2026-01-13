@@ -10,8 +10,8 @@ bool show_rssi = true;
 bool show_temp = true;
 
 void PreSetup() {
-  lcd_init();
-  delay(1000);
+  //lcd_init();
+  //delay(1000);
   
   BeginStrip();
   delay(1000);
@@ -293,7 +293,7 @@ bool OnApiCommand(String cmd) {
   PrintCore("ProcessCommand: " + cmd);
   String first_word = str_split(cmd, 0);
   
-  lcd_print(cmd, 2);
+  //lcd_print(cmd, 2);
 
   if (first_word == "set") {
     return OnSetParameter(cmd);
@@ -375,6 +375,11 @@ bool OnApiCommand(String cmd) {
   if (first_word == "clear") {
     led_clear();
     return send_msg("cleared");
+  }
+
+  if (first_word == "scan") {
+    scan_i2c();
+    return send_msg("scanned");
   }
 
 
