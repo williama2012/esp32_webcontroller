@@ -13,8 +13,7 @@ void PreSetup() {
   //lcd_init();
   //delay(1000);
   
-  BeginStrip();
-  delay(1000);
+  led_init();
 }
 
 void PostSetup() {
