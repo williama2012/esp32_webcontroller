@@ -1,7 +1,7 @@
 #include "esp32_webcontroller.h"
 #include <DHT22.h>
 
-#define DHTPIN 13
+#define DHTPIN 23
 DHT22 dht22(DHTPIN);
 
 uint8_t mode = 0;
@@ -9,40 +9,52 @@ uint8_t mode = 0;
 bool show_rssi = true;
 bool show_temp = true;
 
-const int trigPin = 34;  
-const int echoPin = 35;
-float duration, distance;
-
 void PreSetup() {
-  BeginStrip();
   lcd_init();
+  delay(1000);
+  
+  BeginStrip();
+  delay(1000);
+}
 
+void PostSetup() {
+  delay(500);
 
+  set_pixel(11, 11, 255, 255, 255);
 }
 
 void SetupPins() {
-  pinMode(13, INPUT);
-  pinMode(23, OUTPUT);
-	pinMode(trigPin, OUTPUT);  
-	pinMode(echoPin, INPUT);
+
+	pinMode(12, OUTPUT); // Trigger
+	pinMode(13, INPUT);  // Echo
+
+  pinMode(25, INPUT);  // Microwave
+
+	pinMode(26, OUTPUT); // Trigger
+	pinMode(27, INPUT);  // Echo
 
 }
 
 void SetupTimers() {
   timers.AddTimer(0, 3000);
-  timers.AddTimer(1, 10000);
+  timers.AddTimer(1, 100);
 }
+
+float GetRange(uint8_t triggerPin, uint8_t echoPin) {
+	digitalWrite(triggerPin, LOW);
+	delayMicroseconds(2);
+	digitalWrite(triggerPin, HIGH);
+	delayMicroseconds(10);
+	digitalWrite(triggerPin, LOW);
+  float duration = pulseIn(echoPin, HIGH);
+  return (duration * 0.0343)/2;
+}
+
+int microwave;
 
 // Runs on Core 1
 void loop(void) {
-	digitalWrite(trigPin, LOW);  
-	delayMicroseconds(2);  
-	digitalWrite(trigPin, HIGH);  
-	delayMicroseconds(10);  
-	digitalWrite(trigPin, LOW);
-
-  duration = pulseIn(echoPin, HIGH);
-  distance = (duration*.0343)/2;
+  //microwave = digitalRead(25);
 
   if (doBlink) {
     Blink();
@@ -60,22 +72,25 @@ void loop(void) {
       break;
   }
 
-  if (timers.CheckTimer(0)) {
+  // if (timers.CheckTimer(0)) {
+  //   if (show_rssi) {
+  //     lcd_print_r(String(WiFi.RSSI()), 3);
+  //   }
 
-    lcd_print("D:" + String(distance), 1);
+  //   if (show_temp) {
+  //     float temp = dht22.getTemperature(false);
+  //     float hum = dht22.getHumidity();
+  //     lcd_print(String(temp) + "'F " + String(hum) + "%", 3);
+  //   }
 
-    if (show_rssi) {
-      lcd_print_r(String(WiFi.RSSI()), 3);
-    }
+  // }
 
-    if (show_temp) {
-      float temp = dht22.getTemperature(false);
-      float hum = dht22.getHumidity();
-      lcd_print(String(temp) + "'F " + String(hum) + "%", 3);
-    }
-
-  }
-
+  // if (timers.CheckTimer(1)) {
+  //   lcd_print("D:" + String(GetRange(12, 13)), 0);
+  //   delay(10);
+  //   lcd_print("D:" + String(GetRange(26, 27)), 1);
+  //   lcd_print_r(String(microwave));
+  // }
 }
 
 void mode3process() {
@@ -127,11 +142,11 @@ bool HandleLcdCommand(String cmd) {
   // backlight
   if (cmd_1 == "bl") {
     if (cmd_2 == "on") {
-      lcd.backlight();
+      lcd_backlight(true);
       return send_msg("backlight on");
     }
     if (cmd_2 == "off") {
-      lcd.noBacklight();
+      lcd_backlight(false);
       return send_msg("backlight off");
     }
   }

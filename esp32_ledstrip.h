@@ -30,8 +30,7 @@ const uint16_t kMatrixHeight = 22;
 const bool    kMatrixSerpentineLayout = true;
 const bool    kMatrixVertical = false;
 
-uint16_t XY( uint8_t x, uint8_t y)
-{
+uint16_t XY( uint8_t x, uint8_t y) {
   uint16_t i;
   
   if( kMatrixSerpentineLayout == false) {
@@ -101,19 +100,13 @@ void set_pixel_i(uint16_t i, uint16_t r, uint16_t g, uint16_t b) {
 }
 
 void set_pixel(uint16_t x, uint16_t y, CRGB color = CRGB::White) {
-
   uint16_t i = XY(x, y);
-
-  Println(String(x) + "," + String(y) + ":" + String(i));
-
   set_pixel_i(i, color);
 }
 
 void set_pixel(uint16_t x, uint16_t y, uint16_t r, uint16_t g, uint16_t b) {
   set_pixel(x, y, CRGB(r, g, b));
 }
-
-
 
 CRGB led_color(String color) {
   Serial.println(color);

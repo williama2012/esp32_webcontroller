@@ -569,6 +569,7 @@ void Core0Processor(void *parameter) {
 }
 
 void PreSetup();
+void PostSetup();
 void SetupPins();
 void SetupTimers();
 
@@ -581,9 +582,9 @@ void setup(void) {
   analogWriteResolution(23, 12);
 
   PreSetup();
+
   SetupPins();
   SetupTimers();
-
   SetupWifi();
   SetupServer();
 
@@ -596,6 +597,7 @@ void setup(void) {
     &Task1,           /* Task handle. */
     0);               /* Core where the task should run */
 
+  PostSetup();
 }
 
 #pragma endregion Setup
