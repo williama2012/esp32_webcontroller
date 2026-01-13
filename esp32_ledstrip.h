@@ -69,7 +69,7 @@ void led_clear() {
   FastLED.show();
 }
 
-void BeginStrip() {
+void led_init() {
     FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
     FastLED.setBrightness(100);
     led_clear();
