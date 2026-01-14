@@ -191,19 +191,19 @@ void PrintCore(String msg) {
 
 #pragma endregion Printing
 
-String* scan_i2c() {
+byte * scan_i2c() {
   byte error, address;
   int nDevices = 0;
   
-  String addresses[8];
+  byte* array = (byte*)malloc(0x7f * sizeof(byte));
 
   Serial.println("Scanning for I2C devices ...");
-  for (address = 0x01; address < 0x7f; address++) {
+  for (address = 0x01; address < 0x7f; address++) { //0x7f
     Wire.beginTransmission(address);
     error = Wire.endTransmission();
     if (error == 0) {
       Serial.printf("I2C device found at address 0x%02X\n", address);
-      addresses[nDevices] = address;
+      array[nDevices] = address;
       nDevices++;
     } else if (error != 2) {
       Serial.printf("Error %d at address 0x%02X\n", error, address);
@@ -213,7 +213,7 @@ String* scan_i2c() {
     Serial.println("No I2C devices found");
   }
 
-  return addresses;
+  return array;
 }
 
 #endif
