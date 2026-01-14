@@ -46,16 +46,7 @@ String post_data(String src, String type, String var, String val) {
     String buffer;
     serializeJson(doc, buffer);
 
-    String url = DATA_URL;
-    url += "?src=" + urlEncode("01:01:01:01:01:01");
-    String response = net_post(url, buffer);
-
-    post_data(MACADDRESS, "type0", "arg0", "val_0x01");
-
-
-
-
-    return net_post(url, "{\"src\":\"test\"}");
+    return net_post(url, buffer);
 }
 
 String post_data(String src, String type, String var, float val) {
