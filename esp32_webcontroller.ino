@@ -5,6 +5,7 @@
 
 #define DHTPIN 23
 #define ONE_WIRE_COUNT 1
+#define ONE_WIRE_TYPE "dev"
 const bool USE_LCD = true;
 const bool USE_LED = false;
 
@@ -79,7 +80,7 @@ void PollSensors() {
     String txt = "Sensor " + String(i) + ": " + String(temp);
     lcd_print(txt, i);
 
-    String response = post_data(MACADDRESS, "dev", "sensor_" + String(i), temp);
+    String response = post_data(MACADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp);
     if (response == "connection refused") {
       lcd_print("X");
     }
