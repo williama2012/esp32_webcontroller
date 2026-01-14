@@ -6,7 +6,7 @@
 #define DHTPIN 23
 DHT22 dht22(DHTPIN);
 
-uint8_t mode = 10;
+uint8_t mode = 0;
 
 bool show_rssi = true;
 bool show_temp = true;
@@ -18,16 +18,12 @@ void PreSetup() {
   if (USE_LCD) {
     lcd_init();
   }
-  if (USE_LED) {
-    led_init();
-  }
 
   ds_init();
 }
 
 void PostSetup() {
   if (USE_LCD) {
-    delay(3000);
     lcd_clear();
   }
   if (USE_LED) {
@@ -35,7 +31,13 @@ void PostSetup() {
   }
 }
 
-void NetReady() {}
+void NetReady() {
+  if (USE_LCD) {
+    delay(3000);
+    lcd_clear();
+  }
+
+}
 
 void SetupPins() {
 
@@ -79,7 +81,7 @@ void PollSensors() {
     String txt = "Sensor " + String(i) + ": " + String(temp);
     lcd_print(txt, i);
 
-    String response = post_data(MACADDRESS, "fridge", "sensor_" + String(i), temp);
+    String response = post_data(MACADDRESS, "dev", "sensor_" + String(i), temp);
     if (response == "connection refused") {
       lcd_print("X");
     }
