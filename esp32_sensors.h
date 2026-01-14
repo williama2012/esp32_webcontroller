@@ -19,8 +19,6 @@ float * ds_temps(uint8_t count) {
   for(int i = 0; i < count; i++) {
     float temp = sensors.getTempFByIndex(i);
     array[i] = temp;
-    String txt = "Sensor " + String(i) + ": " + String(temp);
-    Serial.println(txt);
   }
   
   return array;
