@@ -129,78 +129,81 @@ void Blink() {
 
 #pragma region Printing
 
-void Print(String msg) {
+void s_print(String msg) {
   if (Serial) {
     Serial.print(msg);
   }
 }
 
-void Print(const char *msg) {
+void s_print(const char *msg) {
   if (Serial) {
     Serial.print(msg);
   }
 }
 
-void Print(char *msg) {
+void s_print(char *msg) {
   if (Serial) {
     Serial.print(msg);
   }
 }
 
-void Print(uint32_t msg) {
+void s_print(uint32_t msg) {
   if (Serial) {
     Serial.print(msg);
   }
 }
 
-void Println(String msg) {
+void s_println(String msg) {
   if (Serial) {
     Serial.println(msg);
   }
 }
 
-void Println(const char *msg) {
+void s_println(const char *msg) {
   if (Serial) {
     Serial.println(msg);
   }
 }
 
-void Println(char *msg) {
+void s_println(char *msg) {
   if (Serial) {
     Serial.println(msg);
   }
 }
 
-void Println(uint32_t msg) {
+void s_println(uint32_t msg) {
   if (Serial) {
     Serial.println(msg);
   }
 }
 
 void PrintCore(char *msg) {
-  Print("--- " + String(msg) + " running on core ");
-  Print(xPortGetCoreID());
-  Println(" ---");
+  s_print("--- " + String(msg) + " running on core ");
+  s_print(xPortGetCoreID());
+  s_println(" ---");
 }
 
 void PrintCore(String msg) {
-  Print("--- " + String(msg) + " running on core ");
-  Print(xPortGetCoreID());
-  Println(" ---");
+  s_print("--- " + String(msg) + " running on core ");
+  s_print(xPortGetCoreID());
+  s_println(" ---");
 }
 
 #pragma endregion Printing
 
-void scan_i2c() {
+String* scan_i2c() {
   byte error, address;
   int nDevices = 0;
   
+  String addresses[8];
+
   Serial.println("Scanning for I2C devices ...");
   for (address = 0x01; address < 0x7f; address++) {
     Wire.beginTransmission(address);
     error = Wire.endTransmission();
     if (error == 0) {
       Serial.printf("I2C device found at address 0x%02X\n", address);
+      addresses[nDevices] = address;
       nDevices++;
     } else if (error != 2) {
       Serial.printf("Error %d at address 0x%02X\n", error, address);
@@ -210,7 +213,7 @@ void scan_i2c() {
     Serial.println("No I2C devices found");
   }
 
-
+  return addresses;
 }
 
 #endif
