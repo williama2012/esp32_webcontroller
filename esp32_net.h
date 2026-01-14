@@ -25,7 +25,7 @@ String net_post(String url, String requestData) {
       return http.getString();
     }
   }
-
+  Serial.println(http.errorToString(httpCode).c_str());
   return http.errorToString(httpCode).c_str();
 }
 
