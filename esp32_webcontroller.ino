@@ -4,15 +4,15 @@
 #include <ArduinoJson.h>
 
 #define DHTPIN 23
+#define ONE_WIRE_COUNT 1
+const bool USE_LCD = true;
+const bool USE_LED = false;
+
 DHT22 dht22(DHTPIN);
 
 uint8_t mode = 0;
-
 bool show_rssi = true;
 bool show_temp = true;
-
-const bool USE_LCD = true;
-const bool USE_LED = false;
 
 void PreSetup() {
   if (USE_LCD) {
@@ -72,10 +72,8 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 int microwave;
 
 void PollSensors() {
-  uint8_t sensor_count = 1;
-
-  float* temps = ds_temps(sensor_count);
-  for(int i = 0; i < sensor_count; i++) {
+  float* temps = ds_temps(ONE_WIRE_COUNT);
+  for(int i = 0; i < ONE_WIRE_COUNT; i++) {
     float temp = temps[i];
 
     String txt = "Sensor " + String(i) + ": " + String(temp);
@@ -85,9 +83,7 @@ void PollSensors() {
     if (response == "connection refused") {
       lcd_print("X");
     }
-
   }
-
 }
 
 // Runs on Core 1
