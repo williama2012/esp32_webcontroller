@@ -6,13 +6,14 @@
 #define DHTPIN 23
 DHT22 dht22(DHTPIN);
 
-uint8_t mode = 0;
+uint8_t mode = 10;
 
 bool show_rssi = true;
 bool show_temp = true;
 
 void PreSetup() {
   lcd_init();
+  ds_init();
   //led_init();
 }
 
@@ -37,7 +38,10 @@ void SetupPins() {
 
 void SetupTimers() {
   timers.AddTimer(0, 3000);
-  timers.AddTimer(1, 100);
+  
+  timers.AddTimer(11, 1000);
+
+  timers.AddTimer(21, 100);
 }
 
 float GetRange(uint8_t triggerPin, uint8_t echoPin) {
@@ -68,24 +72,41 @@ void loop(void) {
     case 3:
       mode3process();
       break;
+    case 10:
+      if (timers.CheckTimer(11)) {
+        uint8_t sensor_count = 1;
+
+        float* temps = ds_temps(sensor_count);
+        s_print("temp:");
+        s_println(String(temps[0]));
+
+        for(int i = 0; i < sensor_count; i++) {
+          float temp = temps[i];
+          String txt = "Sensor " + String(i) + ": " + String(temp);
+          lcd_print(txt, i);
+          //Serial.println(txt);
+        }
+
+      }
     default:
       break;
   }
 
-  // if (timers.CheckTimer(0)) {
-  //   if (show_rssi) {
-  //     lcd_print_r(String(WiFi.RSSI()), 3);
-  //   }
+  if (timers.CheckTimer(0)) {
+    if (show_rssi) {
+      String rssi = String(WiFi.RSSI()) + " dBm";
+      lcd_print_r(rssi, 3);
+    }
 
-  //   if (show_temp) {
-  //     float temp = dht22.getTemperature(false);
-  //     float hum = dht22.getHumidity();
-  //     lcd_print(String(temp) + "'F " + String(hum) + "%", 3);
-  //   }
+    // if (show_temp) {
+    //   float temp = dht22.getTemperature(false);
+    //   float hum = dht22.getHumidity();
+    //   lcd_print(String(temp) + "'F " + String(hum) + "%", 3);
+    // }
 
-  // }
+  }
 
-  // if (timers.CheckTimer(1)) {
+  // if (timers.CheckTimer(21)) {
   //   lcd_print("D:" + String(GetRange(12, 13)), 0);
   //   delay(10);
   //   lcd_print("D:" + String(GetRange(26, 27)), 1);
@@ -349,39 +370,62 @@ bool OnApiCommand(String cmd) {
   }
 
   if (first_word == "scan_i2c") {
-    String* addresses = scan_i2c();
-    String response = "{";
+    byte *addresses = scan_i2c();
+    uint8_t length = sizeof(addresses);
+
+    s_println(String(sizeof(addresses[0])));
+    s_println(String(sizeof(addresses)));
     
-    int i;
-    for (i = 0; i < 8; i++) {
-      String address = addresses[i];
-      if (address.length() > 0) {
-        response += jsonField("address", address, true);
-      }
+    String response = "[";
+    // uint8_t i;
+    // for (i = 0; i < length; i++) {
+    //   byte address = addresses[i];
+    //   response += "\"" + String(address, HEX) + "\",";
+    // }
+
+    if (response.length() > 1) {
+      //response = response.substring(0, response.length() - 2); // remove last comma
     }
 
-    response += "}";
+    response += "]";
 
     return send_msg(response);
   }
 
   if (first_word == "test") {
 
-  JsonDocument doc;
+    JsonDocument doc;
 
-  doc["cmd"] = "gps";
-  doc["time"] = 1351824120;
-  doc["data"][0] = 48.756080;
-  doc["data"][1] = 2.302038;
+    doc["src"] = MACADDRESS;
+    doc["type"] = "sensors";
+    doc["var"] = "refridgerator";
 
-  String holder;
-  serializeJson(doc, holder);
+    doc["val"][0]["id"] = "sensor0";
+    doc["val"][0]["type"] = "temp_sensor";
+    doc["val"][0]["var"] = "temp";
+    doc["val"][0]["val"] = "75.42";
 
-    String response = net_post("http://192.168.0.219/api", holder);
-    Serial.println(response);
+    doc["val"][1]["id"] = "sensor1";
+    doc["val"][1]["type"] = "temp_sensor";
+    doc["val"][1]["var"] = "temp";
+    doc["val"][1]["val"] = "-1.51";
+
+    doc["val"][2]["id"] = "sensor2";
+    doc["val"][2]["type"] = "motion_sensor";
+    doc["val"][2]["var"] = "active";
+    doc["val"][2]["val"] = "1";
+
+    String buffer;
+    serializeJson(doc, buffer);
+
+    String url = DATA_URL;
+    url += "?src=" + urlEncode("01:01:01:01:01:01");
+    String response = net_post(url, buffer);
+
+    post_data(MACADDRESS, "type0", "arg0", "val_0x01");
   }
-
-
 
   return false;
 }
+
+
