@@ -463,30 +463,35 @@ void handleApiPost() {
   if (first_word == "reset") {
     ResetPins();
     server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
-  } else if (first_word == "int") {
-    
-    IntegerPost(str_int(cmd, 1), str_int(cmd, 2));
-  } else if (first_word == "servo") {
+    return;
+  }
 
-    //handleServoWritePost();
-  } else if (first_word == "analog") {
+  if (first_word == "an" || first_word == "analog") {
+    int pin = str_int(cmd, 1);
+    int val = str_int(cmd, 2);
+    AnalogWritePost(pin,val);
+    return;
+  }
 
-    //handleAnalogReadPost();
-  } else if (first_word == "tone") {
+  // Digital Output (pin, value)
+  if (first_word == "di" || first_word == "digital") {
+    int pin = str_int(cmd, 1);
+    int val = str_int(cmd, 2);
+    DigitalWritePost(pin,val);
+    return;
+  }
 
-    //handleToneWritePost();
-  } else if (first_word == "pulse") {
+  // Tone Output (pin, value)
+  if (first_word == "to" || first_word == "tone") {
+    int pin = str_int(cmd, 1);
+    int val = str_int(cmd, 2);
+    ToneWritePost(pin,val);
+    return;
+  }
 
-    //handlePulsePost();
-  } else if (first_word == "sweep") {
-
-    //handleSweepPost();
-  } else {
-    bool response_handled = OnApiCommand(cmd);
-    if (!response_handled) {
-      send_rec(cmd);
-    }
-    
+  bool response_handled = OnApiCommand(cmd);
+  if (!response_handled) {
+    send_rec(cmd);
   }
 }
 
@@ -560,18 +565,23 @@ void SetupWifi() {
   Println("URL: http://" + IPADDRESS);
 }
 
+void PreSetup();
+void PostSetup();
+void SetupPins();
+void SetupTimers();
+void NetReady();
+
 void Core0Processor(void *parameter) {
   PrintCore("Core0Processor");
+  SetupWifi();
+  SetupServer();
+
+  NetReady();
 
   for (;;) {
     server.handleClient();
   }
 }
-
-void PreSetup();
-void PostSetup();
-void SetupPins();
-void SetupTimers();
 
 void setup(void) {
   Serial.begin(SERIAL_BAUDRATE);
@@ -585,8 +595,7 @@ void setup(void) {
 
   SetupPins();
   SetupTimers();
-  SetupWifi();
-  SetupServer();
+
 
   xTaskCreatePinnedToCore(
     Core0Processor,   /* Function to implement the task */
