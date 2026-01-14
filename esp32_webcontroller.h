@@ -5,15 +5,17 @@
 #include "esp32_timer.h"
 #include "esp32_ledstrip.h"
 #include "esp32_lcd.h"
+#include "esp32_sensors.h"
 
 #define SERIAL_BAUDRATE 115200
-#define VERSION 20260111.01
+#define VERSION 20260114.01
 
 Timer timers;
 TaskHandle_t Task1;
 
 bool doBlink = false;
 String IPADDRESS;
+String MACADDRESS;
 
 bool show_actions = true;
 uint32_t action_count = 0;
@@ -265,6 +267,7 @@ void handleGetStylesheet() {
 }
 
 void handleNotFound() {
+  PrintCore("handleNotFound");
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -279,6 +282,11 @@ void handleNotFound() {
   }
 
   server.send(404, "text/plain", message);
+}
+
+void handleGetId() {
+  PrintCore("handleGetId");
+  server.send(200, "text/plain", MACADDRESS);
 }
 
 #pragma endregion Get_Handlers
@@ -494,6 +502,22 @@ void handleApiPost() {
   }
 }
 
+void handleDataPost() {
+  PrintCore("handleDataPost");
+
+  String src = server.arg("src");
+  String type = server.arg("type");
+  String var = server.arg("var");
+  String val = server.arg("val");
+  s_println(src);
+  s_println(type);
+  s_println(var);
+  s_println(val);
+  
+
+  send_rec("ok");
+}
+
 #pragma endregion Post_Handlers
 
 #pragma region Setup
@@ -513,6 +537,7 @@ void SetupServer() {
   server.on("/ctrl", HTTP_GET, handleGetIndex);
   server.on("/matrix", HTTP_GET, handleGetMatrix);
   server.on("/terminal", HTTP_GET, handleGetTerminal);
+  server.on("/id", HTTP_GET, handleGetId);
 
   server.on("/index.js", HTTP_GET, handleGetJavascript);
   server.on("/index.css", HTTP_GET, handleGetStylesheet);
@@ -526,8 +551,11 @@ void SetupServer() {
   server.on("/analogin", HTTP_POST, handleAnalogReadPost);
   server.on("/tone", HTTP_POST, handleToneWritePost);
   server.on("/api", HTTP_POST, handleApiPost);
+  server.on("/data", HTTP_POST, handleDataPost);
+
   server.on("/pulse", HTTP_POST, handlePulsePost);
   server.on("/sweep", HTTP_POST, handleSweepPost);
+  
 
   server.onNotFound(handleNotFound);
   server.begin();
@@ -563,6 +591,7 @@ void SetupWifi() {
   s_print("Connected to ");
   s_println(ssid);
   IPADDRESS = WiFi.localIP().toString() + ":" + String(HTTP_PORT);
+  MACADDRESS = WiFi.macAddress();
   s_println("URL: http://" + IPADDRESS);
 }
 
