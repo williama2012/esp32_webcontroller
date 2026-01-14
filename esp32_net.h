@@ -1,17 +1,19 @@
 #ifndef ESP32_NET
 #define ESP32_NET_H
 #include <Arduino.h>
+#include <ArduinoJson.h>
+#include <UrlEncode.h>
 
 #include <HTTPClient.h>
-#include <UrlEncode.h>
 
 const char* DATA_URL = "http://192.168.0.190:3000/data";
 
 String net_post(String url, String requestData) {
-  Serial.print("REQUEST:");
-  Serial.println(url);
-  Serial.print("BODY:");
-  Serial.println(requestData);
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("WiFi is not connected");
+    return "WiFi is not connected";
+  }
 
   HTTPClient http;
   http.begin(url);
@@ -20,10 +22,7 @@ String net_post(String url, String requestData) {
   int httpCode = http.POST(requestData);
   if (httpCode > 0) {
     if (httpCode == HTTP_CODE_OK) {
-      String payload = http.getString();
-      Serial.print("RESPONSE:");
-      Serial.println(payload);
-      return payload;
+      return http.getString();
     }
   }
 
@@ -37,8 +36,37 @@ String post_data(String src, String type, String var, String val) {
     url += "&var=" + urlEncode(var);
     url += "&val=" + urlEncode(val);
 
+    JsonDocument doc;
+
+    doc["src"] = src;
+    doc["type"] = type;
+    doc["var"] = var;
+    doc["val"] = val;
+
+    String buffer;
+    serializeJson(doc, buffer);
+
+    String url = DATA_URL;
+    url += "?src=" + urlEncode("01:01:01:01:01:01");
+    String response = net_post(url, buffer);
+
+    post_data(MACADDRESS, "type0", "arg0", "val_0x01");
+
+
+
+
     return net_post(url, "{\"src\":\"test\"}");
 }
+
+String post_data(String src, String type, String var, float val) {
+  return post_data(src, type, var, String(val));
+}
+
+String post_data(String src, String type, String var, int val) {
+  return post_data(src, type, var, String(val));
+}
+
+
 
 
 #endif
