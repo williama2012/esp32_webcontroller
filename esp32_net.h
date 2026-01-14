@@ -6,7 +6,7 @@
 
 #include <HTTPClient.h>
 
-const char* DATA_URL = "http://192.168.0.190:3000/data";
+const char* DATA_URL = "http://192.168.0.231:3000/data";
 
 String net_post(String url, String requestData) {
 
