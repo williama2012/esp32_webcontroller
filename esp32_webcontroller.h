@@ -124,7 +124,7 @@ void AnalogReadPost() {
   pinStr.replace("[", "");
   pinStr.replace("]", "");
 
-  Println("pins:" + pinStr);
+  s_println("pins:" + pinStr);
 
   int i = pinStr.indexOf(",");
   String part;
@@ -449,11 +449,10 @@ void handlePulsePost() {
   PulsePost(pin, value, time);
 }
 
-#pragma endregion Post_Handlers
-
 void handleApiPost() {
   PrintCore("handleApiPost");
   String cmd = server.arg("cmd");
+  lcd_print(cmd, 3);
   cmd.toLowerCase();
   
   doBlink = true;
@@ -495,12 +494,14 @@ void handleApiPost() {
   }
 }
 
+#pragma endregion Post_Handlers
+
 #pragma region Setup
 
 void SetupServer() {
   PrintCore("SetupServer");
   if (MDNS.begin("esp32")) {
-    Println("MDNS responder started");
+    s_println("MDNS responder started");
   }
   server.enableCORS(true);
   server.enableCrossOrigin(true);
@@ -531,38 +532,38 @@ void SetupServer() {
   server.onNotFound(handleNotFound);
   server.begin();
 
-  Println("HTTP server started");
-  //lcd_clear();
-  //lcd_print("HTTP server started");
-  //lcd_print(IPADDRESS, 1);
+  s_println("HTTP server started");
+  lcd_clear();
+  lcd_print("HTTP server started");
+  lcd_print(IPADDRESS, 1);
 }
 
 void SetupWifi() {
   PrintCore("SetupWifi");
 
-  //lcd_print("SSID:" + String(ssid), 0);
+  lcd_print("SSID:" + String(ssid), 0);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  //lcd_print("Connecting..", 1);
+  lcd_print("Connecting..", 1);
 
   bool o = false;
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Print(".");
+    s_print(".");
     o = o ? false : true;
-    //lcd_print(o ? "|" : "-", 1, 12);
-    //lcd_print("Status:" + String(WiFi.status()), 2);
+    lcd_print(o ? "|" : "-", 1, 12);
+    lcd_print("Status:" + String(WiFi.status()), 2);
   }
-  //lcd_print("Status:" + String(WiFi.status()), 2);
+  lcd_print("Status:" + String(WiFi.status()), 2);
 
-  Println("");
-  Print("Connected to ");
-  Println(ssid);
+  s_println("");
+  s_print("Connected to ");
+  s_println(ssid);
   IPADDRESS = WiFi.localIP().toString() + ":" + String(HTTP_PORT);
-  Println("URL: http://" + IPADDRESS);
+  s_println("URL: http://" + IPADDRESS);
 }
 
 void PreSetup();
