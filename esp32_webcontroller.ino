@@ -11,15 +11,28 @@ uint8_t mode = 10;
 bool show_rssi = true;
 bool show_temp = true;
 
+const bool USE_LCD = true;
+const bool USE_LED = false;
+
 void PreSetup() {
-  lcd_init();
+  if (USE_LCD) {
+    lcd_init();
+  }
+  if (USE_LED) {
+    led_init();
+  }
+
   ds_init();
-  //led_init();
 }
 
 void PostSetup() {
-  set_pixel(11, 11, 255, 255, 255);
-
+  if (USE_LCD) {
+    delay(3000);
+    lcd_clear();
+  }
+  if (USE_LED) {
+    set_pixel(11, 11, 255, 255, 255);
+  }
 }
 
 void NetReady() {}
@@ -56,6 +69,25 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 
 int microwave;
 
+void PollSensors() {
+  uint8_t sensor_count = 1;
+
+  float* temps = ds_temps(sensor_count);
+  for(int i = 0; i < sensor_count; i++) {
+    float temp = temps[i];
+
+    String txt = "Sensor " + String(i) + ": " + String(temp);
+    lcd_print(txt, i);
+
+    String response = post_data(MACADDRESS, "fridge", "sensor_" + String(i), temp);
+    if (response == "connection refused") {
+      lcd_print("X");
+    }
+
+  }
+
+}
+
 // Runs on Core 1
 void loop(void) {
   //microwave = digitalRead(25);
@@ -74,19 +106,7 @@ void loop(void) {
       break;
     case 10:
       if (timers.CheckTimer(11)) {
-        uint8_t sensor_count = 1;
-
-        float* temps = ds_temps(sensor_count);
-        s_print("temp:");
-        s_println(String(temps[0]));
-
-        for(int i = 0; i < sensor_count; i++) {
-          float temp = temps[i];
-          String txt = "Sensor " + String(i) + ": " + String(temp);
-          lcd_print(txt, i);
-          post_data(MACADDRESS, "fridge", "sensor_" + String(i), temp);
-        }
-
+        PollSensors();
       }
     default:
       break;
