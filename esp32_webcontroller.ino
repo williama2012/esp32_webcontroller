@@ -84,7 +84,7 @@ void loop(void) {
           float temp = temps[i];
           String txt = "Sensor " + String(i) + ": " + String(temp);
           lcd_print(txt, i);
-          //Serial.println(txt);
+          post_data(MACADDRESS, "fridge", "sensor_" + String(i), temp);
         }
 
       }
