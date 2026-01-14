@@ -460,7 +460,6 @@ void handlePulsePost() {
 void handleApiPost() {
   PrintCore("handleApiPost");
   String cmd = server.arg("cmd");
-  lcd_print(cmd, 3);
   cmd.toLowerCase();
   
   doBlink = true;
@@ -605,7 +604,6 @@ void Core0Processor(void *parameter) {
   PrintCore("Core0Processor");
   SetupWifi();
   SetupServer();
-
   NetReady();
 
   for (;;) {
@@ -625,7 +623,6 @@ void setup(void) {
 
   SetupPins();
   SetupTimers();
-
 
   xTaskCreatePinnedToCore(
     Core0Processor,   /* Function to implement the task */
