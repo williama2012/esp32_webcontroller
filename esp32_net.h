@@ -9,6 +9,9 @@ String net_post(String url, String requestData) {
   HTTPClient http;
   http.begin(url);
   http.addHeader("Content-Type", "application/json");
+  Serial.print("Sending:");
+  Serial.println(requestData);
+
   int httpCode = http.POST(requestData);
   if (httpCode > 0) {
     if (httpCode == HTTP_CODE_OK) {
