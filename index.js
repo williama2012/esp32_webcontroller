@@ -146,7 +146,7 @@ $(function(){
         document
             .getElementById("matrix-clear")
             .addEventListener("click", (evt) => {
-                PostApiCommand("clear");
+                PostApiCommand("led clear");
                 matrix.empty();
                 build_matrix(matrix);
 
