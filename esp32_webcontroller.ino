@@ -1,4 +1,5 @@
 #include "esp32_webcontroller.h"
+#include "esp32_net.h"
 #include <DHT22.h>
 
 #define DHTPIN 23
