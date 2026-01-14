@@ -1,6 +1,7 @@
 #include "esp32_webcontroller.h"
 #include "esp32_net.h"
 #include <DHT22.h>
+#include <ArduinoJson.h>
 
 #define DHTPIN 23
 DHT22 dht22(DHTPIN);
@@ -11,16 +12,13 @@ bool show_rssi = true;
 bool show_temp = true;
 
 void PreSetup() {
-  //lcd_init();
-  //delay(1000);
-  
-  led_init();
+  lcd_init();
+  //led_init();
 }
 
 void PostSetup() {
-  delay(500);
-
   set_pixel(11, 11, 255, 255, 255);
+
 }
 
 void NetReady() {}
@@ -292,7 +290,7 @@ bool HandleLedCommand(String cmd) {
 
 // Runs on Core 0
 bool OnApiCommand(String cmd) {
-  PrintCore("ProcessCommand: " + cmd);
+  PrintCore("ApiCommand [" + cmd + "]");
   String first_word = str_split(cmd, 0);
   
   //lcd_print(cmd, 2);
@@ -350,15 +348,39 @@ bool OnApiCommand(String cmd) {
     return send_msg("invalid mode value");
   }
 
-  if (first_word == "clear") {
-    led_clear();
-    return send_msg("cleared");
+  if (first_word == "scan_i2c") {
+    String* addresses = scan_i2c();
+    String response = "{";
+    
+    int i;
+    for (i = 0; i < 8; i++) {
+      String address = addresses[i];
+      if (address.length() > 0) {
+        response += jsonField("address", address, true);
+      }
+    }
+
+    response += "}";
+
+    return send_msg(response);
   }
 
-  if (first_word == "scan") {
-    scan_i2c();
-    return send_msg("scanned");
+  if (first_word == "test") {
+
+  JsonDocument doc;
+
+  doc["cmd"] = "gps";
+  doc["time"] = 1351824120;
+  doc["data"][0] = 48.756080;
+  doc["data"][1] = 2.302038;
+
+  String holder;
+  serializeJson(doc, holder);
+
+    String response = net_post("http://192.168.0.219/api", holder);
+    Serial.println(response);
   }
+
 
 
   return false;
