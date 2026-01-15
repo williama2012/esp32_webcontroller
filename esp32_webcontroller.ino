@@ -11,7 +11,7 @@ const bool USE_LED = false;
 
 DHT22 dht22(DHTPIN);
 
-uint8_t mode = 0;
+uint8_t mode = 10;
 bool show_rssi = true;
 bool show_temp = true;
 
