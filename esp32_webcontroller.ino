@@ -11,7 +11,7 @@ const bool USE_LED = false;
 
 DHT22 dht22(DHTPIN);
 
-uint8_t mode = 10;
+uint8_t mode = 0;
 bool show_rssi = true;
 bool show_temp = true;
 
@@ -55,7 +55,7 @@ void SetupPins() {
 void SetupTimers() {
   timers.AddTimer(0, 3000);
   
-  timers.AddTimer(11, 1000);
+  timers.AddTimer(10, 1000);
 
   timers.AddTimer(21, 100);
 }
@@ -104,7 +104,7 @@ void loop(void) {
       mode3process();
       break;
     case 10:
-      if (timers.CheckTimer(11)) {
+      if (timers.CheckTimer(10)) {
         PollSensors();
       }
     default:
