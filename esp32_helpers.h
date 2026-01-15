@@ -129,7 +129,7 @@ void Blink() {
 
 #pragma region Printing
 
-void s_print(String msg) {
+void s_print(const String& msg) {
   if (Serial) {
     Serial.print(msg);
   }
@@ -137,13 +137,13 @@ void s_print(String msg) {
 
 void s_print(const char *msg) {
   if (Serial) {
-    Serial.print(msg);
+    Serial.print(F(msg));
   }
 }
 
 void s_print(char *msg) {
   if (Serial) {
-    Serial.print(msg);
+    Serial.print(F(msg));
   }
 }
 
@@ -153,7 +153,7 @@ void s_print(uint32_t msg) {
   }
 }
 
-void s_println(String msg) {
+void s_println(const String& msg) {
   if (Serial) {
     Serial.println(msg);
   }
@@ -161,13 +161,13 @@ void s_println(String msg) {
 
 void s_println(const char *msg) {
   if (Serial) {
-    Serial.println(msg);
+    Serial.println(F(msg));
   }
 }
 
 void s_println(char *msg) {
   if (Serial) {
-    Serial.println(msg);
+    Serial.println(F(msg));
   }
 }
 
@@ -183,7 +183,7 @@ void PrintCore(char *msg) {
   s_println(" ---");
 }
 
-void PrintCore(String msg) {
+void PrintCore(const String& msg) {
   s_print("--- " + String(msg) + " running on core ");
   s_print(xPortGetCoreID());
   s_println(" ---");
