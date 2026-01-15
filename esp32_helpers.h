@@ -59,6 +59,13 @@ int str_int(String str, uint8_t position, char separator = ' ') {
   return valueStr.toInt();
 }
 
+void str_pad(String& str, uint8_t length) {
+  uint8_t diff = length - str.length();
+  
+  for(int i = 0; i < diff; i++) {
+    str += " ";
+  }
+}
 
 
 #pragma region Pins
@@ -84,15 +91,6 @@ PinSet get_pin(uint8_t pin) {
     pin = MAX_PIN;
   }
   return PIN_SET[pin];
-}
-
-void ResetPins() {
-  for (int i = 2; i <= 24; i++) {
-    pinMode(i, OUTPUT);
-    analogWrite(i, 0);
-    pinMode(i, INPUT);
-    int val = analogRead(i);
-  }
 }
 
 #pragma endregion Pins
@@ -184,6 +182,17 @@ void PrintCore(const String &msg) {
 }
 
 #pragma endregion Printing
+
+bool check_i2c(byte address) {
+  byte error;
+  Wire.beginTransmission(address);
+  delay(1);
+  error = Wire.endTransmission();
+  if (error == 0) {
+    return true;
+  }
+  return false;
+}
 
 byte *scan_i2c() {
   byte error, address;
