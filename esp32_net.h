@@ -7,7 +7,7 @@
 
 const char* DATA_URL = "http://192.168.0.190:3000/api/data";
 
-int net_post(String url, String requestData, String& response) {
+int net_post(const String& url, const String& requestData, String& response) {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println(F("WiFi is not connected"));
     return 0;
@@ -27,7 +27,7 @@ int net_post(String url, String requestData, String& response) {
   return httpCode;
 }
 
-int post_data(String src, String type, String var, String val, String& response) {
+int post_data(const String& src, const String& type, const String& var, const String& val, String& response) {
     String url = DATA_URL;
     url += "?src=" + urlEncode(src);
     url += "&type=" + urlEncode(type);
