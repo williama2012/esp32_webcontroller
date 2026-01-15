@@ -361,24 +361,6 @@ bool OnApiCommand(String cmd) {
     }
   }
 
-  if (first_word == "color") {
-      color_r = str_int(cmd, 1);
-      color_g = str_int(cmd, 2);
-      color_b = str_int(cmd, 3);
-      uint16_t brightness = str_int(cmd, 4);
-      if (brightness > -1) {
-        set_brightness(brightness);
-      }
-  }
-
-  if (first_word == "brightness") {
-      uint16_t brightness = str_int(cmd, 1);
-      if (brightness > -1) {
-        set_brightness(brightness);
-        return send_body(jsonField("brightness", String(brightness), false));
-      }
-  }
-
   if (first_word == "mode") {
     int m = str_int(cmd, 1);
     if (m > -1) {
@@ -387,6 +369,14 @@ bool OnApiCommand(String cmd) {
     }
     return send_msg("invalid mode value");
   }
+
+  if (first_word == "timer") {
+    int timer_id = str_int(cmd, 1);
+    int timer_delay = str_int(cmd, 2);
+    timers.SetTimer(timer_id, timer_delay);
+  }
+
+  /**   */
 
   if (first_word == "scan_i2c") {
     byte *addresses = scan_i2c();
