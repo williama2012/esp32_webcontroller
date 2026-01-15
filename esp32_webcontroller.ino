@@ -11,7 +11,7 @@ const bool USE_LED = false;
 
 DHT22 dht22(DHTPIN);
 
-uint8_t mode = 0;
+uint8_t mode = 10;
 bool show_rssi = true;
 bool show_temp = true;
 
@@ -72,7 +72,7 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 
 int microwave;
 
-void PollSensors() {
+void PollSensors(bool postData = false) {
   float* temps = ds_temps(ONE_WIRE_COUNT);
   for(int i = 0; i < ONE_WIRE_COUNT; i++) {
     float temp = temps[i];
@@ -80,9 +80,11 @@ void PollSensors() {
     String txt = "Sensor " + String(i) + ": " + String(temp);
     lcd_print(txt, i);
 
-    String response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp);
-    if (response == "connection refused") {
-      lcd_print("X");
+    if (postData) {
+      String response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp);
+      if (response == "connection refused") {
+        lcd_print("X");
+      }
     }
   }
 }
@@ -105,7 +107,11 @@ void loop(void) {
       break;
     case 10:
       if (timers.CheckTimer(10)) {
-        PollSensors();
+        PollSensors(true);
+      }
+    case 11:
+      if (timers.CheckTimer(10)) {
+        PollSensors(false);
       }
     default:
       break;
