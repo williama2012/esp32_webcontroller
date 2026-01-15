@@ -467,12 +467,6 @@ void handleApiPost() {
   
   String first_word = str_split(cmd, 0);
 
-  if (first_word == "reset") {
-    ResetPins();
-    server.send(200, "application/json", "{" + jsonField("reset", "complete", false) + "}");
-    return;
-  }
-
   if (first_word == "an" || first_word == "analog") {
     int pin = str_int(cmd, 1);
     int val = str_int(cmd, 2);
@@ -530,9 +524,6 @@ void SetupServer() {
   server.enableCORS(true);
   server.enableCrossOrigin(true);
 
-  // server.on("/", HTTP_GET, handleGetIndex);
-  // server.on("/matrix", HTTP_GET, handleGetMatrix);
-
   server.on("/", HTTP_GET, handleGetMatrix);
   server.on("/ctrl", HTTP_GET, handleGetIndex);
   server.on("/matrix", HTTP_GET, handleGetMatrix);
@@ -561,6 +552,7 @@ void SetupServer() {
   server.begin();
 
   s_println("HTTP server started");
+
   lcd_clear();
   lcd_print("HTTP server started");
   lcd_print(IPADDRESS, 1);
@@ -621,7 +613,6 @@ void setup(void) {
   analogWriteResolution(23, 12);
 
   PreSetup();
-
   SetupPins();
   SetupTimers();
 
