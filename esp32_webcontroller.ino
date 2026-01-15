@@ -80,7 +80,7 @@ void PollSensors() {
     String txt = "Sensor " + String(i) + ": " + String(temp);
     lcd_print(txt, i);
 
-    String response = post_data(MACADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp);
+    String response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp);
     if (response == "connection refused") {
       lcd_print("X");
     }
