@@ -14,8 +14,8 @@ Timer timers;
 TaskHandle_t Task1;
 
 bool doBlink = false;
-String IPADDRESS;
-String MACADDRESS;
+String PROGMEM IPADDRESS;
+String PROGMEM MACADDRESS;
 
 bool show_actions = true;
 uint32_t action_count = 0;
