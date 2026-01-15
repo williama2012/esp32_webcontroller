@@ -6,8 +6,8 @@
 #define DHTPIN 23
 #define ONE_WIRE_COUNT 1
 #define ONE_WIRE_TYPE "dev"
-const bool USE_LCD = true;
-const bool USE_LED = false;
+bool USE_LCD = true;
+bool USE_LED = false;
 
 DHT22 dht22(DHTPIN);
 
@@ -16,15 +16,22 @@ bool show_rssi = true;
 
 void PreSetup() {
   if (USE_LCD) {
-    lcd_init();
+    bool check_lcd = check_i2c(LCD_ADDRESS);
+    Serial.print(F("lcd_check(PreSetup):"));
+    Serial.println(check_lcd);
   }
-
+  
   ds_init();
 }
 
 void PostSetup() {
+  bool check_lcd = check_i2c(LCD_ADDRESS);
+  Serial.print(F("lcd_check(PostSetup):"));
+  Serial.println(check_lcd);
+ 
   if (USE_LCD) {
-    lcd_clear();
+    lcd_init();
+    delay(100);
   }
   if (USE_LED) {
     set_pixel(11, 11, 255, 255, 255);
@@ -32,9 +39,16 @@ void PostSetup() {
 }
 
 void NetReady() {
+  bool check_lcd = check_i2c(LCD_ADDRESS);
+  Serial.print(F("lcd_check(NetReady):"));
+  Serial.println(check_lcd);
+  USE_LCD = check_i2c(LCD_ADDRESS);
+
   if (USE_LCD) {
     delay(3000);
     lcd_clear();
+    lcd_print(IPADDRESS, 2);
+
   }
 
 }
@@ -75,7 +89,8 @@ void PollSensors(bool postData = false) {
   for(int i = 0; i < ONE_WIRE_COUNT; i++) {
     float temp = temps[i];
 
-    String txt = "Sensor " + String(i) + ": " + String(temp);
+    String txt = "Sensor_" + String(i) + ": " + String(temp);
+    str_pad(txt, 20);
     lcd_print(txt, i);
 
     if (postData) {
