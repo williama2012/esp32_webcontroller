@@ -3,21 +3,19 @@
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include <UrlEncode.h>
-
 #include <HTTPClient.h>
+#define NET_FAILED_RESPONSE "x_connection_failed_x"
 
-const char* DATA_URL = "http://192.168.0.233:3000/data";
+const char* DATA_URL = "http://192.168.0.190:3000/api/data";
 
 String net_post(String url, String requestData) {
 
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi is not connected");
-    return "WiFi is not connected";
   }
 
   if (IPADDRESS == "") {
     Serial.println("IPADDRESS not set");
-    return "IPADDRESS not set";
   }
 
   HTTPClient http;
@@ -25,13 +23,16 @@ String net_post(String url, String requestData) {
   http.addHeader("Content-Type", "text/plain");
 
   int httpCode = http.POST(requestData);
+
   if (httpCode > 0) {
     if (httpCode == HTTP_CODE_OK) {
       return http.getString();
     }
+    Serial.println(F(httpCode));
+    return NET_FAILED_RESPONSE;
   }
-  Serial.println(http.errorToString(httpCode).c_str());
-  return http.errorToString(httpCode).c_str();
+  Serial.println(F(http.errorToString(httpCode).c_str()));
+  return NET_FAILED_RESPONSE;
 }
 
 String post_data(String src, String type, String var, String val) {
