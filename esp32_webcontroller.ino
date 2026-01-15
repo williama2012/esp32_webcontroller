@@ -54,7 +54,7 @@ void SetupPins() {
 void SetupTimers() {
   timers.AddTimer(0, 3000);
   timers.AddTimer(10, 1000);
-  timers.AddTimer(21, 100);
+  timers.AddTimer(20, 500);
 }
 
 float GetRange(uint8_t triggerPin, uint8_t echoPin) {
@@ -78,9 +78,15 @@ void PollSensors(bool postData = false) {
     lcd_print(txt, i);
 
     if (postData) {
-      String response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp);
-      if (response == NET_FAILED_RESPONSE) {
-        lcd_print("X");
+      String R;
+      int response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp, R);
+      Serial.println(R);
+
+      if (response != HTTP_CODE_OK) {
+        lcd_print(String(response));
+        counters[1]++;
+      } else {
+        counters[0]++;
       }
     }
   }
@@ -119,9 +125,6 @@ void loop(void) {
       String rssi = String(WiFi.RSSI()) + " dBm";
       lcd_print_r(rssi, 3);
     }
-    if (USE_LCD) {
-      lcd_print(String(counter), 3);
-    }
     // if (show_temp) {
     //   float temp = dht22.getTemperature(false);
     //   float hum = dht22.getHumidity();
@@ -130,6 +133,9 @@ void loop(void) {
 
   }
 
+  if (USE_LCD && timers.CheckTimer(20)) {
+    lcd_print(String(counters[0]) + " | " + String(counters[1]), 3);
+  }
   // if (timers.CheckTimer(21)) {
   //   lcd_print("D:" + String(GetRange(12, 13)), 0);
   //   delay(10);
@@ -170,7 +176,7 @@ bool OnSetParameter(String cmd) {
   return send_body(jsonField("param", String(param), true) + jsonField("value", String(value)));
 }
 
-bool HandleLcdCommand(String cmd) {
+bool HandleLcdCommand(String& cmd) {
   String cmd_1 = str_split(cmd, 1);
   String cmd_2 = str_split(cmd, 2);
 
@@ -247,7 +253,7 @@ bool HandleLcdCommand(String cmd) {
   return send_msg("received");
 }
 
-bool HandleLedCommand(String cmd) {
+bool HandleLedCommand(String& cmd) {
   String cmd_1 = str_split(cmd, 1);
 
   if (cmd_1 == "clear") {
@@ -333,8 +339,10 @@ bool HandleLedCommand(String cmd) {
   return send_msg("received");
 }
 
+bool HandleResetCommand(String& cmd) {}
+
 // Runs on Core 0
-bool OnApiCommand(String cmd) {
+bool OnApiCommand(String& cmd) {
   PrintCore("ApiCommand [" + cmd + "]");
   String first_word = str_split(cmd, 0);
   
