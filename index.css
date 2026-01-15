@@ -363,8 +363,8 @@ input {
 }
 
 .terminal-history-container {
-    min-height:75vh;
-    max-height:75vh;
+    min-height:10em;
+    max-height:10em;
     overflow-y: scroll;
 
     background-color: rgba(0, 0, 0, 0.5);
@@ -405,8 +405,8 @@ input {
 }
 
 .terminal-input {
-    min-height:20vh;
-    max-height:20vh;
+    min-height:1em;
+    max-height:5em;
     border-radius: 0 0 5px 5px;
     
     border: 2px solid black;
