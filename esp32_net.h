@@ -15,6 +15,11 @@ String net_post(String url, String requestData) {
     return "WiFi is not connected";
   }
 
+  if (IPADDRESS == "") {
+    Serial.println("IPADDRESS not set");
+    return "IPADDRESS not set";
+  }
+
   HTTPClient http;
   http.begin(url);
   http.addHeader("Content-Type", "text/plain");
