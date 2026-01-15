@@ -68,6 +68,7 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 }
 
 int microwave;
+String _net_response;
 
 void PollSensors(bool postData = false) {
   float* temps = ds_temps(ONE_WIRE_COUNT);
@@ -78,10 +79,7 @@ void PollSensors(bool postData = false) {
     lcd_print(txt, i);
 
     if (postData) {
-      String R;
-      int response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp, R);
-      Serial.println(R);
-
+      int response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp, _net_response);
       if (response != HTTP_CODE_OK) {
         lcd_print(String(response));
         counters[1]++;
@@ -168,7 +166,7 @@ void mode1process() {
 }
 
 bool OnSetParameter(String cmd) {
-  PrintCore("OnSetParameter: " + cmd);
+  //PrintCore("OnSetParameter: " + cmd);
   
   String param = str_split(cmd, 1);
   String value = str_split(cmd, 2);
@@ -339,15 +337,18 @@ bool HandleLedCommand(String& cmd) {
   return send_msg("received");
 }
 
-bool HandleResetCommand(String& cmd) {}
+bool HandleResetCommand(String& cmd) {
+  String cmd_1 = str_split(cmd, 1);
+  if (cmd_1 == "counters") {
+    counters[0] = 0;
+    counters[1] = 0;
+  }
+}
 
 // Runs on Core 0
 bool OnApiCommand(String& cmd) {
-  PrintCore("ApiCommand [" + cmd + "]");
   String first_word = str_split(cmd, 0);
   
-  //lcd_print(cmd, 2);
-
   if (first_word == "set") {
     return OnSetParameter(cmd);
   }
@@ -358,6 +359,10 @@ bool OnApiCommand(String& cmd) {
 
   if (first_word == "led") {
     return HandleLedCommand(cmd);
+  }
+
+  if (first_word == "reset") {
+    return HandleResetCommand(cmd);
   }
 
   if (first_word == "p") {
@@ -388,8 +393,6 @@ bool OnApiCommand(String& cmd) {
     int timer_delay = str_int(cmd, 2);
     timers.SetTimer(timer_id, timer_delay);
   }
-
-  /**   */
 
   if (first_word == "scan_i2c") {
     byte *addresses = scan_i2c();
