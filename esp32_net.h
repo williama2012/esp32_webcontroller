@@ -4,38 +4,30 @@
 #include <ArduinoJson.h>
 #include <UrlEncode.h>
 #include <HTTPClient.h>
-#define NET_FAILED_RESPONSE "x_connection_failed_x"
 
 const char* DATA_URL = "http://192.168.0.190:3000/api/data";
 
-String net_post(String url, String requestData) {
-
+int net_post(String url, String requestData, String& response) {
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("WiFi is not connected");
+    Serial.println(F("WiFi is not connected"));
+    return 0;
   }
-
   if (IPADDRESS == "") {
-    Serial.println("IPADDRESS not set");
+    Serial.println(F("IPADDRESS not set"));
+    return 0;
   }
 
   HTTPClient http;
   http.begin(url);
-  http.addHeader("Content-Type", "text/plain");
-
+  http.addHeader("Content-Type", "application/json");
   int httpCode = http.POST(requestData);
-
-  if (httpCode > 0) {
-    if (httpCode == HTTP_CODE_OK) {
-      return http.getString();
-    }
-    Serial.println(F(httpCode));
-    return NET_FAILED_RESPONSE;
+  if (httpCode == HTTP_CODE_OK) {
+    response = http.getString();
   }
-  Serial.println(F(http.errorToString(httpCode).c_str()));
-  return NET_FAILED_RESPONSE;
+  return httpCode;
 }
 
-String post_data(String src, String type, String var, String val) {
+int post_data(String src, String type, String var, String val, String& response) {
     String url = DATA_URL;
     url += "?src=" + urlEncode(src);
     url += "&type=" + urlEncode(type);
@@ -52,15 +44,15 @@ String post_data(String src, String type, String var, String val) {
     String buffer;
     serializeJson(doc, buffer);
 
-    return net_post(url, buffer);
+    return net_post(url, buffer, response);
 }
 
-String post_data(String src, String type, String var, float val) {
-  return post_data(src, type, var, String(val));
+int post_data(String src, String type, String var, float val, String& response) {
+  return post_data(src, type, var, String(val), response);
 }
 
-String post_data(String src, String type, String var, int val) {
-  return post_data(src, type, var, String(val));
+int post_data(String src, String type, String var, int val, String& response) {
+  return post_data(src, type, var, String(val), response);
 }
 
 
