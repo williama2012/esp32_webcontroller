@@ -13,7 +13,6 @@ DHT22 dht22(DHTPIN);
 
 uint8_t mode = 10;
 bool show_rssi = true;
-bool show_temp = true;
 
 void PreSetup() {
   if (USE_LCD) {
@@ -54,9 +53,7 @@ void SetupPins() {
 
 void SetupTimers() {
   timers.AddTimer(0, 3000);
-  
   timers.AddTimer(10, 1000);
-
   timers.AddTimer(21, 100);
 }
 
@@ -82,7 +79,7 @@ void PollSensors(bool postData = false) {
 
     if (postData) {
       String response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp);
-      if (response == "connection refused") {
+      if (response == NET_FAILED_RESPONSE) {
         lcd_print("X");
       }
     }
@@ -122,7 +119,9 @@ void loop(void) {
       String rssi = String(WiFi.RSSI()) + " dBm";
       lcd_print_r(rssi, 3);
     }
-
+    if (USE_LCD) {
+      lcd_print(String(counter), 3);
+    }
     // if (show_temp) {
     //   float temp = dht22.getTemperature(false);
     //   float hum = dht22.getHumidity();
@@ -435,9 +434,11 @@ bool OnApiCommand(String cmd) {
 
     String url = DATA_URL;
     url += "?src=" + urlEncode("01:01:01:01:01:01");
-    String response = net_post(url, buffer);
+    //String response = net_post(url, buffer);
 
-    post_data(MACADDRESS, "type0", "arg0", "val_0x01");
+    //String response;
+    //post_data(MACADDRESS, "type0", "arg0", "val_0x01", response);
+
   }
 
   return false;
