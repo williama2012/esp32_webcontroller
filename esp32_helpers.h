@@ -11,12 +11,12 @@ typedef struct {
   char *value;
 } Aarg;
 
-enum PinModeEnum { 
-  AnalogWrite = 1, 
-  AnalogRead = 2, 
-  DigitalWrite = 3, 
-  DigitalRead = 4, 
-  Servo = 5, 
+enum PinModeEnum {
+  AnalogWrite = 1,
+  AnalogRead = 2,
+  DigitalWrite = 3,
+  DigitalRead = 4,
+  Servo = 5,
   Tone = 6,
   Pulse = 7,
   Integer = 8
@@ -44,10 +44,10 @@ String str_split(String str, uint8_t position, char separator = ' ') {
     }
   }
 
-  if(position > StringCount) {
+  if (position > StringCount) {
     return "";
   }
-  
+
   return strs[position];
 }
 
@@ -129,61 +129,55 @@ void Blink() {
 
 #pragma region Printing
 
-void s_print(const String& msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
+void s_print(const String &msg) {
+  if (!Serial) { return; }
+  Serial.print(msg);
 }
 
 void s_print(const char *msg) {
-  if (Serial) {
-    Serial.print(F(msg));
-  }
+  if (!Serial) { return; }
+  Serial.print(F(msg));
 }
 
 void s_print(char *msg) {
-  if (Serial) {
-    Serial.print(F(msg));
-  }
+  if (!Serial) { return; }
+  Serial.print(F(msg));
 }
 
 void s_print(uint32_t msg) {
-  if (Serial) {
-    Serial.print(msg);
-  }
+  if (!Serial) { return; }
+  Serial.print(msg);
 }
 
-void s_println(const String& msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
+void s_println(const String &msg) {
+  if (!Serial) { return; }
+  Serial.println(msg);
 }
 
 void s_println(const char *msg) {
-  if (Serial) {
-    Serial.println(F(msg));
-  }
+  if (!Serial) { return; }
+  Serial.println(F(msg));
 }
 
 void s_println(char *msg) {
-  if (Serial) {
-    Serial.println(F(msg));
-  }
+  if (!Serial) { return; }
+  Serial.println(F(msg));
 }
 
 void s_println(uint32_t msg) {
-  if (Serial) {
-    Serial.println(msg);
-  }
+  if (!Serial) { return; }
+  Serial.println(msg);
 }
 
 void PrintCore(char *msg) {
+  if (!Serial) { return ; }
   s_print("--- " + String(msg) + " running on core ");
   s_print(xPortGetCoreID());
   s_println(" ---");
 }
 
-void PrintCore(const String& msg) {
+void PrintCore(const String &msg) {
+  if (!Serial) { return ; }
   s_print("--- " + String(msg) + " running on core ");
   s_print(xPortGetCoreID());
   s_println(" ---");
@@ -191,14 +185,14 @@ void PrintCore(const String& msg) {
 
 #pragma endregion Printing
 
-byte * scan_i2c() {
+byte *scan_i2c() {
   byte error, address;
   int nDevices = 0;
-  
-  byte* array = (byte*)malloc(0x7f * sizeof(byte));
+
+  byte *array = (byte *)malloc(0x7f * sizeof(byte));
 
   Serial.println("Scanning for I2C devices ...");
-  for (address = 0x01; address < 0x7f; address++) { //0x7f
+  for (address = 0x01; address < 0x7f; address++) {  //0x7f
     Wire.beginTransmission(address);
     error = Wire.endTransmission();
     if (error == 0) {
