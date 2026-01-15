@@ -21,6 +21,7 @@ bool show_actions = true;
 uint32_t action_count = 0;
 
 bool OnApiCommand(String cmd);
+int counter = 0;
 
 #pragma region Actions
 
