@@ -6,13 +6,12 @@
 #define DHTPIN 23
 #define ONE_WIRE_COUNT 1
 #define ONE_WIRE_TYPE "dev"
+uint8_t mode = 0;
 bool USE_LCD = true;
 bool USE_LED = false;
+bool show_rssi = false;
 
 DHT22 dht22(DHTPIN);
-
-uint8_t mode = 10;
-bool show_rssi = true;
 
 void PreSetup() {
   if (USE_LCD) {
@@ -48,9 +47,8 @@ void NetReady() {
     delay(3000);
     lcd_clear();
     lcd_print(IPADDRESS, 2);
-
   }
-
+  reset_counters();
 }
 
 void SetupPins() {
@@ -355,13 +353,17 @@ bool HandleLedCommand(String& cmd) {
 bool HandleResetCommand(String& cmd) {
   String cmd_1 = str_split(cmd, 1);
   if (cmd_1 == "counters") {
-    counters[0] = 0;
-    counters[1] = 0;
+    reset_counters();
+    return send_msg("counters cleared");
   }
+
+  return send_msg("cleared");
 }
 
 // Runs on Core 0
 bool OnApiCommand(String& cmd) {
+  PrintCore("OnApiCommand:" + cmd);
+
   String first_word = str_split(cmd, 0);
   
   if (first_word == "set") {
@@ -407,6 +409,7 @@ bool OnApiCommand(String& cmd) {
     int timer_id = str_int(cmd, 1);
     int timer_delay = str_int(cmd, 2);
     timers.SetTimer(timer_id, timer_delay);
+    return send_msg("set timer [" + String(timer_id) + "] to " + String(timer_delay) + " ms");
   }
 
   if (first_word == "scan_i2c") {
