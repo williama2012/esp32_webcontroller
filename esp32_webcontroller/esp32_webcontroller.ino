@@ -6,7 +6,7 @@
 #define DHTPIN 23
 #define ONE_WIRE_COUNT 1
 #define ONE_WIRE_TYPE "dev"
-uint8_t mode = 0;
+uint8_t mode = 10;
 bool USE_LCD = true;
 bool USE_LED = false;
 bool show_rssi = false;
