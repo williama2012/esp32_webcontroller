@@ -24,6 +24,7 @@ int net_post(const String& url, const String& requestData, String& response) {
   int httpCode = http.POST(requestData);
   if (httpCode == HTTP_CODE_OK) {
     response = http.getString();
+    delayMicroseconds(1);
     http.end();
   }
   return httpCode;
