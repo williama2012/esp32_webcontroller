@@ -18,11 +18,13 @@ int net_post(const String& url, const String& requestData, String& response) {
   }
 
   HTTPClient http;
+  http.setTimeout(10000);
   http.begin(url);
   http.addHeader("Content-Type", "application/json");
   int httpCode = http.POST(requestData);
   if (httpCode == HTTP_CODE_OK) {
     response = http.getString();
+    http.end();
   }
   return httpCode;
 }
