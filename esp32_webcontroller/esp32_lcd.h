@@ -12,6 +12,7 @@ byte SadFace[] = { B10001, B11011, B01110, B00100, B00100, B01110, B11011, B1000
 
 LiquidCrystal_I2C lcd(LCD_ADDRESS, LCD_COLS, LCD_ROWS);
 bool lcd_initialized = false;
+bool lcd_writing = false;
 
 void lcd_init() {
   lcd.init();
@@ -38,51 +39,56 @@ void lcd_clear() {
 }
 
 void lcd_print(const String& txt, uint8_t row = 0, uint8_t col = 0) {
-  if (!lcd_initialized) {
+  if (!lcd_initialized || lcd_writing) {
     return;
   }
-
+  lcd_writing = true;
   lcd.setCursor(col, row);
   lcd.print(txt);
+  lcd_writing = false;
 }
 
 void lcd_print_r(const String& txt, uint8_t row = 0, uint8_t offset = 0) {
-  if (!lcd_initialized) {
+  if (!lcd_initialized || lcd_writing) {
     return;
   }
-
+  lcd_writing = true;
   lcd.setCursor(LCD_COLS - txt.length() - offset, row);
   lcd.print(txt);
+  lcd_writing = false;
 }
 
 void lcd_write(uint8_t char_id, uint8_t row = 0, uint8_t col = 0) {
-  if (!lcd_initialized) {
+  if (!lcd_initialized || lcd_writing) {
     return;
   }
-
+  lcd_writing = true;
   lcd.setCursor(col, row);
   lcd.write(char_id);
+  lcd_writing = false;
 }
 
 void lcd_write_r(uint8_t char_id, uint8_t row = 0, uint8_t offset = 0) {
-  if (!lcd_initialized) {
+  if (!lcd_initialized || lcd_writing) {
     return;
   }
-
+  lcd_writing = true;
   lcd.setCursor(LCD_COLS - 1 - offset, row);
   lcd.write(char_id);
+  lcd_writing = false;
 }
 
 void lcd_backlight(bool on) {
-  if (!lcd_initialized) {
+  if (!lcd_initialized || lcd_writing) {
     return;
   }
-
+  lcd_writing = true;
   if (on) {
     lcd.backlight();
   } else {
     lcd.noBacklight();
   }
+  lcd_writing = false;
 }
 
 #endif
