@@ -9,9 +9,17 @@
 uint8_t mode = 10;
 bool USE_LCD = true;
 bool USE_LED = false;
-bool show_rssi = false;
+bool show_rssi = true;
 
 DHT22 dht22(DHTPIN);
+
+#pragma region Setup
+
+void SetupTimers() {
+  timers.AddTimer(0, 3000);
+  timers.AddTimer(10, 100);
+  timers.AddTimer(20, 500);
+}
 
 void PreSetup() {
   if (USE_LCD) {
@@ -62,12 +70,10 @@ void SetupPins() {
 	pinMode(27, INPUT);  // Echo
 
 }
+  
+#pragma endregion Setup
 
-void SetupTimers() {
-  timers.AddTimer(0, 3000);
-  timers.AddTimer(10, 1000);
-  timers.AddTimer(20, 500);
-}
+#pragma region Testing
 
 float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 	digitalWrite(triggerPin, LOW);
@@ -103,6 +109,8 @@ void PollSensors(bool postData = false) {
   }
 }
 
+#pragma endregion Testing
+
 // Runs on Core 1
 void loop(void) {
   //microwave = digitalRead(25);
@@ -116,13 +124,11 @@ void loop(void) {
     case 1:
       mode1process();
       break;
-    case 3:
-      mode3process();
-      break;
     case 10:
       if (timers.CheckTimer(10)) {
         PollSensors(true);
       }
+      break;
     case 11:
       if (timers.CheckTimer(10)) {
         PollSensors(false);
@@ -155,11 +161,6 @@ void loop(void) {
   // }
 }
 
-void mode3process() {
-  led_clear();
-  setAllColorSequence(color_r, color_g, color_b);
-}
-
 void mode1process() {
   if (timers.CheckTimer(0)) {
     step_weight();
@@ -178,7 +179,9 @@ void mode1process() {
   }
 }
 
-bool OnSetParameter(String cmd) {
+#pragma region Handlers
+
+bool HandleSetParameter(String cmd) {
   //PrintCore("OnSetParameter: " + cmd);
   
   String param = str_split(cmd, 1);
@@ -360,6 +363,8 @@ bool HandleResetCommand(String& cmd) {
   return send_msg("cleared");
 }
 
+#pragma endregion Handlers
+
 // Runs on Core 0
 bool OnApiCommand(String& cmd) {
   PrintCore("OnApiCommand:" + cmd);
@@ -367,7 +372,7 @@ bool OnApiCommand(String& cmd) {
   String first_word = str_split(cmd, 0);
   
   if (first_word == "set") {
-    return OnSetParameter(cmd);
+    return HandleSetParameter(cmd);
   }
 
   if (first_word == "lcd") {
@@ -383,17 +388,28 @@ bool OnApiCommand(String& cmd) {
   }
 
   if (first_word == "p") {
-    int x = str_int(cmd, 1);
-    int y = str_int(cmd, 2);
-    String color_str = str_split(cmd, 3);
-    if (color_str != "") {
-      CRGB color = led_color(color_str);
-      set_pixel(x, y, color);
-      return send_body(jsonField("x", String(x), true) + jsonField("y", String(y), true) + jsonField("color", color_str, false));
-    } else {
-      set_pixel(x, y);
-      return send_body(jsonField("x", String(x), true) + jsonField("y", String(y), true) + jsonField("color", "white", false));
-    }
+    String pos_str = str_split(cmd, 1);
+    int x = str_int(pos_str, 0, ',');
+    int y = str_int(pos_str, 1, ',');
+
+    String clr_str = str_split(cmd,2);
+    int r = str_int(clr_str, 0, ',');
+    int g = str_int(clr_str, 1, ',');
+    int b = str_int(clr_str, 2, ',');
+    int a = str_int(clr_str, 3, ',');
+
+    set_pixel(x, y, r, g, b);
+
+
+    // String color_str = str_split(cmd, 3);
+    // if (color_str != "") {
+    //   CRGB color = led_color(color_str);
+    //   set_pixel(x, y, color);
+    //   return send_body(jsonField("x", String(x), true) + jsonField("y", String(y), true) + jsonField("color", color_str, false));
+    // } else {
+    //   set_pixel(x, y);
+    //   return send_body(jsonField("x", String(x), true) + jsonField("y", String(y), true) + jsonField("color", "white", false));
+    // }
   }
 
   if (first_word == "mode") {
