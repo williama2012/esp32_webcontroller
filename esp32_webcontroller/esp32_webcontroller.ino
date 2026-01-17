@@ -72,7 +72,6 @@ void send_data(const String& src, const String& type, const String& var, const S
     #ifdef ESP32_LCD_H
       char str[4];
       sprintf(str, "%d", response);
-      printf("Converted string: %s\n", str);
       lcd_print_r(str);
     #endif
 
