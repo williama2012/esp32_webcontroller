@@ -2,7 +2,7 @@
 
 #define ONE_WIRE_COUNT 1
 #define ONE_WIRE_TYPE "led_matrix"
-uint8_t mode = 10;
+uint8_t mode = 0;
 bool show_rssi = false;
 
 bool lcd_show_network = true;
@@ -52,8 +52,7 @@ void SetupPins() {
 	pinMode(12, OUTPUT);  // Trigger
 	pinMode(13, INPUT);   // Echo
 
-  pinMode(18, INPUT);   // DHT
-  pinMode(19, INPUT);   // LED
+  pinMode(18, OUTPUT);   // DHT
   pinMode(23, INPUT);   // OneWire
   pinMode(25, INPUT);   // Microwave
 
