@@ -5,7 +5,7 @@
 #include "esp32_server.h"
 #include "esp32_net.h"
 #include "esp32_timer.h"
-#include "esp32_ledstrip.h"
+#include "esp32_led.h"
 #include "esp32_lcd.h"
 #include "esp32_onewire.h"
 #include "esp32_dht.h"
