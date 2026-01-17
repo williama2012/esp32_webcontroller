@@ -13,10 +13,6 @@ int net_post(const String& url, const String& requestData, String& response) {
     Serial.println(F("WiFi is not connected"));
     return 0;
   }
-  if (IPADDRESS == "") {
-    Serial.println(F("IPADDRESS not set"));
-    return 0;
-  }
 
   HTTPClient http;
   http.setTimeout(10000);
