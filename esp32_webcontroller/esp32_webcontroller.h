@@ -4,8 +4,8 @@
 #include "esp32_server.h"
 #include "esp32_timer.h"
 #include "esp32_ledstrip.h"
-#include "esp32_lcd.h"
-#include "esp32_sensors.h"
+//#include "esp32_lcd.h"
+//#include "esp32_sensors.h"
 
 #define SERIAL_BAUDRATE 115200
 #define VERSION 20260114.01
@@ -29,8 +29,6 @@ void reset_counters() {
 #pragma region Actions
 
 void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint16_t b = 255) {
-  PrintCore("MatrixPost");
-
   doBlink = true;
 
   set_pixel(x, y, CRGB(r, g, b));
@@ -44,9 +42,6 @@ void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint
 }
 
 void IntegerPost(int pin, int value) {
-  PrintCore("IntegerPost");
-
-  set_pin(pin, Integer, value);
 
   String response = "{";
   response += jsonField("pin", String(pin), true);
@@ -58,10 +53,6 @@ void IntegerPost(int pin, int value) {
 }
 
 void AnalogWritePost(int pin, int value) {
-  PrintCore("AnalogWritePost");
-
-  //ClearServo(pin);
-  set_pin(pin, AnalogWrite, value);
 
   pinMode(pin, OUTPUT);
   analogWrite(pin, value);
@@ -77,10 +68,6 @@ void AnalogWritePost(int pin, int value) {
 }
 
 void DigitalWritePost(int pin, int value) {
-  PrintCore("DigitalWritePost");
-
-  //ClearServo(pin);
-  set_pin(pin, DigitalWrite, value);
 
   pinMode(pin, OUTPUT);
   digitalWrite(pin, value);
@@ -96,12 +83,8 @@ void DigitalWritePost(int pin, int value) {
 }
 
 void ServoWritePost(int pin, int value) {
-  PrintCore("ServoWritePost");
-
   int pos = value;
   //int pos = map(value, 0, 4095, 0, 180);
-
-  set_pin(pin, Servo, value);
 
   //MoveServo(pin, pos);
   // servoPos.pin = pin;
@@ -119,8 +102,6 @@ void ServoWritePost(int pin, int value) {
 }
 
 void AnalogReadPost() {
-  PrintCore("AnalogReadPost");
-
   String pinStr = server.arg("pins");
   pinStr.replace("[", "");
   pinStr.replace("]", "");
@@ -146,7 +127,6 @@ void AnalogReadPost() {
       //ClearServo(pin);
       pinMode(pin, INPUT);
       int value = analogRead(pin);
-      set_pin(pin, AnalogRead, value);
 
       response += "{"
                   + jsonField("pin", String(pin), true)
@@ -163,10 +143,6 @@ void AnalogReadPost() {
 }
 
 void ToneWritePost(int pin, unsigned int value) {
-  PrintCore("ToneWritePost");
-
-  set_pin(pin, Tone, value);
-
   pinMode(pin, OUTPUT);
 
   if (value == 0) {
@@ -187,10 +163,6 @@ void ToneWritePost(int pin, unsigned int value) {
 
 void PulsePost(int pin, int value, int time) {
   PrintCore("PulsePost");
-  
-  set_pin(pin, Pulse, value);
-  //ClearServo(pin);
-
   pinMode(pin, OUTPUT);
 
   analogWrite(pin, value);
@@ -238,33 +210,23 @@ void PulsePost(int pin, int value, int time) {
 #pragma region Get_Handlers
 
 void handleGetIndex() {
-  PrintCore("handleGetIndex");
   server.send(200, "text/html", gWebPageData);
 }
 
-void handleGetTerminal() {
-  PrintCore("handleGetTerminal");
-  server.send(200, "text/html", gTerminalWebPageData);
-}
-
 void handleGetMatrix() {
-  PrintCore("handleGetTerminal");
   server.send(200, "text/html", gMatrixWebPageData);
 }
 
 
 void handleGetJavascript() {
-  PrintCore("handleGetJavascript");
   server.send(200, "text/javascript", gWebJavascriptData);
 }
 
 void handleGetStylesheet() {
-  PrintCore("handleGetStylesheet");
   server.send(200, "text/css", gWebStylesheetData);
 }
 
 void handleNotFound() {
-  PrintCore("handleNotFound");
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -291,7 +253,6 @@ void handleGetId() {
 #pragma region Post_Handlers
 
 void handleMatrixPost() {
-  PrintCore("handleMatrixPost");
   int x = server.arg("x").toInt();
   int y = server.arg("y").toInt();
 
@@ -303,7 +264,6 @@ void handleMatrixPost() {
 }
 
 void handleIntegerPost() {
-  PrintCore("handleIntegerPost");
   String pinStr = "";
   pinStr = server.arg("pin");
   String valueStr = "";
@@ -315,7 +275,6 @@ void handleIntegerPost() {
 }
 
 void handleAnalogWritePost() {
-  PrintCore("handleAnalogWritePost");
   String pinStr = "";
   pinStr = server.arg("pin");
   String valueStr = "";
@@ -327,7 +286,6 @@ void handleAnalogWritePost() {
 }
 
 void handleDigitalWritePost() {
-  PrintCore("handleDigitalWritePost");
   String pinStr = "";
   pinStr = server.arg("pin");
   String valueStr = "";
@@ -338,7 +296,6 @@ void handleDigitalWritePost() {
 }
 
 void handleServoWritePost() {
-  PrintCore("handleServoWritePost");
   String pinStr = "";
   pinStr = server.arg("pin");
   String valueStr = "";
@@ -350,12 +307,10 @@ void handleServoWritePost() {
 }
 
 void handleAnalogReadPost() {
-  PrintCore("handleAnalogReadPost");
   AnalogReadPost();
 }
 
 void handleToneWritePost() {
-  PrintCore("handleToneWritePost");
   String pinStr = "";
   pinStr = server.arg("pin");
   int pin = pinStr.toInt();
@@ -377,9 +332,6 @@ void handleSweepPost() {
 
   pinMode(pwmPin, OUTPUT);
   analogWrite(pwmPin, 0);
-
-  set_pin(servoPin, Servo, count);
-  set_pin(pwmPin, AnalogWrite, value);
 
   // if (servoPin != servo_pin) {
   //   if (servo_pin != 0) {
@@ -437,7 +389,6 @@ void handleSweepPost() {
 }
 
 void handlePulsePost() {
-  PrintCore("handlePulsePost");
 
   String pinStr = "";
   pinStr = server.arg("pin");
@@ -455,10 +406,9 @@ void handlePulsePost() {
 }
 
 void handleApiPost() {
-  PrintCore("handleApiPost");
   String cmd = server.arg("cmd");
   cmd.toLowerCase();
-  s_print("cmd:");
+  s_print("CMD:");
   s_println(cmd);
 
   doBlink = true;
@@ -524,15 +474,11 @@ void SetupServer() {
 
   server.on("/", HTTP_GET, handleGetMatrix);
   server.on("/ctrl", HTTP_GET, handleGetIndex);
-  server.on("/matrix", HTTP_GET, handleGetMatrix);
-  server.on("/terminal", HTTP_GET, handleGetTerminal);
   server.on("/id", HTTP_GET, handleGetId);
-
   server.on("/index.js", HTTP_GET, handleGetJavascript);
   server.on("/index.css", HTTP_GET, handleGetStylesheet);
 
   server.on("/mat", HTTP_POST, handleMatrixPost);
-  server.on("/color", HTTP_POST, handleIntegerPost);
   server.on("/integer", HTTP_POST, handleIntegerPost);
   server.on("/analogout", HTTP_POST, handleAnalogWritePost);
   server.on("/digitalout", HTTP_POST, handleDigitalWritePost);
@@ -548,51 +494,35 @@ void SetupServer() {
 
   server.onNotFound(handleNotFound);
   server.begin();
-
-  s_println("HTTP server started");
-
-  lcd_clear();
-  lcd_print("HTTP server started");
-  lcd_print(IPADDRESS, 1);
 }
 
 void SetupWifi() {
-  PrintCore("SetupWifi");
-
-  lcd_print("SSID:" + String(ssid), 0);
-
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  lcd_print("Connecting..", 1);
-
-  bool o = false;
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    s_print(".");
-    o = o ? false : true;
-    lcd_print(o ? "|" : "-", 1, 12);
-    lcd_print("Status:" + String(WiFi.status()), 2);
+    Serial.print(".");
   }
-  lcd_print("Status:" + String(WiFi.status()), 2);
+  
+  Serial.print("Connected to ");
+  Serial.println(ssid);
 
-  s_println("");
-  s_print("Connected to ");
-  s_println(ssid);
+  delay(1000);
   IPADDRESS = WiFi.localIP().toString() + ":" + String(HTTP_PORT);
   MACADDRESS = WiFi.macAddress();
   s_println("URL: http://" + IPADDRESS);
 }
 
 void PreSetup();
-void PostSetup();
 void SetupPins();
 void SetupTimers();
 void NetReady();
 
 void Core0Processor(void *parameter) {
-  PrintCore("Core0Processor");
   SetupWifi();
   SetupServer();
   NetReady();
@@ -623,7 +553,6 @@ void setup(void) {
     &Task1,           /* Task handle. */
     0);               /* Core where the task should run */
 
-  PostSetup();
 }
 
 #pragma endregion Setup

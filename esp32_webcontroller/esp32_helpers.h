@@ -67,34 +67,6 @@ void str_pad(String& str, uint8_t length) {
   }
 }
 
-
-#pragma region Pins
-
-PinSet PIN_SET[MAX_PIN];
-
-void set_pin(uint8_t pin, PinModeEnum mode, int value) {
-  if (pin > MAX_PIN) {
-    pin = MAX_PIN;
-  }
-  PIN_SET[pin].pin = pin;
-  PIN_SET[pin].mode = mode;
-  PIN_SET[pin].value = value;
-
-  // Aarg args;
-  // args.name = "";
-  // args.value = "";
-  // PIN_SET[pin].args = args;
-}
-
-PinSet get_pin(uint8_t pin) {
-  if (pin > MAX_PIN) {
-    pin = MAX_PIN;
-  }
-  return PIN_SET[pin];
-}
-
-#pragma endregion Pins
-
 #pragma region Json
 
 String jsonField(String field, String value, bool addMore = false) {

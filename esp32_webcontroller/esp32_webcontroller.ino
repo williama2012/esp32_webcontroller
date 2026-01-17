@@ -1,60 +1,52 @@
 #include "esp32_webcontroller.h"
 #include "esp32_net.h"
-#include <DHT22.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
 #include <ArduinoJson.h>
 
 #define DHTPIN 23
-#define ONE_WIRE_COUNT 1
-#define ONE_WIRE_TYPE "dev"
-uint8_t mode = 10;
-bool USE_LCD = true;
-bool USE_LED = false;
-bool show_rssi = true;
+#define DHTTYPE    DHT11 
+#define ONE_WIRE_COUNT 0
+#define ONE_WIRE_TYPE "led_matrix"
+uint8_t mode = 0;
+bool USE_LCD = false;
+bool USE_LED = true;
+bool USE_DHT = true;
+bool show_rssi = false;
 
-DHT22 dht22(DHTPIN);
+DHT_Unified dht(DHTPIN, DHTTYPE);
 
 #pragma region Setup
 
 void SetupTimers() {
   timers.AddTimer(0, 3000);
-  timers.AddTimer(10, 100);
-  timers.AddTimer(20, 500);
+  timers.AddTimer(1, 3001);
+  timers.AddTimer(10, 101);
+  timers.AddTimer(20, 501);
 }
 
 void PreSetup() {
   if (USE_LCD) {
-    bool check_lcd = check_i2c(LCD_ADDRESS);
-    Serial.print(F("lcd_check(PreSetup):"));
-    Serial.println(check_lcd);
-  }
-  
-  ds_init();
-}
-
-void PostSetup() {
-  bool check_lcd = check_i2c(LCD_ADDRESS);
-  Serial.print(F("lcd_check(PostSetup):"));
-  Serial.println(check_lcd);
- 
-  if (USE_LCD) {
-    lcd_init();
-    delay(100);
+    //lcd_init();
   }
   if (USE_LED) {
-    set_pixel(11, 11, 255, 255, 255);
+    led_init();
   }
+  if (USE_DHT) {
+    dht.begin();
+  }  
+  //ds_init();
 }
 
 void NetReady() {
-  bool check_lcd = check_i2c(LCD_ADDRESS);
-  Serial.print(F("lcd_check(NetReady):"));
-  Serial.println(check_lcd);
-  USE_LCD = check_i2c(LCD_ADDRESS);
-
   if (USE_LCD) {
-    delay(3000);
-    lcd_clear();
-    lcd_print(IPADDRESS, 2);
+    //lcd_clear();
+    //lcd_print(IPADDRESS, 2);
+  }
+
+  if (USE_LED) {
+    set_pixel(11, 11, 255, 255, 255);
   }
   reset_counters();
 }
@@ -64,6 +56,7 @@ void SetupPins() {
 	pinMode(12, OUTPUT); // Trigger
 	pinMode(13, INPUT);  // Echo
 
+  pinMode(23, INPUT);  // DHT
   pinMode(25, INPUT);  // Microwave
 
 	pinMode(26, OUTPUT); // Trigger
@@ -88,25 +81,40 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 int microwave;
 String _net_response;
 
-void PollSensors(bool postData = false) {
-  float* temps = ds_temps(ONE_WIRE_COUNT);
-  for(int i = 0; i < ONE_WIRE_COUNT; i++) {
-    float temp = temps[i];
+void send_data(const String& src, const String& type, const String& var, const String& val) {
+  int response = post_data(src, type, var, val, _net_response);
+  Serial.print(F("POST"));
+  Serial.print(type);
+  Serial.print(F(", "));
+  Serial.print(var);
+  Serial.print(F(", "));
+  Serial.println(val);
 
-    String txt = "Sensor_" + String(i) + ": " + String(temp);
-    str_pad(txt, 20);
-    lcd_print(txt, i);
-
-    if (postData) {
-      int response = post_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), temp, _net_response);
-      if (response != HTTP_CODE_OK) {
-        lcd_print(String(response));
-        counters[1]++;
-      } else {
-        counters[0]++;
-      }
+  if (response != HTTP_CODE_OK) {
+    if (USE_LCD) {
+      //lcd_print_r(String(response));
     }
+    counters[1]++;
+  } else {
+    counters[0]++;
   }
+}
+
+void PollSensors(bool postData = false) {
+  // float* temps = ds_temps(ONE_WIRE_COUNT);
+  // for(int i = 0; i < ONE_WIRE_COUNT; i++) {
+  //   float temp = temps[i];
+
+  //   String txt = "Sensor_" + String(i) + ": " + String(temp);
+  //   str_pad(txt, 20);
+  //   if (USE_LCD) {
+  //     //lcd_print(txt, i);
+  //   }
+
+  //   if (postData) {
+  //     send_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), String(temp));
+  //   }
+  // }
 }
 
 #pragma endregion Testing
@@ -122,7 +130,6 @@ void loop(void) {
 
   switch (mode) {
     case 1:
-      mode1process();
       break;
     case 10:
       if (timers.CheckTimer(10)) {
@@ -137,22 +144,40 @@ void loop(void) {
       break;
   }
 
-  if (timers.CheckTimer(0)) {
-    if (show_rssi) {
+  if (show_rssi && timers.CheckTimer(0)) {
+    if (show_rssi && USE_LCD) {
       String rssi = String(WiFi.RSSI()) + " dBm";
-      lcd_print_r(rssi, 3);
+      //lcd_print_r(rssi, 3);
     }
-    // if (show_temp) {
-    //   float temp = dht22.getTemperature(false);
-    //   float hum = dht22.getHumidity();
-    //   lcd_print(String(temp) + "'F " + String(hum) + "%", 3);
-    // }
 
+  }
+
+  if (USE_DHT && timers.CheckTimer(1)) {
+    sensors_event_t event;
+
+    dht.temperature().getEvent(&event);
+    if (isnan(event.temperature)) {
+      s_println(F("Error reading temperature!"));
+    }
+    else {
+      float temp = (event.temperature * 1.8) + 32;
+      send_data(IPADDRESS, ONE_WIRE_TYPE, "temp", String(temp));
+    }
+
+    dht.humidity().getEvent(&event);
+    if (isnan(event.relative_humidity)) {
+      s_println(F("Error reading humidity!"));
+    }
+    else {
+      float hum = event.relative_humidity;
+      send_data(IPADDRESS, ONE_WIRE_TYPE, "hum", String(hum));
+    }
   }
 
   if (USE_LCD && timers.CheckTimer(20)) {
-    lcd_print(String(counters[0]) + " | " + String(counters[1]), 3);
+    //lcd_print(String(counters[0]) + " | " + String(counters[1]), 3);
   }
+
   // if (timers.CheckTimer(21)) {
   //   lcd_print("D:" + String(GetRange(12, 13)), 0);
   //   delay(10);
@@ -195,23 +220,23 @@ bool HandleLcdCommand(String& cmd) {
   String cmd_2 = str_split(cmd, 2);
 
   if (cmd_1 == "init") {
-    lcd_init();
+    //lcd_init();
     return send_msg("initialized");
   }
 
   if (cmd_1 == "clear") {
-    lcd_clear();
+    //lcd_clear();
     return send_msg("cleared");
   }
 
   // backlight
   if (cmd_1 == "bl") {
     if (cmd_2 == "on") {
-      lcd_backlight(true);
+      //lcd_backlight(true);
       return send_msg("backlight on");
     }
     if (cmd_2 == "off") {
-      lcd_backlight(false);
+      //lcd_backlight(false);
       return send_msg("backlight off");
     }
   }
@@ -221,12 +246,12 @@ bool HandleLcdCommand(String& cmd) {
     int col = str_int(cmd, 4);
     if (row > -1) {
       if(col > -1) {
-        lcd_print(cmd_2, row, col);
+        //lcd_print(cmd_2, row, col);
       } else {
-        lcd_print(cmd_2, row);
+        //lcd_print(cmd_2, row);
       }
     } else {
-      lcd_print(cmd_2);
+      //lcd_print(cmd_2);
     }
     return send_msg("print " + cmd_2);
   }
@@ -236,12 +261,12 @@ bool HandleLcdCommand(String& cmd) {
     int col = str_int(cmd, 4);
     if (row > -1) {
       if(col > -1) {
-        lcd_print_r(cmd_2, row, col);
+        //lcd_print_r(cmd_2, row, col);
       } else {
-        lcd_print_r(cmd_2, row);
+        //lcd_print_r(cmd_2, row);
       }
     } else {
-      lcd_print_r(cmd_2);
+      //lcd_print_r(cmd_2);
     }
     return send_msg("print " + cmd_2);
   }
@@ -249,13 +274,13 @@ bool HandleLcdCommand(String& cmd) {
 
   if (cmd_1 == "show") {
     if (cmd_2 == "ip") {
-      lcd_print(IPADDRESS);
+      //lcd_print(IPADDRESS);
     }
     if (cmd_2 == "mac") {
-      lcd_print(String(WiFi.macAddress()));
+      //lcd_print(String(WiFi.macAddress()));
     }
     if (cmd_2 == "version") {
-      lcd_print(String(VERSION));
+      //lcd_print(String(VERSION));
     }
     if (cmd_2 == "rssi") {
       show_rssi = show_rssi ? false : true;
@@ -399,17 +424,6 @@ bool OnApiCommand(String& cmd) {
     int a = str_int(clr_str, 3, ',');
 
     set_pixel(x, y, r, g, b);
-
-
-    // String color_str = str_split(cmd, 3);
-    // if (color_str != "") {
-    //   CRGB color = led_color(color_str);
-    //   set_pixel(x, y, color);
-    //   return send_body(jsonField("x", String(x), true) + jsonField("y", String(y), true) + jsonField("color", color_str, false));
-    // } else {
-    //   set_pixel(x, y);
-    //   return send_body(jsonField("x", String(x), true) + jsonField("y", String(y), true) + jsonField("color", "white", false));
-    // }
   }
 
   if (first_word == "mode") {

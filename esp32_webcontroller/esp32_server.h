@@ -15,7 +15,6 @@
 WebServer server(HTTP_PORT);
 
 INCTXT(WebPage, "index.html");
-INCTXT(TerminalWebPage, "terminal.html");
 INCTXT(MatrixWebPage, "matrix.html");
 INCTXT(WebJavascript, "index.js");
 INCTXT(WebStylesheet, "index.css");
