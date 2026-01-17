@@ -35,7 +35,7 @@ void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint
   doBlink = true;
 
   #ifdef ESP32_LED_H
-    set_pixel(x, y, CRGB(r, g, b));
+    set_pixel(x, y, CRGB(r, g, b), hold);
   #endif
 
   send_body(
@@ -266,8 +266,9 @@ void handleMatrixPost() {
   int r = server.arg("r").toInt();
   int g = server.arg("g").toInt();
   int b = server.arg("b").toInt();
+  int h = server.arg("h").toInt();
   
-  MatrixPost(x, y, r, g, b);
+  MatrixPost(x, y, r, g, b, h > 0);
 }
 
 void handleIntegerPost() {
@@ -482,8 +483,8 @@ void SetupServer() {
   #ifdef ESP32_SITE_H
     server.on("/", HTTP_GET, handleGetMatrix);
     server.on("/ctrl", HTTP_GET, handleGetIndex);
-    server.on("/index.js", HTTP_GET, handleGetJavascript);
-    server.on("/index.css", HTTP_GET, handleGetStylesheet);
+    server.on("/index.min.js", HTTP_GET, handleGetJavascript);
+    server.on("/index.min.css", HTTP_GET, handleGetStylesheet);
   #endif
 
   server.on("/id", HTTP_GET, handleGetId);
