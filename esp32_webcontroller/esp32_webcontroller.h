@@ -1,5 +1,6 @@
 #ifndef ESP32_CONTROLLER_H
 #define ESP32_CONTROLLER_H
+#include <stdio.h>
 #include <Arduino.h>
 #include "esp32_helpers.h"
 #include "esp32_server.h"
@@ -12,7 +13,7 @@
 #include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
-#define VERSION 20260117.01
+#define VERSION 20260117.10
 
 Timer timers;
 TaskHandle_t Task1;
