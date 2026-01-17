@@ -1,6 +1,5 @@
 #include "esp32_webcontroller.h"
 
-
 #define ONE_WIRE_COUNT 0
 #define ONE_WIRE_TYPE "dev"
 uint8_t mode = 0;
@@ -20,7 +19,7 @@ void PreSetup() {
     lcd_init();
   #endif
   
-  #ifdef ESP32_LEDSTRIP_H
+  #ifdef ESP32_LED_H
     led_init();
   #endif
   
@@ -34,7 +33,7 @@ void PreSetup() {
 }
 
 void NetReady() {
-  #ifdef ESP32_LEDSTRIP_H
+  #ifdef ESP32_LED_H
     set_pixel(11, 11, 255, 255, 255);
   #endif
 
@@ -82,7 +81,7 @@ void send_data(const String& src, const String& type, const String& var, const S
   Serial.println(val);
 
   if (response != HTTP_CODE_OK) {
-    #ifdef ESP32_LEDSTRIP_H
+    #ifdef ESP32_LED_H
       //lcd_print_r(String(response));
     #endif
     counters[1]++;
@@ -314,7 +313,7 @@ bool HandleLedCommand(String& cmd) {
   String cmd_1 = str_split(cmd, 1);
 
   if (cmd_1 == "clear") {
-    #ifdef ESP32_LEDSTRIP_H
+    #ifdef ESP32_LED_H
       led_clear();
     #endif
     return send_msg("cleared");
@@ -327,12 +326,12 @@ bool HandleLedCommand(String& cmd) {
       int color_b = str_int(color_str, 2, ',');
       int brightness = str_int(color_str, 3, ',');
       if (brightness > -1) {
-        #ifdef ESP32_LEDSTRIP_H
+        #ifdef ESP32_LED_H
           set_brightness(brightness);
         #endif
       }
 
-      #ifdef ESP32_LEDSTRIP_H
+      #ifdef ESP32_LED_H
         setAllColor(color_r, color_g, color_b);
       #endif
 
@@ -355,11 +354,11 @@ bool HandleLedCommand(String& cmd) {
       int color_b = str_int(color_str, 2, ',');
       int brightness = str_int(color_str, 3, ',');
       if (brightness > -1) {
-        #ifdef ESP32_LEDSTRIP_H
+        #ifdef ESP32_LED_H
           set_brightness(brightness);
         #endif
       }
-      #ifdef ESP32_LEDSTRIP_H
+      #ifdef ESP32_LED_H
         set_pixel(x, y, color_r, color_g, color_b);
       #endif
 
@@ -382,11 +381,11 @@ bool HandleLedCommand(String& cmd) {
       int color_b = str_int(color_str, 2, ',');
       int brightness = str_int(color_str, 3, ',');
       if (brightness > -1) {
-        #ifdef ESP32_LEDSTRIP_H
+        #ifdef ESP32_LED_H
           set_brightness(brightness);
         #endif
       }
-      #ifdef ESP32_LEDSTRIP_H
+      #ifdef ESP32_LED_H
         set_pixel_i(i, color_r, color_g, color_b);
       #endif
 
@@ -402,7 +401,7 @@ bool HandleLedCommand(String& cmd) {
   if (cmd_1 == "brightness") {
       uint16_t brightness = str_int(cmd, 2);
       if (brightness > -1) {
-        #ifdef ESP32_LEDSTRIP_H
+        #ifdef ESP32_LED_H
           set_brightness(brightness);
         #endif
 
@@ -458,11 +457,11 @@ bool OnApiCommand(String& cmd) {
     int g = str_int(clr_str, 1, ',');
     int b = str_int(clr_str, 2, ',');
     int a = str_int(clr_str, 3, ',');
-    #ifdef ESP32_LEDSTRIP_H
+    #ifdef ESP32_LED_H
       set_pixel(x, y, r, g, b);
       return send_msg("pixel set");
     #endif
-    return send_msg("ESP32_LEDSTRIP_H not included");
+    return send_msg("ESP32_LED_H not included");
   }
 
   if (first_word == "mode") {
@@ -479,6 +478,11 @@ bool OnApiCommand(String& cmd) {
     int timer_delay = str_int(cmd, 2);
     timers.SetTimer(timer_id, timer_delay);
     return send_msg("set timer [" + String(timer_id) + "] to " + String(timer_delay) + " ms");
+  }
+
+  if (first_word == "mem") {
+    uint32_t mem = ESP.getFreeHeap();
+
   }
 
   if (first_word == "scan_i2c") {
