@@ -5,9 +5,10 @@
 #include "esp32_server.h"
 #include "esp32_net.h"
 #include "esp32_timer.h"
+#include "esp32_site.h"
 #include "esp32_led.h"
-#include "esp32_lcd.h"
-#include "esp32_onewire.h"
+//#include "esp32_lcd.h"
+//#include "esp32_onewire.h"
 #include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
@@ -30,10 +31,10 @@ void reset_counters() {
 
 #pragma region Actions
 
-void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint16_t b = 255) {
+void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint16_t b = 255, bool hold = false) {
   doBlink = true;
 
-  #ifdef ESP32_LEDSTRIP_H
+  #ifdef ESP32_LED_H
     set_pixel(x, y, CRGB(r, g, b));
   #endif
 
@@ -213,22 +214,24 @@ void PulsePost(int pin, int value, int time) {
 
 #pragma region Get_Handlers
 
-// void handleGetIndex() {
-//   server.send(200, "text/html", gWebPageData);
-// }
+#ifdef ESP32_SITE_H
+void handleGetIndex() {
+  server.send(200, "text/html", gWebPageData);
+}
 
-// void handleGetMatrix() {
-//   server.send(200, "text/html", gMatrixWebPageData);
-// }
+void handleGetMatrix() {
+  server.send(200, "text/html", gMatrixWebPageData);
+}
 
 
-// void handleGetJavascript() {
-//   server.send(200, "text/javascript", gWebJavascriptData);
-// }
+void handleGetJavascript() {
+  server.send(200, "text/javascript", gWebJavascriptData);
+}
 
-// void handleGetStylesheet() {
-//   server.send(200, "text/css", gWebStylesheetData);
-// }
+void handleGetStylesheet() {
+  server.send(200, "text/css", gWebStylesheetData);
+}
+#endif
 
 void handleNotFound() {
   String message = "File Not Found\n\n";
@@ -476,10 +479,12 @@ void SetupServer() {
   server.enableCORS(true);
   server.enableCrossOrigin(true);
 
-  // server.on("/", HTTP_GET, handleGetMatrix);
-  // server.on("/ctrl", HTTP_GET, handleGetIndex);
-  // server.on("/index.js", HTTP_GET, handleGetJavascript);
-  // server.on("/index.css", HTTP_GET, handleGetStylesheet);
+  #ifdef ESP32_SITE_H
+    server.on("/", HTTP_GET, handleGetMatrix);
+    server.on("/ctrl", HTTP_GET, handleGetIndex);
+    server.on("/index.js", HTTP_GET, handleGetJavascript);
+    server.on("/index.css", HTTP_GET, handleGetStylesheet);
+  #endif
 
   server.on("/id", HTTP_GET, handleGetId);
 
