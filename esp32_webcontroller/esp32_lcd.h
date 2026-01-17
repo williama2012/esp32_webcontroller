@@ -30,18 +30,15 @@ void lcd_init() {
 }
 
 void lcd_clear() {
-  if (!lcd_initialized) {
-    return;
-  }
+  if (!lcd_initialized) { return; }
 
   lcd.clear();
   delay(10);
 }
 
 void lcd_print(const String& txt, uint8_t row = 0, uint8_t col = 0) {
-  if (!lcd_initialized || lcd_writing) {
-    return;
-  }
+  if (!lcd_initialized || lcd_writing) { return; }
+
   lcd_writing = true;
   lcd.setCursor(col, row);
   lcd.print(txt);
@@ -49,9 +46,8 @@ void lcd_print(const String& txt, uint8_t row = 0, uint8_t col = 0) {
 }
 
 void lcd_print_r(const String& txt, uint8_t row = 0, uint8_t offset = 0) {
-  if (!lcd_initialized || lcd_writing) {
-    return;
-  }
+  if (!lcd_initialized || lcd_writing) { return; }
+
   lcd_writing = true;
   lcd.setCursor(LCD_COLS - txt.length() - offset, row);
   lcd.print(txt);
@@ -59,9 +55,8 @@ void lcd_print_r(const String& txt, uint8_t row = 0, uint8_t offset = 0) {
 }
 
 void lcd_write(uint8_t char_id, uint8_t row = 0, uint8_t col = 0) {
-  if (!lcd_initialized || lcd_writing) {
-    return;
-  }
+  if (!lcd_initialized || lcd_writing) { return; }
+
   lcd_writing = true;
   lcd.setCursor(col, row);
   lcd.write(char_id);
@@ -69,9 +64,8 @@ void lcd_write(uint8_t char_id, uint8_t row = 0, uint8_t col = 0) {
 }
 
 void lcd_write_r(uint8_t char_id, uint8_t row = 0, uint8_t offset = 0) {
-  if (!lcd_initialized || lcd_writing) {
-    return;
-  }
+  if (!lcd_initialized || lcd_writing) { return; }
+
   lcd_writing = true;
   lcd.setCursor(LCD_COLS - 1 - offset, row);
   lcd.write(char_id);
@@ -79,9 +73,8 @@ void lcd_write_r(uint8_t char_id, uint8_t row = 0, uint8_t offset = 0) {
 }
 
 void lcd_backlight(bool on) {
-  if (!lcd_initialized || lcd_writing) {
-    return;
-  }
+  if (!lcd_initialized || lcd_writing) { return; }
+  
   lcd_writing = true;
   if (on) {
     lcd.backlight();
