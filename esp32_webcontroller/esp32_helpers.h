@@ -191,4 +191,6 @@ byte *scan_i2c() {
   return array;
 }
 
+void(* resetFunc) (void) = 0;
+
 #endif
