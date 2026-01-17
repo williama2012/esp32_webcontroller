@@ -1,9 +1,11 @@
 #include "esp32_webcontroller.h"
 
 #define ONE_WIRE_COUNT 0
-#define ONE_WIRE_TYPE "dev"
+#define ONE_WIRE_TYPE "led_matrix"
 uint8_t mode = 0;
 bool show_rssi = false;
+
+int Wifi_Signal;
 
 #pragma region Setup
 
@@ -108,8 +110,6 @@ void PollSensors(bool postData = false) {
 }
 
 #pragma endregion Testing
-
-uint8_t Wifi_Signal;
 
 // Runs on Core 1
 void loop(void) {
