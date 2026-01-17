@@ -6,11 +6,11 @@
 #include "esp32_server.h"
 #include "esp32_net.h"
 #include "esp32_timer.h"
-#include "esp32_site.h"
-#include "esp32_led.h"
-//#include "esp32_lcd.h"
-//#include "esp32_onewire.h"
-#include "esp32_dht.h"
+//#include "esp32_site.h"
+//#include "esp32_led.h"
+#include "esp32_lcd.h"
+#include "esp32_onewire.h"
+//#include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
 #define VERSION 20260117.10
@@ -24,6 +24,11 @@ String PROGMEM MACADDRESS;
 
 bool OnApiCommand(String& cmd);
 int counters[8];
+/**
+ 0 = API Out - Success
+ 1 = API Out - Failure
+ 2 = API In
+*/
 void reset_counters() {
   for(int i = 0; i < 8; i++) {
     counters[i] = 0;
@@ -261,6 +266,7 @@ void handleGetId() {
 #pragma region Post_Handlers
 
 void handleMatrixPost() {
+  counters[2]++;
   int x = server.arg("x").toInt();
   int y = server.arg("y").toInt();
 
@@ -273,6 +279,7 @@ void handleMatrixPost() {
 }
 
 void handleIntegerPost() {
+  counters[2]++;
   String pinStr = "";
   pinStr = server.arg("pin");
   String valueStr = "";
@@ -284,6 +291,7 @@ void handleIntegerPost() {
 }
 
 void handleAnalogWritePost() {
+  counters[2]++;
   String pinStr = "";
   pinStr = server.arg("pin");
   String valueStr = "";
@@ -295,6 +303,7 @@ void handleAnalogWritePost() {
 }
 
 void handleDigitalWritePost() {
+  counters[2]++;
   String pinStr = "";
   pinStr = server.arg("pin");
   String valueStr = "";
@@ -305,6 +314,7 @@ void handleDigitalWritePost() {
 }
 
 void handleServoWritePost() {
+  counters[2]++;
   String pinStr = "";
   pinStr = server.arg("pin");
   String valueStr = "";
@@ -316,10 +326,12 @@ void handleServoWritePost() {
 }
 
 void handleAnalogReadPost() {
+  counters[2]++;
   AnalogReadPost();
 }
 
 void handleToneWritePost() {
+  counters[2]++;
   String pinStr = "";
   pinStr = server.arg("pin");
   int pin = pinStr.toInt();
@@ -331,6 +343,7 @@ void handleToneWritePost() {
 }
 
 void handleSweepPost() {
+  counters[2]++;
   int servoPin = intArg("servo");
   int pwmPin = intArg("pwm");
   int value = intArg("value");
@@ -398,7 +411,7 @@ void handleSweepPost() {
 }
 
 void handlePulsePost() {
-
+  counters[2]++;
   String pinStr = "";
   pinStr = server.arg("pin");
   int pin = pinStr.toInt();
@@ -415,6 +428,7 @@ void handlePulsePost() {
 }
 
 void handleApiPost() {
+  counters[2]++;
   String cmd = server.arg("cmd");
   cmd.toLowerCase();
   Serial.print("CMD:");
