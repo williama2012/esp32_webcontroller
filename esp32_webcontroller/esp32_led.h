@@ -4,7 +4,7 @@
 #include <FastLED.h>
 
 // Configuration
-#define LED_PIN     22
+#define LED_PIN     19
 #define NUM_LEDS    484
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
