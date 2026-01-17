@@ -6,6 +6,7 @@ uint8_t mode = 0;
 bool show_rssi = false;
 
 int Wifi_Signal;
+String _net_response;
 
 #pragma region Setup
 
@@ -58,6 +59,40 @@ void SetupPins() {
   
 #pragma endregion Setup
 
+void send_data(const String& src, const String& type, const String& var, const String& val) {
+  int response = post_data(src, type, var, val, _net_response);
+  Serial.print(F("POST:"));
+  Serial.print(type);
+  Serial.print(F(", "));
+  Serial.print(var);
+  Serial.print(F(", "));
+  Serial.println(val);
+
+  if (response != HTTP_CODE_OK) {
+    #ifdef ESP32_LCD_H
+      char str[4];
+      sprintf(str, "%d", response);
+      printf("Converted string: %s\n", str);
+      lcd_print_r(str);
+    #endif
+
+    if (response == -2 || response == -11) {
+      #ifdef ESP32_LCD_H
+        lcd_print(str_pad("!CRITICAL NETWORK FAILURE!", 20));
+        lcd_print(str_pad("!REBOOTING IN 5 SECONDS!", 20), 1);
+        delay(5000);
+        resetFunc();
+      #endif
+
+      resetFunc();
+    }
+
+    counters[1]++;
+  } else {
+    counters[0]++;
+  }
+}
+
 #pragma region Testing
 
 float GetRange(uint8_t triggerPin, uint8_t echoPin) {
@@ -71,26 +106,6 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 }
 
 int microwave;
-String _net_response;
-
-void send_data(const String& src, const String& type, const String& var, const String& val) {
-  int response = post_data(src, type, var, val, _net_response);
-  Serial.print(F("POST:"));
-  Serial.print(type);
-  Serial.print(F(", "));
-  Serial.print(var);
-  Serial.print(F(", "));
-  Serial.println(val);
-
-  if (response != HTTP_CODE_OK) {
-    #ifdef ESP32_LED_H
-      //lcd_print_r(String(response));
-    #endif
-    counters[1]++;
-  } else {
-    counters[0]++;
-  }
-}
 
 void PollSensors(bool postData = false) {
   // float* temps = ds_temps(ONE_WIRE_COUNT);
