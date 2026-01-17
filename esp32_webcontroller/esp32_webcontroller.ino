@@ -1,7 +1,7 @@
 #include "esp32_webcontroller.h"
 
 #define ONE_WIRE_COUNT 1
-#define ONE_WIRE_TYPE "dev"
+#define ONE_WIRE_TYPE "led_matrix"
 uint8_t mode = 10;
 bool show_rssi = false;
 
@@ -117,20 +117,22 @@ float temp;
 String PollSensors_txt;
 
 void PollSensors(bool postData = false) {
-  temps = ds_temps(ONE_WIRE_COUNT);
-  for(int i = 0; i < ONE_WIRE_COUNT; i++) {
-    temp = temps[i];
+  #ifdef ESP32_ONEWIRE_H
+    temps = ds_temps(ONE_WIRE_COUNT);
+    for(int i = 0; i < ONE_WIRE_COUNT; i++) {
+      temp = temps[i];
 
-    #ifdef ESP32_LCD_H
-      PollSensors_txt = "Sensor_" + String(i) + ": " + String(temp);
-      str_pad(PollSensors_txt, 20);
-      lcd_print(PollSensors_txt, i);
-    #endif
+      #ifdef ESP32_LCD_H
+        PollSensors_txt = "Sensor_" + String(i) + ": " + String(temp);
+        str_pad(PollSensors_txt, 20);
+        lcd_print(PollSensors_txt, i);
+      #endif
 
-    if (postData) {
-      send_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), String(temp));
+      if (postData) {
+        send_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), String(temp));
+      }
     }
-  }
+  #endif
 }
 
 #pragma endregion Testing
