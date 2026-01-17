@@ -1,4 +1,4 @@
-#ifndef ESP32_LCD
+#ifndef ESP32_LCD_H
 #define ESP32_LCD_H
 #include <Arduino.h>
 #include <LiquidCrystal_I2C.h>

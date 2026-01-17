@@ -1,4 +1,4 @@
-#ifndef ESP32_LEDSTRIP
+#ifndef ESP32_LEDSTRIP_H
 #define ESP32_LEDSTRIP_H
 #include <Arduino.h>
 #include <FastLED.h>

@@ -1,5 +1,5 @@
-#ifndef ESP32_HELPERS
-#define ESP32_HELPERS_H
+#ifndef ESP32_SERVER_H
+#define ESP32_SERVER_H
 #include <Arduino.h>
 #include "secrets.h"
 #include "incbin.h"

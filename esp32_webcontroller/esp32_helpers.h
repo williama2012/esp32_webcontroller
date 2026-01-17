@@ -1,6 +1,7 @@
-#ifndef ESP32_HELPERS
+#ifndef ESP32_HELPERS_H
 #define ESP32_HELPERS_H
 #include <Arduino.h>
+#include "Wire.h"
 
 #define BLINK_DELAY 50
 #define MAX_PIN 64
@@ -99,58 +100,20 @@ void Blink() {
 
 #pragma region Printing
 
-void s_print(const String &msg) {
-  if (!Serial) { return; }
-  Serial.print(msg);
-}
-
-void s_print(const char *msg) {
-  if (!Serial) { return; }
-  Serial.print(F(msg));
-}
-
-void s_print(char *msg) {
-  if (!Serial) { return; }
-  Serial.print(F(msg));
-}
-
-void s_print(uint32_t msg) {
-  if (!Serial) { return; }
-  Serial.print(msg);
-}
-
-void s_println(const String &msg) {
-  if (!Serial) { return; }
-  Serial.println(msg);
-}
-
-void s_println(const char *msg) {
-  if (!Serial) { return; }
-  Serial.println(F(msg));
-}
-
-void s_println(char *msg) {
-  if (!Serial) { return; }
-  Serial.println(F(msg));
-}
-
-void s_println(uint32_t msg) {
-  if (!Serial) { return; }
-  Serial.println(msg);
-}
-
 void PrintCore(char *msg) {
   if (!Serial) { return ; }
-  s_print("--- " + String(msg) + " running on core ");
-  s_print(xPortGetCoreID());
-  s_println(" ---");
+  Serial.print(F("--- "));
+  Serial.print(F(msg));
+  Serial.print(xPortGetCoreID());
+  Serial.println(F(" ---"));
 }
 
-void PrintCore(const String &msg) {
+void PrintCore(const String& msg) {
   if (!Serial) { return ; }
-  s_print("--- " + String(msg) + " running on core ");
-  s_print(xPortGetCoreID());
-  s_println(" ---");
+  Serial.print(F("--- "));
+  Serial.print(msg);
+  Serial.print(xPortGetCoreID());
+  Serial.println(F(" ---"));
 }
 
 #pragma endregion Printing

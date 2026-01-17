@@ -1,5 +1,5 @@
-#ifndef ESP32_SENSORS
-#define ESP32_SENSORS_H
+#ifndef ESP32_ONEWIRE_H
+#define ESP32_ONEWIRE_H
 #include <Arduino.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -25,3 +25,4 @@ float * ds_temps(uint8_t count) {
 }
 
 #endif
+

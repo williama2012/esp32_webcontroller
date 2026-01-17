@@ -1,14 +1,17 @@
-#ifndef ESP32_CONTROLLER
+#ifndef ESP32_CONTROLLER_H
 #define ESP32_CONTROLLER_H
 #include <Arduino.h>
+#include "esp32_helpers.h"
 #include "esp32_server.h"
+#include "esp32_net.h"
 #include "esp32_timer.h"
 #include "esp32_ledstrip.h"
-//#include "esp32_lcd.h"
-//#include "esp32_sensors.h"
+#include "esp32_lcd.h"
+#include "esp32_onewire.h"
+#include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
-#define VERSION 20260114.01
+#define VERSION 20260117.01
 
 Timer timers;
 TaskHandle_t Task1;
@@ -25,13 +28,14 @@ void reset_counters() {
   }
 }
 
-
 #pragma region Actions
 
 void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint16_t b = 255) {
   doBlink = true;
 
-  set_pixel(x, y, CRGB(r, g, b));
+  #ifdef ESP32_LEDSTRIP_H
+    set_pixel(x, y, CRGB(r, g, b));
+  #endif
 
   send_body(
     jsonField("x", String(x), true)
@@ -106,7 +110,7 @@ void AnalogReadPost() {
   pinStr.replace("[", "");
   pinStr.replace("]", "");
 
-  s_println("pins:" + pinStr);
+  Serial.println("pins:" + pinStr);
 
   int i = pinStr.indexOf(",");
   String part;
@@ -209,22 +213,22 @@ void PulsePost(int pin, int value, int time) {
 
 #pragma region Get_Handlers
 
-void handleGetIndex() {
-  server.send(200, "text/html", gWebPageData);
-}
+// void handleGetIndex() {
+//   server.send(200, "text/html", gWebPageData);
+// }
 
-void handleGetMatrix() {
-  server.send(200, "text/html", gMatrixWebPageData);
-}
+// void handleGetMatrix() {
+//   server.send(200, "text/html", gMatrixWebPageData);
+// }
 
 
-void handleGetJavascript() {
-  server.send(200, "text/javascript", gWebJavascriptData);
-}
+// void handleGetJavascript() {
+//   server.send(200, "text/javascript", gWebJavascriptData);
+// }
 
-void handleGetStylesheet() {
-  server.send(200, "text/css", gWebStylesheetData);
-}
+// void handleGetStylesheet() {
+//   server.send(200, "text/css", gWebStylesheetData);
+// }
 
 void handleNotFound() {
   String message = "File Not Found\n\n";
@@ -408,8 +412,8 @@ void handlePulsePost() {
 void handleApiPost() {
   String cmd = server.arg("cmd");
   cmd.toLowerCase();
-  s_print("CMD:");
-  s_println(cmd);
+  Serial.print("CMD:");
+  Serial.println(cmd);
 
   doBlink = true;
   
@@ -451,10 +455,10 @@ void handleDataPost() {
   String type = server.arg("type");
   String var = server.arg("var");
   String val = server.arg("val");
-  s_println(src);
-  s_println(type);
-  s_println(var);
-  s_println(val);
+  Serial.println(src);
+  Serial.println(type);
+  Serial.println(var);
+  Serial.println(val);
   
 
   send_rec("ok");
@@ -467,16 +471,17 @@ void handleDataPost() {
 void SetupServer() {
   PrintCore("SetupServer");
   if (MDNS.begin("esp32")) {
-    s_println("MDNS responder started");
+    Serial.println("MDNS responder started");
   }
   server.enableCORS(true);
   server.enableCrossOrigin(true);
 
-  server.on("/", HTTP_GET, handleGetMatrix);
-  server.on("/ctrl", HTTP_GET, handleGetIndex);
+  // server.on("/", HTTP_GET, handleGetMatrix);
+  // server.on("/ctrl", HTTP_GET, handleGetIndex);
+  // server.on("/index.js", HTTP_GET, handleGetJavascript);
+  // server.on("/index.css", HTTP_GET, handleGetStylesheet);
+
   server.on("/id", HTTP_GET, handleGetId);
-  server.on("/index.js", HTTP_GET, handleGetJavascript);
-  server.on("/index.css", HTTP_GET, handleGetStylesheet);
 
   server.on("/mat", HTTP_POST, handleMatrixPost);
   server.on("/integer", HTTP_POST, handleIntegerPost);
@@ -514,7 +519,7 @@ void SetupWifi() {
   delay(1000);
   IPADDRESS = WiFi.localIP().toString() + ":" + String(HTTP_PORT);
   MACADDRESS = WiFi.macAddress();
-  s_println("URL: http://" + IPADDRESS);
+  Serial.println("URL: http://" + IPADDRESS);
 }
 
 void PreSetup();

@@ -1,4 +1,4 @@
-#ifndef ESP32_NET
+#ifndef ESP32_NET_H
 #define ESP32_NET_H
 #include <Arduino.h>
 #include <ArduinoJson.h>

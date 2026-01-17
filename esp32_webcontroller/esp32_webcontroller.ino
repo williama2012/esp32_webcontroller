@@ -1,21 +1,10 @@
 #include "esp32_webcontroller.h"
-#include "esp32_net.h"
-#include <Adafruit_Sensor.h>
-#include <DHT.h>
-#include <DHT_U.h>
-#include <ArduinoJson.h>
 
-#define DHTPIN 23
-#define DHTTYPE    DHT11 
+
 #define ONE_WIRE_COUNT 0
-#define ONE_WIRE_TYPE "led_matrix"
+#define ONE_WIRE_TYPE "dev"
 uint8_t mode = 0;
-bool USE_LCD = false;
-bool USE_LED = true;
-bool USE_DHT = true;
 bool show_rssi = false;
-
-DHT_Unified dht(DHTPIN, DHTTYPE);
 
 #pragma region Setup
 
@@ -27,27 +16,28 @@ void SetupTimers() {
 }
 
 void PreSetup() {
-  if (USE_LCD) {
-    //lcd_init();
-  }
-  if (USE_LED) {
+  #ifdef ESP32_LCD_H
+    lcd_init();
+  #endif
+  
+  #ifdef ESP32_LEDSTRIP_H
     led_init();
-  }
-  if (USE_DHT) {
+  #endif
+  
+  #ifdef ESP32_DHT_H
     dht.begin();
-  }  
-  //ds_init();
+  #endif
+
+  #ifdef ESP32_ONEWIRE_H
+    ds_init();
+  #endif
 }
 
 void NetReady() {
-  if (USE_LCD) {
-    //lcd_clear();
-    //lcd_print(IPADDRESS, 2);
-  }
-
-  if (USE_LED) {
+  #ifdef ESP32_LEDSTRIP_H
     set_pixel(11, 11, 255, 255, 255);
-  }
+  #endif
+
   reset_counters();
 }
 
@@ -57,6 +47,7 @@ void SetupPins() {
 	pinMode(13, INPUT);  // Echo
 
   pinMode(23, INPUT);  // DHT
+
   pinMode(25, INPUT);  // Microwave
 
 	pinMode(26, OUTPUT); // Trigger
@@ -83,7 +74,7 @@ String _net_response;
 
 void send_data(const String& src, const String& type, const String& var, const String& val) {
   int response = post_data(src, type, var, val, _net_response);
-  Serial.print(F("POST"));
+  Serial.print(F("POST:"));
   Serial.print(type);
   Serial.print(F(", "));
   Serial.print(var);
@@ -91,9 +82,9 @@ void send_data(const String& src, const String& type, const String& var, const S
   Serial.println(val);
 
   if (response != HTTP_CODE_OK) {
-    if (USE_LCD) {
+    #ifdef ESP32_LEDSTRIP_H
       //lcd_print_r(String(response));
-    }
+    #endif
     counters[1]++;
   } else {
     counters[0]++;
@@ -118,6 +109,8 @@ void PollSensors(bool postData = false) {
 }
 
 #pragma endregion Testing
+
+uint8_t Wifi_Signal;
 
 // Runs on Core 1
 void loop(void) {
@@ -145,37 +138,36 @@ void loop(void) {
   }
 
   if (show_rssi && timers.CheckTimer(0)) {
-    if (show_rssi && USE_LCD) {
-      String rssi = String(WiFi.RSSI()) + " dBm";
-      //lcd_print_r(rssi, 3);
+    if (show_rssi) {
+      Wifi_Signal = WiFi.RSSI();
+      #ifdef ESP32_LCD_H
+        //TODO: Make specific function to not make a new String.
+        lcd_print_r((String(Wifi_Signal) + " dBm"), 3);
+      #endif
     }
 
   }
 
-  if (USE_DHT && timers.CheckTimer(1)) {
-    sensors_event_t event;
+  if (timers.CheckTimer(1)) {
+    #ifdef ESP32_DHT_H
 
-    dht.temperature().getEvent(&event);
-    if (isnan(event.temperature)) {
-      s_println(F("Error reading temperature!"));
-    }
-    else {
-      float temp = (event.temperature * 1.8) + 32;
+      float temp, hum;
+      dht_getvalues(temp, hum);
+      Serial.print(F("Temp:"));
+      Serial.print(temp);
+      Serial.print(F(" Hum:"));
+      Serial.println(hum);
+      
       send_data(IPADDRESS, ONE_WIRE_TYPE, "temp", String(temp));
-    }
-
-    dht.humidity().getEvent(&event);
-    if (isnan(event.relative_humidity)) {
-      s_println(F("Error reading humidity!"));
-    }
-    else {
-      float hum = event.relative_humidity;
       send_data(IPADDRESS, ONE_WIRE_TYPE, "hum", String(hum));
-    }
+
+    #endif
   }
 
-  if (USE_LCD && timers.CheckTimer(20)) {
-    //lcd_print(String(counters[0]) + " | " + String(counters[1]), 3);
+  if (timers.CheckTimer(20)) {
+    #ifdef ESP32_LCD_H
+      lcd_print(String(counters[0]) + " | " + String(counters[1]), 3);
+    #endif
   }
 
   // if (timers.CheckTimer(21)) {
@@ -187,21 +179,21 @@ void loop(void) {
 }
 
 void mode1process() {
-  if (timers.CheckTimer(0)) {
-    step_weight();
+  // if (timers.CheckTimer(0)) {
+  //   step_weight();
 
-    if (flip == 1) {
-      color_r = color_weight;
-      color_g = 0;
-      color_b = 0;
-      setAllColor(color_r, color_g, color_b);
-    } else {
-      color_r = 0;
-      color_g = color_weight;
-      color_b = 0;
-      setAllColor(color_r, color_g, color_b);
-    }
-  }
+  //   if (flip == 1) {
+  //     color_r = color_weight;
+  //     color_g = 0;
+  //     color_b = 0;
+  //     setAllColor(color_r, color_g, color_b);
+  //   } else {
+  //     color_r = 0;
+  //     color_g = color_weight;
+  //     color_b = 0;
+  //     setAllColor(color_r, color_g, color_b);
+  //   }
+  // }
 }
 
 #pragma region Handlers
@@ -220,23 +212,31 @@ bool HandleLcdCommand(String& cmd) {
   String cmd_2 = str_split(cmd, 2);
 
   if (cmd_1 == "init") {
-    //lcd_init();
+    #ifdef ESP32_LCD_H
+      lcd_init();
+    #endif
     return send_msg("initialized");
   }
 
   if (cmd_1 == "clear") {
-    //lcd_clear();
+    #ifdef ESP32_LCD_H
+      lcd_clear();
+    #endif
     return send_msg("cleared");
   }
 
   // backlight
   if (cmd_1 == "bl") {
     if (cmd_2 == "on") {
-      //lcd_backlight(true);
+      #ifdef ESP32_LCD_H
+        lcd_backlight(true);
+      #endif
       return send_msg("backlight on");
     }
     if (cmd_2 == "off") {
-      //lcd_backlight(false);
+      #ifdef ESP32_LCD_H
+        lcd_backlight(false);
+      #endif
       return send_msg("backlight off");
     }
   }
@@ -246,12 +246,18 @@ bool HandleLcdCommand(String& cmd) {
     int col = str_int(cmd, 4);
     if (row > -1) {
       if(col > -1) {
-        //lcd_print(cmd_2, row, col);
+        #ifdef ESP32_LCD_H
+          lcd_print(cmd_2, row, col);
+        #endif
       } else {
-        //lcd_print(cmd_2, row);
+        #ifdef ESP32_LCD_H
+          lcd_print(cmd_2, row);
+        #endif
       }
     } else {
-      //lcd_print(cmd_2);
+      #ifdef ESP32_LCD_H
+        lcd_print(cmd_2);
+      #endif
     }
     return send_msg("print " + cmd_2);
   }
@@ -261,12 +267,18 @@ bool HandleLcdCommand(String& cmd) {
     int col = str_int(cmd, 4);
     if (row > -1) {
       if(col > -1) {
-        //lcd_print_r(cmd_2, row, col);
+        #ifdef ESP32_LCD_H
+          lcd_print_r(cmd_2, row, col);
+        #endif
       } else {
-        //lcd_print_r(cmd_2, row);
+        #ifdef ESP32_LCD_H
+          lcd_print_r(cmd_2, row);
+        #endif
       }
     } else {
-      //lcd_print_r(cmd_2);
+      #ifdef ESP32_LCD_H
+        lcd_print_r(cmd_2);
+      #endif
     }
     return send_msg("print " + cmd_2);
   }
@@ -274,13 +286,19 @@ bool HandleLcdCommand(String& cmd) {
 
   if (cmd_1 == "show") {
     if (cmd_2 == "ip") {
-      //lcd_print(IPADDRESS);
+      #ifdef ESP32_LCD_H
+        lcd_print(IPADDRESS);
+      #endif
     }
     if (cmd_2 == "mac") {
-      //lcd_print(String(WiFi.macAddress()));
+      #ifdef ESP32_LCD_H
+        lcd_print(String(WiFi.macAddress()));
+      #endif
     }
     if (cmd_2 == "version") {
-      //lcd_print(String(VERSION));
+      #ifdef ESP32_LCD_H
+        lcd_print(String(VERSION));
+      #endif
     }
     if (cmd_2 == "rssi") {
       show_rssi = show_rssi ? false : true;
@@ -296,7 +314,9 @@ bool HandleLedCommand(String& cmd) {
   String cmd_1 = str_split(cmd, 1);
 
   if (cmd_1 == "clear") {
-    led_clear();
+    #ifdef ESP32_LEDSTRIP_H
+      led_clear();
+    #endif
     return send_msg("cleared");
   }
 
@@ -307,10 +327,14 @@ bool HandleLedCommand(String& cmd) {
       int color_b = str_int(color_str, 2, ',');
       int brightness = str_int(color_str, 3, ',');
       if (brightness > -1) {
-        set_brightness(brightness);
+        #ifdef ESP32_LEDSTRIP_H
+          set_brightness(brightness);
+        #endif
       }
 
-      setAllColor(color_r, color_g, color_b);
+      #ifdef ESP32_LEDSTRIP_H
+        setAllColor(color_r, color_g, color_b);
+      #endif
 
       return send_body(
         jsonField("color_r", String(color_r), true) 
@@ -331,9 +355,13 @@ bool HandleLedCommand(String& cmd) {
       int color_b = str_int(color_str, 2, ',');
       int brightness = str_int(color_str, 3, ',');
       if (brightness > -1) {
-        set_brightness(brightness);
+        #ifdef ESP32_LEDSTRIP_H
+          set_brightness(brightness);
+        #endif
       }
-      set_pixel(x, y, color_r, color_g, color_b);
+      #ifdef ESP32_LEDSTRIP_H
+        set_pixel(x, y, color_r, color_g, color_b);
+      #endif
 
       return send_body(
         jsonField("x", String(x), true)
@@ -354,9 +382,13 @@ bool HandleLedCommand(String& cmd) {
       int color_b = str_int(color_str, 2, ',');
       int brightness = str_int(color_str, 3, ',');
       if (brightness > -1) {
-        set_brightness(brightness);
+        #ifdef ESP32_LEDSTRIP_H
+          set_brightness(brightness);
+        #endif
       }
-      set_pixel_i(i, color_r, color_g, color_b);
+      #ifdef ESP32_LEDSTRIP_H
+        set_pixel_i(i, color_r, color_g, color_b);
+      #endif
 
       return send_body(
         jsonField("i", String(i), true)
@@ -370,11 +402,15 @@ bool HandleLedCommand(String& cmd) {
   if (cmd_1 == "brightness") {
       uint16_t brightness = str_int(cmd, 2);
       if (brightness > -1) {
-        set_brightness(brightness);
+        #ifdef ESP32_LEDSTRIP_H
+          set_brightness(brightness);
+        #endif
+
         return send_body(jsonField("brightness", String(brightness), false));
       }
   }
 
+  
   return send_msg("received");
 }
 
@@ -384,6 +420,8 @@ bool HandleResetCommand(String& cmd) {
     reset_counters();
     return send_msg("counters cleared");
   }
+  
+  resetFunc();
 
   return send_msg("cleared");
 }
@@ -392,8 +430,6 @@ bool HandleResetCommand(String& cmd) {
 
 // Runs on Core 0
 bool OnApiCommand(String& cmd) {
-  PrintCore("OnApiCommand:" + cmd);
-
   String first_word = str_split(cmd, 0);
   
   if (first_word == "set") {
@@ -422,8 +458,11 @@ bool OnApiCommand(String& cmd) {
     int g = str_int(clr_str, 1, ',');
     int b = str_int(clr_str, 2, ',');
     int a = str_int(clr_str, 3, ',');
-
-    set_pixel(x, y, r, g, b);
+    #ifdef ESP32_LEDSTRIP_H
+      set_pixel(x, y, r, g, b);
+      return send_msg("pixel set");
+    #endif
+    return send_msg("ESP32_LEDSTRIP_H not included");
   }
 
   if (first_word == "mode") {
@@ -446,8 +485,8 @@ bool OnApiCommand(String& cmd) {
     byte *addresses = scan_i2c();
     uint8_t length = sizeof(addresses);
 
-    s_println(String(sizeof(addresses[0])));
-    s_println(String(sizeof(addresses)));
+    Serial.println(String(sizeof(addresses[0])));
+    Serial.println(String(sizeof(addresses)));
     
     String response = "[";
     // uint8_t i;
@@ -492,7 +531,7 @@ bool OnApiCommand(String& cmd) {
     serializeJson(doc, buffer);
 
     String url = DATA_URL;
-    url += "?src=" + urlEncode("01:01:01:01:01:01");
+    url += "?src=" + urlEncode("127.0.0.1");
     //String response = net_post(url, buffer);
 
     //String response;
