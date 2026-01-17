@@ -1,9 +1,13 @@
 #include "esp32_webcontroller.h"
 
-#define ONE_WIRE_COUNT 0
-#define ONE_WIRE_TYPE "led_matrix"
-uint8_t mode = 0;
+#define ONE_WIRE_COUNT 1
+#define ONE_WIRE_TYPE "dev"
+uint8_t mode = 10;
 bool show_rssi = false;
+
+bool lcd_show_network = true;
+bool lcd_show_rssi = true;
+bool serial_debug = false;
 
 int Wifi_Signal;
 String _net_response;
@@ -11,8 +15,8 @@ String _net_response;
 #pragma region Setup
 
 void SetupTimers() {
-  timers.AddTimer(0, 3000);
-  timers.AddTimer(1, 3001);
+  timers.AddTimer(0, 100);  // Network Counts
+  timers.AddTimer(1, 3000); // Wifi Signal
   timers.AddTimer(10, 101);
   timers.AddTimer(20, 501);
 }
@@ -45,15 +49,16 @@ void NetReady() {
 
 void SetupPins() {
 
-	pinMode(12, OUTPUT); // Trigger
-	pinMode(13, INPUT);  // Echo
+	pinMode(12, OUTPUT);  // Trigger
+	pinMode(13, INPUT);   // Echo
 
-  pinMode(23, INPUT);  // DHT
+  pinMode(18, INPUT);   // DHT
+  pinMode(19, INPUT);   // LED
+  pinMode(23, INPUT);   // OneWire
+  pinMode(25, INPUT);   // Microwave
 
-  pinMode(25, INPUT);  // Microwave
-
-	pinMode(26, OUTPUT); // Trigger
-	pinMode(27, INPUT);  // Echo
+	pinMode(26, OUTPUT);  // Trigger
+	pinMode(27, INPUT);   // Echo
 
 }
   
@@ -61,12 +66,14 @@ void SetupPins() {
 
 void send_data(const String& src, const String& type, const String& var, const String& val) {
   int response = post_data(src, type, var, val, _net_response);
-  Serial.print(F("POST:"));
-  Serial.print(type);
-  Serial.print(F(", "));
-  Serial.print(var);
-  Serial.print(F(", "));
-  Serial.println(val);
+  if (serial_debug) {
+    Serial.print(F("POST:"));
+    Serial.print(type);
+    Serial.print(F(", "));
+    Serial.print(var);
+    Serial.print(F(", "));
+    Serial.println(val);
+  }
 
   if (response != HTTP_CODE_OK) {
     #ifdef ESP32_LCD_H
@@ -77,8 +84,8 @@ void send_data(const String& src, const String& type, const String& var, const S
 
     if (response == -2 || response == -11) {
       #ifdef ESP32_LCD_H
-        lcd_print(str_pad("!CRITICAL NETWORK FAILURE!", 20));
-        lcd_print(str_pad("!REBOOTING IN 5 SECONDS!", 20), 1);
+        lcd_print("!! CRIT FAILURE !");
+        lcd_print("!! REBOOTING IN 5 !!", 1);
         delay(5000);
         resetFunc();
       #endif
@@ -105,22 +112,25 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 }
 
 int microwave;
+float* temps;
+float temp;
+String PollSensors_txt;
 
 void PollSensors(bool postData = false) {
-  // float* temps = ds_temps(ONE_WIRE_COUNT);
-  // for(int i = 0; i < ONE_WIRE_COUNT; i++) {
-  //   float temp = temps[i];
+  temps = ds_temps(ONE_WIRE_COUNT);
+  for(int i = 0; i < ONE_WIRE_COUNT; i++) {
+    temp = temps[i];
 
-  //   String txt = "Sensor_" + String(i) + ": " + String(temp);
-  //   str_pad(txt, 20);
-  //   if (USE_LCD) {
-  //     //lcd_print(txt, i);
-  //   }
+    #ifdef ESP32_LCD_H
+      PollSensors_txt = "Sensor_" + String(i) + ": " + String(temp);
+      str_pad(PollSensors_txt, 20);
+      lcd_print(PollSensors_txt, i);
+    #endif
 
-  //   if (postData) {
-  //     send_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), String(temp));
-  //   }
-  // }
+    if (postData) {
+      send_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), String(temp));
+    }
+  }
 }
 
 #pragma endregion Testing
@@ -150,39 +160,36 @@ void loop(void) {
       break;
   }
 
-  if (show_rssi && timers.CheckTimer(0)) {
-    if (show_rssi) {
-      Wifi_Signal = WiFi.RSSI();
-      #ifdef ESP32_LCD_H
-        //TODO: Make specific function to not make a new String.
-        lcd_print_r((String(Wifi_Signal) + " dBm"), 3);
-      #endif
+  #ifdef ESP32_LCD_H
+    if (lcd_show_network && timers.CheckTimer(0)) {
+      lcd_print(String(counters[0]) + "|" + String(counters[1]) + "|" + String(counters[2]), 3);
     }
+  #endif
 
-  }
+  #ifdef ESP32_LCD_H
+    if (lcd_show_rssi && timers.CheckTimer(1)) {
+      Wifi_Signal = WiFi.RSSI();
+      //TODO: Make specific function to not make a new String.
+      lcd_print_r((String(Wifi_Signal) + " dBm"), 3);
+    }
+  #endif
 
-  if (timers.CheckTimer(1)) {
-    #ifdef ESP32_DHT_H
+  #ifdef ESP32_DHT_H
+    if (timers.CheckTimer(1)) {
+        float temp, hum;
+        dht_getvalues(temp, hum);
 
-      float temp, hum;
-      dht_getvalues(temp, hum);
-      Serial.print(F("Temp:"));
-      Serial.print(temp);
-      Serial.print(F(" Hum:"));
-      Serial.println(hum);
-      
-      send_data(IPADDRESS, ONE_WIRE_TYPE, "temp", String(temp));
-      send_data(IPADDRESS, ONE_WIRE_TYPE, "hum", String(hum));
-
-    #endif
-  }
-
-  if (timers.CheckTimer(20)) {
-    #ifdef ESP32_LCD_H
-      lcd_print(String(counters[0]) + " | " + String(counters[1]), 3);
-    #endif
-  }
-
+        if (serial_debug) {
+          Serial.print(F("Temp:"));
+          Serial.print(temp);
+          Serial.print(F(" Hum:"));
+          Serial.println(hum);
+        }
+        
+        send_data(IPADDRESS, ONE_WIRE_TYPE, "temp", String(temp));
+        send_data(IPADDRESS, ONE_WIRE_TYPE, "hum", String(hum));
+    }
+  #endif
   // if (timers.CheckTimer(21)) {
   //   lcd_print("D:" + String(GetRange(12, 13)), 0);
   //   delay(10);
@@ -496,7 +503,33 @@ bool OnApiCommand(String& cmd) {
 
   if (first_word == "mem") {
     uint32_t mem = ESP.getFreeHeap();
+    Serial.print(F("FreeHeap:"));
+    Serial.println(mem);
+    return send_body(jsonField("mem", String(mem), false));
+  }
 
+  if (first_word == "sitrep") {
+    String res = "";
+
+    res += jsonField("mem", String(ESP.getFreeHeap()), true);
+    res += jsonField("mode", String(mode), true);
+    res += jsonField("show_rssi", String(show_rssi), true);
+    res += jsonField("lcd_show_network", String(lcd_show_network), true);
+    res += jsonField("lcd_show_rssi", String(lcd_show_rssi), true);
+    res += jsonField("serial_debug", String(serial_debug), true);
+    res += jsonField("rssi", String(WiFi.RSSI()), true);
+    res += jsonField("ipaddress", String(IPADDRESS), true);
+    res += jsonField("macaddress", String(MACADDRESS), true);
+    res += jsonField("counter_0", String(counters[0]), true);
+    res += jsonField("counter_1", String(counters[1]), true);
+    res += jsonField("counter_2", String(counters[2]), true);
+    res += jsonField("counter_3", String(counters[3]), true);
+    res += jsonField("counter_4", String(counters[4]), true);
+    res += jsonField("counter_5", String(counters[5]), true);
+    res += jsonField("counter_6", String(counters[6]), true);
+    res += jsonField("counter_7", String(counters[7]), false);
+    
+    return send_body(res);
   }
 
   if (first_word == "scan_i2c") {
