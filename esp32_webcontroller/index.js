@@ -156,7 +156,7 @@ $(function(){
             .getElementById("matrix-color-a")
             .addEventListener("change", (evt) => {
                 const a = $("#matrix-color-a").val();
-                PostApiCommand(`brightness ${a}`);
+                PostApiCommand(`led brightness ${a}`);
             });
 
     }
