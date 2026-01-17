@@ -14,10 +14,10 @@
 
 WebServer server(HTTP_PORT);
 
-INCTXT(WebPage, "index.html");
-INCTXT(MatrixWebPage, "matrix.html");
-INCTXT(WebJavascript, "index.js");
-INCTXT(WebStylesheet, "index.css");
+// INCTXT(WebPage, "index.html");
+// INCTXT(MatrixWebPage, "matrix.html");
+// INCTXT(WebJavascript, "index.js");
+// INCTXT(WebStylesheet, "index.css");
 
 #pragma region server
 
