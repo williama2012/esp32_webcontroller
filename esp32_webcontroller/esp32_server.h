@@ -2,7 +2,6 @@
 #define ESP32_SERVER_H
 #include <Arduino.h>
 #include "secrets.h"
-#include "incbin.h"
 #include "Wire.h"
 #include <WiFi.h>
 #include <WiFiClient.h>
@@ -14,10 +13,6 @@
 
 WebServer server(HTTP_PORT);
 
-// INCTXT(WebPage, "index.html");
-// INCTXT(MatrixWebPage, "matrix.html");
-// INCTXT(WebJavascript, "index.js");
-// INCTXT(WebStylesheet, "index.css");
 
 #pragma region server
 
@@ -48,7 +43,8 @@ bool send_msg(String msg) {
 }
 
 bool send_500(String msg) {
-  return send_body(jsonField("status", "500", true) + jsonField("msg", msg, false));
+  server.send(500, "application/json", "{" + jsonField("msg", msg, false) + "}");
+  return true;
 }
 
 #pragma endregion server
