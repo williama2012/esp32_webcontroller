@@ -4,7 +4,7 @@
 #include <FastLED.h>
 
 // Configuration
-#define LED_PIN     19
+#define LED_PIN     22
 #define NUM_LEDS    484
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
@@ -65,6 +65,7 @@ uint16_t XY( uint8_t x, uint8_t y) {
 #pragma endregion Pixel XY coordination
 
 void led_clear() {
+  if (!led_initialized) { return; }
   fill_solid(leds, NUM_LEDS, CRGB(0,0,0));
   FastLED.show();
 }
@@ -99,6 +100,7 @@ void set_pixel_i(uint16_t i, CRGB color, bool hold_refresh = false) {
   }
 
   leds[i] = color;
+  
   if (!hold_refresh) {
     FastLED.show();
   }
