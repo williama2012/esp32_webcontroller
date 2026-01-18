@@ -1,7 +1,7 @@
 #include "esp32_webcontroller.h"
 
 #define ONE_WIRE_COUNT 1
-#define ONE_WIRE_TYPE "led_matrix"
+#define ONE_WIRE_TYPE "dev"
 uint8_t mode = 0;
 bool show_rssi = false;
 
