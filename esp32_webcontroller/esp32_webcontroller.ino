@@ -2,7 +2,7 @@
 
 #define ONE_WIRE_COUNT 1
 #define ONE_WIRE_TYPE "dev"
-uint8_t mode = 0;
+uint8_t mode = 10;
 bool show_rssi = false;
 
 bool lcd_show_network = true;
@@ -48,17 +48,8 @@ void NetReady() {
 }
 
 void SetupPins() {
-
-	pinMode(12, OUTPUT);  // Trigger
-	pinMode(13, INPUT);   // Echo
-
-  pinMode(18, OUTPUT);   // DHT
-  pinMode(23, INPUT);   // OneWire
-  pinMode(25, INPUT);   // Microwave
-
-	pinMode(26, OUTPUT);  // Trigger
-	pinMode(27, INPUT);   // Echo
-
+	pinMode(13, INPUT);
+  pinMode(23, INPUT);
 }
   
 #pragma endregion Setup
@@ -136,9 +127,11 @@ void PollSensors(bool postData = false) {
 
 #pragma endregion Testing
 
+
+
 // Runs on Core 1
 void loop(void) {
-  //microwave = digitalRead(25);
+  microwave = digitalRead(25);
 
   if (doBlink) {
     Blink();
