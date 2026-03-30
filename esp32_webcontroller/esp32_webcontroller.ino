@@ -50,6 +50,8 @@ void NetReady() {
 void SetupPins() {
 	pinMode(13, INPUT);
   pinMode(23, INPUT);
+  pinMode(25, INPUT);
+  pinMode(26, INPUT);
 }
   
 #pragma endregion Setup
@@ -101,7 +103,8 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
   return (duration * 0.0343)/2;
 }
 
-int microwave;
+int microwave_0;
+int microwave_1;
 float* temps;
 float temp;
 String PollSensors_txt;
@@ -128,10 +131,24 @@ void PollSensors(bool postData = false) {
 #pragma endregion Testing
 
 
+uint32_t motion_0 = 0;
+uint32_t motion_1 = 0;
 
 // Runs on Core 1
 void loop(void) {
-  microwave = digitalRead(25);
+  microwave_0 = digitalRead(25);
+  if (microwave_0 == 0) {
+    motion_0++;
+  }
+
+  microwave_1 = digitalRead(26);
+  if (microwave_1 == 0) {
+    motion_1++;
+  }
+
+
+  lcd_print(String(motion_0), 0, 0);
+  lcd_print(String(motion_1), 1, 0);
 
   if (doBlink) {
     Blink();

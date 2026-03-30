@@ -104,6 +104,7 @@ void PrintCore(char *msg) {
   if (!Serial) { return ; }
   Serial.print(F("--- "));
   Serial.print(F(msg));
+  Serial.print(F(" "));
   Serial.print(xPortGetCoreID());
   Serial.println(F(" ---"));
 }
@@ -112,6 +113,7 @@ void PrintCore(const String& msg) {
   if (!Serial) { return ; }
   Serial.print(F("--- "));
   Serial.print(msg);
+  Serial.print(F(" "));
   Serial.print(xPortGetCoreID());
   Serial.println(F(" ---"));
 }
