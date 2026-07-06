@@ -7,7 +7,7 @@
 #include <DHT_U.h>
 //#include "esp32_helpers.h"
 
-#define DHTPIN    18
+#define DHTPIN    23
 #define DHTTYPE   DHT11
 
 DHT_Unified dht(DHTPIN, DHTTYPE);
