@@ -10,10 +10,10 @@
 //#include "esp32_led.h"
 //#include "esp32_lcd.h"
 //#include "esp32_onewire.h"
-//#include "esp32_dht.h"
+#include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
-#define VERSION 20260117.10
+#define VERSION 20260705.01
 
 Timer timers;
 TaskHandle_t Task1;
@@ -237,7 +237,27 @@ void handleGetJavascript() {
 void handleGetStylesheet() {
   server.send(200, "text/css", gWebStylesheetData);
 }
+
 #endif
+
+void handleGetData() {
+  PrintCore("handleGetData");
+
+  String src = server.arg("src");
+
+  if (src == "temp") {
+    #ifdef ESP32_DHT_H
+      float temp, hum;
+      dht_getvalues(temp, hum);
+      send_body(jsonField("temp", String(temp), true) + jsonField("hum", String(hum), false));
+      return;
+    #endif
+  }
+
+  send_rec("no 'src' param given");
+}
+
+
 
 void handleNotFound() {
   String message = "File Not Found\n\n";
@@ -501,7 +521,8 @@ void SetupServer() {
     server.on("/index.min.js", HTTP_GET, handleGetJavascript);
     server.on("/index.min.css", HTTP_GET, handleGetStylesheet);
   #endif
-
+  
+  server.on("/data", HTTP_GET, handleGetData);
   server.on("/id", HTTP_GET, handleGetId);
 
   server.on("/mat", HTTP_POST, handleMatrixPost);
