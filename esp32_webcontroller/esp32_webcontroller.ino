@@ -1,7 +1,5 @@
 #include "esp32_webcontroller.h"
 
-#define ONE_WIRE_COUNT 1
-#define ONE_WIRE_TYPE "dev"
 uint8_t mode = 1;
 bool show_rssi = false;
 
@@ -197,8 +195,8 @@ void loop(void) {
           Serial.println(hum);
         }
         
-        send_data(IPADDRESS, ONE_WIRE_TYPE, "temp", String(temp));
-        send_data(IPADDRESS, ONE_WIRE_TYPE, "hum", String(hum));
+        // send_data(IPADDRESS, ONE_WIRE_TYPE, "temp", String(temp));
+        // send_data(IPADDRESS, ONE_WIRE_TYPE, "hum", String(hum));
     }
   #endif
   // if (timers.CheckTimer(21)) {
