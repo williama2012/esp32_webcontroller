@@ -6,14 +6,17 @@
 #include "esp32_server.h"
 #include "esp32_net.h"
 #include "esp32_timer.h"
-//#include "esp32_site.h"
+#include "esp32_site.h"
 //#include "esp32_led.h"
-//#include "esp32_lcd.h"
+#include "esp32_lcd.h"
 //#include "esp32_onewire.h"
 #include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
-#define VERSION 20260705.01
+#define VERSION 20260717.01
+
+#define ONE_WIRE_COUNT 1
+#define ONE_WIRE_TYPE "dev"
 
 Timer timers;
 TaskHandle_t Task1;
@@ -34,6 +37,49 @@ void reset_counters() {
     counters[i] = 0;
   }
 }
+
+void handleGetData() {
+  PrintCore("handleGetData");
+
+  String src = server.arg("src");
+  float temp;
+  String idx = server.arg("idx");
+  int idx_i = idx.toInt();
+
+  if (src == "dht") {
+    #ifdef ESP32_DHT_H
+      float hum;
+      dht_getvalues(temp, hum);
+      send_body(jsonField("temp", String(temp), true) + jsonField("hum", String(hum), false));
+      return;
+    #endif
+  }
+
+  if (src == "onewire") {
+  #ifdef ESP32_ONEWIRE_H
+    float* temps;
+    temps = ds_temps(ONE_WIRE_COUNT);
+    temp = temps[idx_i];
+    send_body(jsonField("temp", String(temp), false));
+    return;
+  #endif
+  }
+
+  // analog read
+  if (src == "ar") {
+    send_body(jsonField("val", String(analogRead(idx_i)), false));
+    return;
+  }
+
+  // digital read
+  if (src == "dr") {
+    send_body(jsonField("val", String(digitalRead(idx_i)), false));
+    return;
+  }
+
+  send_rec("no 'src' param given");
+}
+
 
 #pragma region Actions
 
@@ -218,7 +264,7 @@ void PulsePost(int pin, int value, int time) {
 
 #pragma endregion servo
 
-#pragma region Get_Handlers
+#pragma region Get_Site_Handlers
 
 #ifdef ESP32_SITE_H
 void handleGetIndex() {
@@ -229,7 +275,6 @@ void handleGetMatrix() {
   server.send(200, "text/html", gMatrixWebPageData);
 }
 
-
 void handleGetJavascript() {
   server.send(200, "text/javascript", gWebJavascriptData);
 }
@@ -239,24 +284,6 @@ void handleGetStylesheet() {
 }
 
 #endif
-
-void handleGetData() {
-  PrintCore("handleGetData");
-
-  String src = server.arg("src");
-
-  if (src == "temp") {
-    #ifdef ESP32_DHT_H
-      float temp, hum;
-      dht_getvalues(temp, hum);
-      send_body(jsonField("temp", String(temp), true) + jsonField("hum", String(hum), false));
-      return;
-    #endif
-  }
-
-  send_rec("no 'src' param given");
-}
-
 
 
 void handleNotFound() {
