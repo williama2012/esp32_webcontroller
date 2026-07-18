@@ -54,41 +54,6 @@ void SetupPins() {
   
 #pragma endregion Setup
 
-void send_data(const String& src, const String& type, const String& var, const String& val) {
-  int response = post_data(src, type, var, val, _net_response);
-  if (serial_debug) {
-    Serial.print(F("POST:"));
-    Serial.print(type);
-    Serial.print(F(", "));
-    Serial.print(var);
-    Serial.print(F(", "));
-    Serial.println(val);
-  }
-
-  if (response != HTTP_CODE_OK) {
-    #ifdef ESP32_LCD_H
-      char str[4];
-      sprintf(str, "%d", response);
-      lcd_print_r(str);
-    #endif
-
-    if (response == -2 || response == -11) {
-      #ifdef ESP32_LCD_H
-        lcd_print("!! CRIT FAILURE !");
-        lcd_print("!! REBOOTING IN 5 !!", 1);
-        delay(5000);
-        resetFunc();
-      #endif
-
-      resetFunc();
-    }
-
-    counters[1]++;
-  } else {
-    counters[0]++;
-  }
-}
-
 #pragma region Testing
 
 float GetRange(uint8_t triggerPin, uint8_t echoPin) {
@@ -105,26 +70,6 @@ int microwave_0;
 int microwave_1;
 float* temps;
 float temp;
-String PollSensors_txt;
-
-void PollSensors(bool postData = false) {
-  #ifdef ESP32_ONEWIRE_H
-    temps = ds_temps(ONE_WIRE_COUNT);
-    for(int i = 0; i < ONE_WIRE_COUNT; i++) {
-      temp = temps[i];
-
-      #ifdef ESP32_LCD_H
-        PollSensors_txt = "Sensor_" + String(i) + ": " + String(temp);
-        str_pad(PollSensors_txt, 20);
-        lcd_print(PollSensors_txt, i);
-      #endif
-
-      if (postData) {
-        send_data(IPADDRESS, ONE_WIRE_TYPE, "sensor_" + String(i), String(temp));
-      }
-    }
-  #endif
-}
 
 #pragma endregion Testing
 
@@ -156,15 +101,6 @@ void loop(void) {
   switch (mode) {
     case 1:
       break;
-    case 10:
-      if (timers.CheckTimer(10)) {
-        PollSensors(true);
-      }
-      break;
-    case 11:
-      if (timers.CheckTimer(10)) {
-        PollSensors(false);
-      }
     default:
       break;
   }
@@ -184,20 +120,14 @@ void loop(void) {
   #endif
 
   #ifdef ESP32_DHT_H
+   #ifdef ESP32_LCD_H
     if (timers.CheckTimer(1)) {
         float temp, hum;
         dht_getvalues(temp, hum);
-
-        if (serial_debug) {
-          Serial.print(F("Temp:"));
-          Serial.print(temp);
-          Serial.print(F(" Hum:"));
-          Serial.println(hum);
-        }
-        
-        // send_data(IPADDRESS, ONE_WIRE_TYPE, "temp", String(temp));
-        // send_data(IPADDRESS, ONE_WIRE_TYPE, "hum", String(hum));
+        lcd_print_r((String(temp) + " F"), 0);
+        lcd_print_r((String(hum) + " %"), 1);
     }
+    #endif
   #endif
   // if (timers.CheckTimer(21)) {
   //   lcd_print("D:" + String(GetRange(12, 13)), 0);
@@ -517,30 +447,6 @@ bool OnApiCommand(String& cmd) {
     return send_body(jsonField("mem", String(mem), false));
   }
 
-  if (first_word == "sitrep") {
-    String res = "";
-
-    res += jsonField("mem", String(ESP.getFreeHeap()), true);
-    res += jsonField("mode", String(mode), true);
-    res += jsonField("show_rssi", String(show_rssi), true);
-    res += jsonField("lcd_show_network", String(lcd_show_network), true);
-    res += jsonField("lcd_show_rssi", String(lcd_show_rssi), true);
-    res += jsonField("serial_debug", String(serial_debug), true);
-    res += jsonField("rssi", String(WiFi.RSSI()), true);
-    res += jsonField("ipaddress", String(IPADDRESS), true);
-    res += jsonField("macaddress", String(MACADDRESS), true);
-    res += jsonField("counter_0", String(counters[0]), true);
-    res += jsonField("counter_1", String(counters[1]), true);
-    res += jsonField("counter_2", String(counters[2]), true);
-    res += jsonField("counter_3", String(counters[3]), true);
-    res += jsonField("counter_4", String(counters[4]), true);
-    res += jsonField("counter_5", String(counters[5]), true);
-    res += jsonField("counter_6", String(counters[6]), true);
-    res += jsonField("counter_7", String(counters[7]), false);
-    
-    return send_body(res);
-  }
-
   if (first_word == "scan_i2c") {
     byte *addresses = scan_i2c();
     uint8_t length = sizeof(addresses);
@@ -562,41 +468,6 @@ bool OnApiCommand(String& cmd) {
     response += "]";
 
     return send_msg(response);
-  }
-
-  if (first_word == "test") {
-
-    JsonDocument doc;
-
-    doc["src"] = MACADDRESS;
-    doc["type"] = "sensors";
-    doc["var"] = "refridgerator";
-
-    doc["val"][0]["id"] = "sensor0";
-    doc["val"][0]["type"] = "temp_sensor";
-    doc["val"][0]["var"] = "temp";
-    doc["val"][0]["val"] = "75.42";
-
-    doc["val"][1]["id"] = "sensor1";
-    doc["val"][1]["type"] = "temp_sensor";
-    doc["val"][1]["var"] = "temp";
-    doc["val"][1]["val"] = "-1.51";
-
-    doc["val"][2]["id"] = "sensor2";
-    doc["val"][2]["type"] = "motion_sensor";
-    doc["val"][2]["var"] = "active";
-    doc["val"][2]["val"] = "1";
-
-    String buffer;
-    serializeJson(doc, buffer);
-
-    String url = DATA_URL;
-    url += "?src=" + urlEncode("127.0.0.1");
-    //String response = net_post(url, buffer);
-
-    //String response;
-    //post_data(MACADDRESS, "type0", "arg0", "val_0x01", response);
-
   }
 
   return false;
