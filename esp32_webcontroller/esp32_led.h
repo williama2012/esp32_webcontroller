@@ -4,12 +4,12 @@
 #include <FastLED.h>
 
 // Configuration
-#define LED_PIN     22
-#define NUM_LEDS    484
+#define LED_PIN     14
+#define NUM_LEDS    2
 #define LED_TYPE    WS2812B
 #define COLOR_ORDER GRB
-#define LED_COUNT 484
-CRGB leds[NUM_LEDS];
+#define LED_COUNT 2
+CRGB PROGMEM leds[NUM_LEDS];
 
 bool led_initialized = false;
 uint8_t flip = 1;
