@@ -24,7 +24,7 @@ void PreSetup() {
   #endif
   
   #ifdef ESP32_LED_H
-    led_init();
+    setup_leds();
   #endif
   
   #ifdef ESP32_DHT_H
@@ -38,7 +38,7 @@ void PreSetup() {
 
 void NetReady() {
   #ifdef ESP32_LED_H
-    set_pixel(11, 11, 255, 255, 255);
+    //set_pixel(11, 11, 255, 255, 255);
   #endif
 
   reset_counters();
@@ -60,4 +60,8 @@ float temp;
 
 // Runs on Core 1
 void loop(void) {
+  #ifdef ESP32_LED_H
+    loop_leds();
+  #endif
+
 }

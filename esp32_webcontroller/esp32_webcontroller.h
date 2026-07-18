@@ -88,7 +88,7 @@ void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint
   doBlink = true;
 
   #ifdef ESP32_LED_H
-    set_pixel(x, y, CRGB(r, g, b), hold);
+    //set_pixel(x, y, CRGB(r, g, b), hold);
   #endif
 
   send_body(
