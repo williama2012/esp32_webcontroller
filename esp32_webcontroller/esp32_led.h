@@ -58,10 +58,33 @@ void setup_leds() {
 int x    = matrix.width();
 int pass = 0;
 
-void loop_leds() {
+void led_clear() {
+  matrix.fillScreen(0);
+  matrix.show();
+}
+
+void set_pixel(uint16_t x, uint16_t y, uint16_t color) {
+  matrix.drawPixel(x, y, color);
+  matrix.show();
+}
+void set_brightness(uint brightness) {
+  matrix.setBrightness(brightness);
+  matrix.show();
+}
+void set_pixel(uint16_t x, uint16_t y, uint16_t red, uint16_t green, uint16_t blue) {
+  matrix.drawPixel(x, y, matrix.Color(red, green, blue));
+  matrix.show();
+}
+
+void set_pixel_i(uint16_t n, uint16_t red, uint16_t green, uint16_t blue) {
+  matrix.setPixelColor(n, matrix.Color(red, green, blue));
+  matrix.show();
+}
+
+void loop_text(const String& text) {
   matrix.fillScreen(0);
   matrix.setCursor(x, 0);
-  matrix.print(F("Mr.Big"));
+  matrix.print(text);
   if(--x < -36) {
     x = matrix.width();
     if(++pass >= 3) pass = 0;
@@ -70,8 +93,5 @@ void loop_leds() {
   matrix.show();
   delay(100);
 }
-
-
-
 
 #endif

@@ -7,10 +7,10 @@
 #include "esp32_net.h"
 #include "esp32_timer.h"
 #include "esp32_site.h"
-//#include "esp32_led.h"
-#include "esp32_lcd.h"
+#include "esp32_led.h"
+//#include "esp32_lcd.h"
 //#include "esp32_onewire.h"
-#include "esp32_dht.h"
+//#include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
 #define VERSION 20260717.01
@@ -83,11 +83,15 @@ void handleGetData() {
 
 #pragma region Actions
 
+void MatrixClear() {
+
+}
+
 void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint16_t b = 255, bool hold = false) {
   doBlink = true;
 
   #ifdef ESP32_LED_H
-    set_pixel(x, y, CRGB(r, g, b), hold);
+    set_pixel(x, y, r, g, b);
   #endif
 
   send_body(
