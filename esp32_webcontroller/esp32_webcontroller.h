@@ -25,6 +25,8 @@ bool doBlink = false;
 String PROGMEM IPADDRESS;
 String PROGMEM MACADDRESS;
 
+char* PIN_MODE[32];
+
 bool OnApiCommand(String& cmd);
 int counters[8];
 /**
@@ -129,10 +131,10 @@ void AnalogWritePost(int pin, int value) {
 }
 
 void DigitalWritePost(int pin, int value) {
-
+  PIN_MODE[pin] = "d";
   pinMode(pin, OUTPUT);
   digitalWrite(pin, value);
-
+  
   String response = "{";
   response += jsonField("pin", String(pin), true);
   response += jsonField("value", String(value), false);
@@ -144,6 +146,7 @@ void DigitalWritePost(int pin, int value) {
 }
 
 void ServoWritePost(int pin, int value) {
+  PIN_MODE[pin] = "s";
   int pos = value;
   //int pos = map(value, 0, 4095, 0, 180);
 
@@ -204,6 +207,7 @@ void AnalogReadPost() {
 }
 
 void ToneWritePost(int pin, unsigned int value) {
+  PIN_MODE[pin] = "t";
   pinMode(pin, OUTPUT);
 
   if (value == 0) {
@@ -223,6 +227,7 @@ void ToneWritePost(int pin, unsigned int value) {
 }
 
 void PulsePost(int pin, int value, int time) {
+  PIN_MODE[pin] = "p";
   PrintCore("PulsePost");
   pinMode(pin, OUTPUT);
 
