@@ -13,10 +13,8 @@ String _net_response;
 #pragma region Setup
 
 void SetupTimers() {
-  timers.AddTimer(0, 100);  // Network Counts
+  timers.AddTimer(0, 250);  // Network Counts
   timers.AddTimer(1, 3000); // Wifi Signal
-  timers.AddTimer(10, 101);
-  timers.AddTimer(20, 501);
 }
 
 void PreSetup() {
