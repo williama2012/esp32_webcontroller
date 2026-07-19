@@ -8,9 +8,9 @@
 #include "esp32_timer.h"
 #include "esp32_site.h"
 #include "esp32_led.h"
-//#include "esp32_lcd.h"
-//#include "esp32_onewire.h"
-//#include "esp32_dht.h"
+#include "esp32_lcd.h"
+#include "esp32_onewire.h"
+#include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
 #define VERSION 20260717.01
