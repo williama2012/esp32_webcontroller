@@ -89,6 +89,27 @@ void MatrixClear() {
 
 }
 
+void MatrixWrite(const String& text, const String& color = "", int x = 0, int y = 0, bool clear = false, bool loop = false) {
+  #ifdef ESP32_LED_H
+
+
+  uint16_t color_num = strtol(color.c_str(), NULL, 16);
+  Serial.println("[write] '" + String(text) + "' | " + color + " | " + String(color_num) + " | " + String(x) + " | " + String(y) + " | " + String(clear) + " | " + String(loop)); 
+  if (color_num != 0) {
+    led_print(text, color_num, x, y, clear, loop);
+  } else {
+    led_print(text, x, y, clear, loop);
+  }
+
+  send_body(jsonField("status", "true", false));
+
+  return;
+
+  #endif  
+
+  send_body(jsonField("status", "LED library not enablded", false));
+}
+
 void MatrixPost(uint16_t x, uint16_t y, uint16_t r = 255, uint16_t g = 255, uint16_t b = 255, bool hold = false) {
   doBlink = true;
 
@@ -320,6 +341,18 @@ void handleGetId() {
 #pragma endregion Get_Handlers
 
 #pragma region Post_Handlers
+
+void handleMatrixWrite() {
+  counters[2]++;
+  String text = server.arg("text");
+  String color = server.arg("color");
+  int x = server.arg("x").toInt();
+  int y = server.arg("y").toInt();
+  bool clear = server.arg("clear") == "true";
+  bool loop = server.arg("loop") == "true";
+
+  MatrixWrite(text, color, x, y, clear, loop);
+}
 
 void handleMatrixPost() {
   counters[2]++;
@@ -562,6 +595,8 @@ void SetupServer() {
   server.on("/id", HTTP_GET, handleGetId);
 
   server.on("/mat", HTTP_POST, handleMatrixPost);
+  server.on("/write", HTTP_POST, handleMatrixWrite);
+  
   server.on("/integer", HTTP_POST, handleIntegerPost);
   server.on("/analogout", HTTP_POST, handleAnalogWritePost);
   server.on("/digitalout", HTTP_POST, handleDigitalWritePost);

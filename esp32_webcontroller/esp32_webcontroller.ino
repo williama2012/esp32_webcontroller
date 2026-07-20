@@ -75,10 +75,15 @@ float temp;
 uint32_t motion_0 = 0;
 uint32_t motion_1 = 0;
 
+
+
 // Runs on Core 1
 void loop(void) {
 
   #ifdef ESP32_LED_H
+    if (led_loop_text != "") { 
+      loop_text(led_loop_text);
+    }
     //loop_text("Bill");
   #endif
 
@@ -186,6 +191,8 @@ bool HandleLcdCommand(String& cmd) {
     #endif
     return send_msg("cleared");
   }
+
+  
 
   // backlight
   if (cmd_1 == "bl") {

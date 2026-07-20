@@ -14,6 +14,7 @@
 
 #define PIN 14
 
+
 // MATRIX DECLARATION:
 // Parameter 1 = width of NeoPixel matrix
 // Parameter 2 = height of matrix
@@ -45,8 +46,11 @@ Adafruit_NeoMatrix matrix = Adafruit_NeoMatrix(22, 22, PIN,
   NEO_MATRIX_ROWS + NEO_MATRIX_ZIGZAG,
   NEO_GRB            + NEO_KHZ800);
 
-const uint16_t colors[] = {
-  matrix.Color(255, 0, 0), matrix.Color(0, 255, 0), matrix.Color(0, 0, 255) };
+const uint16_t colors[] = { 
+  matrix.Color(255, 255, 255), 
+  matrix.Color(0, 255, 0), 
+  matrix.Color(0, 0, 255) 
+};
 
 void setup_leds() {
   matrix.begin();
@@ -54,9 +58,6 @@ void setup_leds() {
   matrix.setBrightness(40);
   matrix.setTextColor(colors[0]);
 }
-
-int x    = matrix.width();
-int pass = 0;
 
 void led_clear() {
   matrix.fillScreen(0);
@@ -81,17 +82,37 @@ void set_pixel_i(uint16_t n, uint16_t red, uint16_t green, uint16_t blue) {
   matrix.show();
 }
 
+void led_print(const String& text, int x = 0, int y = 0, bool clear = false, bool loop = false) {
+  if(clear == true) {
+    matrix.fillScreen(0);
+  }
+  matrix.setCursor(x, y);
+  matrix.print(text);
+  matrix.show();
+}
+
+void led_print(const String& text, uint16_t color, int x = 0, int y = 0, bool clear = false, bool loop = false) {
+  matrix.setTextColor(color);
+  led_print(text, x, y, clear, loop);
+}
+
+String led_loop_text = "";
+int loop_x = matrix.width();
+int loop_pass = 0;
+int loop_delay = 10;
+
 void loop_text(const String& text) {
   matrix.fillScreen(0);
-  matrix.setCursor(x, 0);
+  matrix.setCursor(loop_x, 0);
   matrix.print(text);
-  if(--x < -36) {
-    x = matrix.width();
-    if(++pass >= 3) pass = 0;
-    matrix.setTextColor(colors[pass]);
+  int len = text.length() * 6.5;
+  if(--loop_x < -len) {
+    loop_x = matrix.width();
+    if(++loop_pass >= 3) loop_pass = 0;
+    matrix.setTextColor(colors[loop_pass]);
   }
   matrix.show();
-  delay(100);
+  delay(loop_delay);
 }
 
 #endif
