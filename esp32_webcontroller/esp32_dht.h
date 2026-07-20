@@ -12,12 +12,12 @@
 #define DHTTYPE   DHT11
 
 //DHT_Unified dht(DHTPIN, DHTTYPE);
-Bonezegei_DHT11 dht(DHTPIN);
+Bonezegei_DHT11 dht_11(DHTPIN);
 
 void dht_getvalues(float& temp, float& humidity) {
-  if (dht.getData()) {
-    temp = dht.getTemperature(true);
-    humidity= dht.getHumidity();
+  if (dht_11.getData()) {
+    temp = dht_11.getTemperature(true);
+    humidity= dht_11.getHumidity();
   }
 }
 
