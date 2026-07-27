@@ -134,8 +134,8 @@ void loop(void) {
     if (httpStatus == HTTP_CODE_OK){
       DeserializationError error = deserializeJson(doc, httpResponse);
       if (!error) {
-        lcd_print(str_pad_s(String(doc["temp"]) + " F", 10), 0);
-        lcd_print(str_pad_s(String(doc["hum"]) + " %", 10), 1);
+        lcd_print(str_pad_s(String(doc["temp"]) + " F", 8), 0);
+        lcd_print(str_pad_s(String(doc["hum"]) + " %", 8), 1);
       } else {
         counters[1]++;
       }
@@ -148,7 +148,7 @@ void loop(void) {
     if (httpStatus == HTTP_CODE_OK){
       DeserializationError error = deserializeJson(doc, httpResponse);
       if (!error) {
-        lcd_print_r(str_pad(String(doc["temp"]) + " F", 10), 0);
+        lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 0);
       } else {
         counters[1]++;
       }
