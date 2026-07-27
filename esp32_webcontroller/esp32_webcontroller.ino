@@ -16,6 +16,7 @@ String _net_response;
 void SetupTimers() {
   timers.AddTimer(0, 1000);
   timers.AddTimer(1, 2000);
+  timers.AddTimer(3, 50);
 }
 
 void PreSetup() {
@@ -45,7 +46,8 @@ void NetReady() {
 }
 
 void SetupPins() {
-	//pinMode(14, OUTPUT); // led
+	pinMode(13, INPUT);
+  pinMode(12, OUTPUT);
 
 }
   
@@ -75,8 +77,10 @@ uint32_t motion_1 = 0;
 
 int httpStatus;
 String httpResponse;
-
 StaticJsonDocument<128> doc;
+uint16_t motion;
+uint32_t mem;
+bool alert_sent = false;
 
 // Runs on Core 1
 void loop(void) {
@@ -85,21 +89,24 @@ void loop(void) {
     if (led_loop_text != "") { 
       loop_text(led_loop_text);
     }
-    //loop_text("Bill");
   #endif
 
-  // microwave_0 = digitalRead(25);
-  // if (microwave_0 == 0) {
-  //   motion_0++;
-  // }
+  motion = digitalRead(13);
+  if (motion == 1) {
+    if (alert_sent == false) {
+      net_post("http://192.168.0.36/api?cmd=motion", "", httpResponse);
+      alert_sent = true;
+      digitalWrite(12, HIGH);
+      lcd_write(0, 0);
+    }
+  } else {
+    if (alert_sent == true) {
+      alert_sent = false;
+      digitalWrite(12, LOW);
+      lcd_print(" ", 0);
+    }
 
-  // microwave_1 = digitalRead(26);
-  // if (microwave_1 == 0) {
-  //   motion_1++;
-  // }
-
-  //lcd_print(String(motion_0), 0, 0);
-  //lcd_print(String(motion_1), 1, 0);
+  }
 
   if (doBlink) {
     Blink();
@@ -111,8 +118,10 @@ void loop(void) {
       lcd_print(String(counters[0]) + "|" + String(counters[1]) + "|" + String(counters[2]), 3);
 
       Wifi_Signal = WiFi.RSSI();
-      //TODO: Make specific function to not make a new String.
-      lcd_print_r((String(Wifi_Signal) + " dBm"), 3);
+      mem = ESP.getFreeHeap();
+
+      lcd_print_r(str_pad_s(String(mem) + " M", 9), 2);
+      lcd_print_r(String(Wifi_Signal) + " dBm", 3);
 
       #ifdef ESP32_DHT_H
         dht_getvalues(temp, hum);
@@ -123,42 +132,38 @@ void loop(void) {
     }
   #endif
 
-  #ifdef ESP32_LCD_H
-    if (timers.CheckTimer(1)) {
-      httpStatus = net_get("http://192.168.0.30/data?src=dht", httpResponse);
-      if (httpStatus == HTTP_CODE_OK){
-        DeserializationError error = deserializeJson(doc, httpResponse);
-        if (!error) {
-          lcd_print(str_pad_s(String(doc["temp"]) + " F", 8), 0);
-          lcd_print(str_pad_s(String(doc["hum"]) + " %", 8), 1);
-        } else {
-          counters[1]++;
-        }
-      } else {
-        lcd_println("NetErr:" + net_status_code(httpStatus), 0);
-        counters[1]++;
-      }
+
+  // #ifdef ESP32_LCD_H
+  //   if (timers.CheckTimer(1)) {
+  //     httpStatus = net_get("http://192.168.0.30/data?src=dht", httpResponse);
+  //     if (httpStatus == HTTP_CODE_OK){
+  //       DeserializationError error = deserializeJson(doc, httpResponse);
+  //       if (!error) {
+  //         lcd_print(str_pad_s(String(doc["temp"]) + " F", 8), 0);
+  //         lcd_print(str_pad_s(String(doc["hum"]) + " %", 8), 1);
+  //       } else {
+  //         counters[1]++;
+  //       }
+  //     } else {
+  //       lcd_println("NetErr:" + net_status_code(httpStatus), 0);
+  //       counters[1]++;
+  //     }
       
-      httpStatus = net_get("http://192.168.0.35/data?src=onewire", httpResponse);
-      if (httpStatus == HTTP_CODE_OK){
-        DeserializationError error = deserializeJson(doc, httpResponse);
-        if (!error) {
-          lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 0);
-        } else {
-          counters[1]++;
-        }
-      } else {
-        lcd_println("NetErr:" + net_status_code(httpStatus), 0);
-        counters[1]++;
-      }
-    }
-  #endif
-  // if (timers.CheckTimer(21)) {
-  //   lcd_print("D:" + String(GetRange(12, 13)), 0);
-  //   delay(10);
-  //   lcd_print("D:" + String(GetRange(26, 27)), 1);
-  //   lcd_print_r(String(microwave));
-  // }
+  //     httpStatus = net_get("http://192.168.0.35/data?src=onewire", httpResponse);
+  //     if (httpStatus == HTTP_CODE_OK){
+  //       DeserializationError error = deserializeJson(doc, httpResponse);
+  //       if (!error) {
+  //         lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 0);
+  //       } else {
+  //         counters[1]++;
+  //       }
+  //     } else {
+  //       lcd_println("NetErr:" + net_status_code(httpStatus), 0);
+  //       counters[1]++;
+  //     }
+  //   }
+  // #endif
+
 }
 
 #pragma region Handlers
