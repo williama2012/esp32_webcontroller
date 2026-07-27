@@ -2,6 +2,9 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../../AppData/Local/Arduino15/packages/esp32/hardware/esp32"
 		}
 	],
 	"settings": {
