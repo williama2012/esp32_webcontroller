@@ -8,16 +8,20 @@
 //#include <DHT_U.h>
 //#include "esp32_helpers.h"
 
-#define DHTPIN    23
+#define DHTPIN    25
 #define DHTTYPE   DHT11
 
 //DHT_Unified dht(DHTPIN, DHTTYPE);
-Bonezegei_DHT11 dht_11(DHTPIN);
+Bonezegei_DHT11 dht(DHTPIN);
+
+void dht_init() {
+  dht.begin();
+}
 
 void dht_getvalues(float& temp, float& humidity) {
-  if (dht_11.getData()) {
-    temp = dht_11.getTemperature(true);
-    humidity= dht_11.getHumidity();
+  if (dht.getData()) {
+    temp = dht.getTemperature(true);
+    humidity= dht.getHumidity();
   }
 }
 
