@@ -70,14 +70,8 @@ float temp, hum;
 
 #pragma endregion Testing
 
-
 uint32_t motion_0 = 0;
 uint32_t motion_1 = 0;
-
-String lcd_row_0;
-String lcd_row_1;
-String lcd_row_2;
-String lcd_row_3;
 
 int httpStatus;
 String httpResponse;
@@ -129,41 +123,36 @@ void loop(void) {
     }
   #endif
 
-  if (timers.CheckTimer(1)) {
-    httpStatus = net_get("http://192.168.0.30/data?src=dht", httpResponse);
-    if (httpStatus == HTTP_CODE_OK){
-      DeserializationError error = deserializeJson(doc, httpResponse);
-      if (!error) {
-        lcd_print(str_pad_s(String(doc["temp"]) + " F", 8), 0);
-        lcd_print(str_pad_s(String(doc["hum"]) + " %", 8), 1);
+  #ifdef ESP32_LCD_H
+    if (timers.CheckTimer(1)) {
+      httpStatus = net_get("http://192.168.0.30/data?src=dht", httpResponse);
+      if (httpStatus == HTTP_CODE_OK){
+        DeserializationError error = deserializeJson(doc, httpResponse);
+        if (!error) {
+          lcd_print(str_pad_s(String(doc["temp"]) + " F", 8), 0);
+          lcd_print(str_pad_s(String(doc["hum"]) + " %", 8), 1);
+        } else {
+          counters[1]++;
+        }
       } else {
+        lcd_println("NetErr:" + net_status_code(httpStatus), 0);
         counters[1]++;
       }
-    } else {
-      lcd_println("NetErr:" + net_status_code(httpStatus), 0);
-      counters[1]++;
-    }
-    
-    httpStatus = net_get("http://192.168.0.35/data?src=onewire", httpResponse);
-    if (httpStatus == HTTP_CODE_OK){
-      DeserializationError error = deserializeJson(doc, httpResponse);
-      if (!error) {
-        lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 0);
+      
+      httpStatus = net_get("http://192.168.0.35/data?src=onewire", httpResponse);
+      if (httpStatus == HTTP_CODE_OK){
+        DeserializationError error = deserializeJson(doc, httpResponse);
+        if (!error) {
+          lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 0);
+        } else {
+          counters[1]++;
+        }
       } else {
+        lcd_println("NetErr:" + net_status_code(httpStatus), 0);
         counters[1]++;
       }
-    } else {
-      lcd_println("NetErr:" + net_status_code(httpStatus), 0);
-      counters[1]++;
     }
-
-    // lcd_println(lcd_row_0, 0);
-    // lcd_println(lcd_row_1, 1);
-    // lcd_println(lcd_row_2, 2);
-    // lcd_println(lcd_row_3, 3);
-
-  }
-
+  #endif
   // if (timers.CheckTimer(21)) {
   //   lcd_print("D:" + String(GetRange(12, 13)), 0);
   //   delay(10);
@@ -171,7 +160,6 @@ void loop(void) {
   //   lcd_print_r(String(microwave));
   // }
 }
-
 
 #pragma region Handlers
 
@@ -492,5 +480,3 @@ bool OnApiCommand(String& cmd) {
 
   return false;
 }
-
-
