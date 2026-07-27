@@ -1,4 +1,5 @@
 #include "esp32_webcontroller.h"
+#include <ArduinoJson.h>
 
 uint8_t mode = 1;
 bool show_rssi = false;
@@ -13,8 +14,8 @@ String _net_response;
 #pragma region Setup
 
 void SetupTimers() {
-  timers.AddTimer(0, 250);  // Network Counts
-  timers.AddTimer(1, 3000); // Wifi Signal
+  timers.AddTimer(0, 1000);
+  timers.AddTimer(1, 2000);
 }
 
 void PreSetup() {
@@ -23,11 +24,11 @@ void PreSetup() {
   #endif
   
   #ifdef ESP32_LED_H
-    setup_leds();
+    led_init();
   #endif
   
   #ifdef ESP32_DHT_H
-    dht.begin();
+    dht_init();
   #endif
 
   #ifdef ESP32_ONEWIRE_H
@@ -44,10 +45,8 @@ void NetReady() {
 }
 
 void SetupPins() {
-	pinMode(13, INPUT);
-  pinMode(23, INPUT);
-  pinMode(25, INPUT);
-  pinMode(26, INPUT);
+	//pinMode(14, OUTPUT); // led
+
 }
   
 #pragma endregion Setup
@@ -67,7 +66,7 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 int microwave_0;
 int microwave_1;
 float* temps;
-float temp;
+float temp, hum;
 
 #pragma endregion Testing
 
@@ -75,7 +74,15 @@ float temp;
 uint32_t motion_0 = 0;
 uint32_t motion_1 = 0;
 
+String lcd_row_0;
+String lcd_row_1;
+String lcd_row_2;
+String lcd_row_3;
 
+int httpStatus;
+String httpResponse;
+
+StaticJsonDocument<128> doc;
 
 // Runs on Core 1
 void loop(void) {
@@ -97,7 +104,6 @@ void loop(void) {
   //   motion_1++;
   // }
 
-
   //lcd_print(String(motion_0), 0, 0);
   //lcd_print(String(motion_1), 1, 0);
 
@@ -106,37 +112,58 @@ void loop(void) {
     doBlink = false;
   }
 
-  switch (mode) {
-    case 1:
-      break;
-    default:
-      break;
-  }
-
   #ifdef ESP32_LCD_H
-    if (lcd_show_network && timers.CheckTimer(0)) {
+    if (timers.CheckTimer(0)) {
       lcd_print(String(counters[0]) + "|" + String(counters[1]) + "|" + String(counters[2]), 3);
-    }
-  #endif
 
-  #ifdef ESP32_LCD_H
-    if (lcd_show_rssi && timers.CheckTimer(1)) {
       Wifi_Signal = WiFi.RSSI();
       //TODO: Make specific function to not make a new String.
       lcd_print_r((String(Wifi_Signal) + " dBm"), 3);
+
+      #ifdef ESP32_DHT_H
+        dht_getvalues(temp, hum);
+        lcd_print_r(str_pad_s((String(temp) + " F"), 8), 0);
+        lcd_print_r(str_pad_s((String(hum) + " %"), 8), 1);
+      #endif
+
     }
   #endif
 
-  #ifdef ESP32_DHT_H
-   #ifdef ESP32_LCD_H
-    if (timers.CheckTimer(1)) {
-        float temp, hum;
-        dht_getvalues(temp, hum);
-        lcd_print_r((String(temp) + " F"), 0);
-        lcd_print_r((String(hum) + " %"), 1);
+  if (timers.CheckTimer(1)) {
+    httpStatus = net_get("http://192.168.0.30/data?src=dht", httpResponse);
+    if (httpStatus == HTTP_CODE_OK){
+      DeserializationError error = deserializeJson(doc, httpResponse);
+      if (!error) {
+        lcd_print(str_pad_s(String(doc["temp"]) + " F", 10), 0);
+        lcd_print(str_pad_s(String(doc["hum"]) + " %", 10), 1);
+      } else {
+        counters[1]++;
+      }
+    } else {
+      lcd_println("NetErr:" + net_status_code(httpStatus), 0);
+      counters[1]++;
     }
-    #endif
-  #endif
+    
+    httpStatus = net_get("http://192.168.0.35/data?src=onewire", httpResponse);
+    if (httpStatus == HTTP_CODE_OK){
+      DeserializationError error = deserializeJson(doc, httpResponse);
+      if (!error) {
+        lcd_print_r(str_pad(String(doc["temp"]) + " F", 10), 0);
+      } else {
+        counters[1]++;
+      }
+    } else {
+      lcd_println("NetErr:" + net_status_code(httpStatus), 0);
+      counters[1]++;
+    }
+
+    // lcd_println(lcd_row_0, 0);
+    // lcd_println(lcd_row_1, 1);
+    // lcd_println(lcd_row_2, 2);
+    // lcd_println(lcd_row_3, 3);
+
+  }
+
   // if (timers.CheckTimer(21)) {
   //   lcd_print("D:" + String(GetRange(12, 13)), 0);
   //   delay(10);
@@ -145,23 +172,6 @@ void loop(void) {
   // }
 }
 
-void mode1process() {
-  // if (timers.CheckTimer(0)) {
-  //   step_weight();
-
-  //   if (flip == 1) {
-  //     color_r = color_weight;
-  //     color_g = 0;
-  //     color_b = 0;
-  //     setAllColor(color_r, color_g, color_b);
-  //   } else {
-  //     color_r = 0;
-  //     color_g = color_weight;
-  //     color_b = 0;
-  //     setAllColor(color_r, color_g, color_b);
-  //   }
-  // }
-}
 
 #pragma region Handlers
 
