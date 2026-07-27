@@ -12,6 +12,10 @@ void ds_init() {
   sensors.begin();
 }
 
+float ds_temp(uint8_t idx) {
+  return sensors.getTempFByIndex(idx);
+}
+
 float * ds_temps(uint8_t count) {
   float* array = (float*)malloc(count * sizeof(float));
   sensors.requestTemperatures();
