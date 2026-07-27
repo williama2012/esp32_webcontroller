@@ -10,7 +10,7 @@
 #include "esp32_led.h"
 #include "esp32_lcd.h"
 #include "esp32_onewire.h"
-#include "esp32_dht.h"
+//#include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
 #define VERSION 20260717.01
@@ -42,11 +42,15 @@ void reset_counters() {
 
 void handleGetData() {
   PrintCore("handleGetData");
-
+  counters[0]++;
   String src = server.arg("src");
   float temp;
   String idx = server.arg("idx");
   int idx_i = idx.toInt();
+
+  bool raw = server.arg("raw") == "true";
+
+
 
   if (src == "dht") {
     #ifdef ESP32_DHT_H
@@ -59,9 +63,7 @@ void handleGetData() {
 
   if (src == "onewire") {
   #ifdef ESP32_ONEWIRE_H
-    float* temps;
-    temps = ds_temps(ONE_WIRE_COUNT);
-    temp = temps[idx_i];
+    temp = ds_temp(idx_i);
     send_body(jsonField("temp", String(temp), false));
     return;
   #endif
@@ -294,7 +296,7 @@ void PulsePost(int pin, int value, int time) {
 
 #pragma endregion servo
 
-#pragma region Get_Site_Handlers
+#pragma region Get_Handlers
 
 #ifdef ESP32_SITE_H
 void handleGetIndex() {
@@ -314,7 +316,6 @@ void handleGetStylesheet() {
 }
 
 #endif
-
 
 void handleNotFound() {
   String message = "File Not Found\n\n";
