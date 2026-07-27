@@ -52,10 +52,10 @@ const uint16_t colors[] = {
   matrix.Color(0, 0, 255) 
 };
 
-void setup_leds() {
+void led_init() {
   matrix.begin();
   matrix.setTextWrap(false);
-  matrix.setBrightness(40);
+  matrix.setBrightness(10);
   matrix.setTextColor(colors[0]);
 }
 
