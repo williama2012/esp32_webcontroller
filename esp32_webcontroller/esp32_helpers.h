@@ -60,13 +60,24 @@ int str_int(String str, uint8_t position, char separator = ' ') {
   return valueStr.toInt();
 }
 
-void str_pad(String& str, uint8_t length) {
+String str_pad(String str, uint8_t length) {
   uint8_t diff = length - str.length();
   
   for(int i = 0; i < diff; i++) {
     str += " ";
   }
+  return str;
 }
+
+String str_pad_s(String str, uint8_t length) {
+  uint8_t diff = length - str.length();
+  String pad = "";
+  for(int i = 0; i < diff; i++) {
+    pad += " ";
+  }
+  return pad + str;
+}
+
 
 #pragma region Json
 
