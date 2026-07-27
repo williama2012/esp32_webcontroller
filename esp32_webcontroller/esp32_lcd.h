@@ -45,6 +45,11 @@ void lcd_print(const String& txt, uint8_t row = 0, uint8_t col = 0) {
   lcd_writing = false;
 }
 
+void lcd_println(const String& txt, uint8_t row = 0, uint8_t col = 0) {
+  if (!lcd_initialized || lcd_writing) { return; }
+  lcd_print(str_pad(txt, LCD_COLS), row, col);
+}
+
 void lcd_print_r(const String& txt, uint8_t row = 0, uint8_t offset = 0) {
   if (!lcd_initialized || lcd_writing) { return; }
 
@@ -53,6 +58,13 @@ void lcd_print_r(const String& txt, uint8_t row = 0, uint8_t offset = 0) {
   lcd.print(txt);
   lcd_writing = false;
 }
+
+void lcd_println_r(const String& txt, uint8_t row = 0, uint8_t col = 0) {
+  if (!lcd_initialized || lcd_writing) { return; }
+  lcd_print(str_pad_s(txt, LCD_COLS), row, col);
+}
+
+
 
 void lcd_write(uint8_t char_id, uint8_t row = 0, uint8_t col = 0) {
   if (!lcd_initialized || lcd_writing) { return; }
