@@ -45,6 +45,7 @@ void handleGetData() {
   counters[0]++;
   String src = server.arg("src");
   float temp;
+  float hum;
   String idx = server.arg("idx");
   int idx_i = idx.toInt();
 
@@ -54,7 +55,6 @@ void handleGetData() {
 
   if (src == "dht") {
     #ifdef ESP32_DHT_H
-      float hum;
       dht_getvalues(temp, hum);
       send_body(jsonField("temp", String(temp), true) + jsonField("hum", String(hum), false));
       return;
