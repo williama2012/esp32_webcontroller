@@ -8,14 +8,22 @@
 // const char* DATA_URL = "http://192.168.0.190:3000/api/data";
 const char *DATA_URL = "http://192.168.0.24:3000/api/data";
 
+bool net_busy = false;
+
 int net_post(const String &url, const String &requestData, String &response)
 {
+  while(net_busy) {
+    Serial.println("net_busy, waiting...");
+    delay(100);
+  }
+
   if (WiFi.status() != WL_CONNECTED)
   {
     Serial.println(F("WiFi is not connected"));
     return 0;
   }
 
+  net_busy = true;
   HTTPClient http;
   http.setTimeout(10000);
   http.begin(url);
@@ -27,17 +35,25 @@ int net_post(const String &url, const String &requestData, String &response)
     delayMicroseconds(1);
   }
   http.end();
+  net_busy = false;
   return httpCode;
 }
 
 int net_get(const String &url, String &response)
 {
+  Serial.println("net_get|" + url);
+
+  while(net_busy) {
+    Serial.println("net_busy, waiting...");
+    delay(100);
+  }
+  
   if (WiFi.status() != WL_CONNECTED)
   {
     Serial.println(F("WiFi is not connected"));
     return 0;
   }
-
+  net_busy = true;
   HTTPClient http;
   http.setTimeout(10000);
   http.begin(url);
@@ -49,6 +65,7 @@ int net_get(const String &url, String &response)
     delayMicroseconds(1);
   }
   http.end();
+  net_busy = false;
   return httpCode;
 }
 
