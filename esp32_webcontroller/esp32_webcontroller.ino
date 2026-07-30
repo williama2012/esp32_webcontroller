@@ -15,7 +15,8 @@ String _net_response;
 
 void SetupTimers() {
   timers.AddTimer(0, 1000);
-  timers.AddTimer(1, 2000);
+  timers.AddTimer(1, 3000);
+  timers.AddTimer(2, 5000);
   timers.AddTimer(3, 50);
 }
 
@@ -91,22 +92,22 @@ void loop(void) {
     }
   #endif
 
-  motion = digitalRead(13);
-  if (motion == 1) {
-    if (alert_sent == false) {
-      net_post("http://192.168.0.36/api?cmd=motion", "", httpResponse);
-      alert_sent = true;
-      digitalWrite(12, HIGH);
-      lcd_write(0, 0);
-    }
-  } else {
-    if (alert_sent == true) {
-      alert_sent = false;
-      digitalWrite(12, LOW);
-      lcd_print(" ", 0);
-    }
+  // motion = digitalRead(13);
+  // if (motion == 1) {
+  //   if (alert_sent == false) {
+  //     net_post("http://192.168.0.36/api?cmd=motion", "", httpResponse);
+  //     alert_sent = true;
+  //     digitalWrite(12, HIGH);
+  //     lcd_write(0, 0);
+  //   }
+  // } else {
+  //   if (alert_sent == true) {
+  //     alert_sent = false;
+  //     digitalWrite(12, LOW);
+  //     lcd_print(" ", 0);
+  //   }
 
-  }
+  // }
 
   if (doBlink) {
     Blink();
@@ -458,6 +459,12 @@ bool OnApiCommand(String& cmd) {
     Serial.print(F("FreeHeap:"));
     Serial.println(mem);
     return send_body(jsonField("mem", String(mem), false));
+  }
+
+  if (first_word == "motion") {
+    #ifdef ESP32_LCD_H
+      lcd_print("motion", 2);
+    #endif
   }
 
   if (first_word == "scan_i2c") {
