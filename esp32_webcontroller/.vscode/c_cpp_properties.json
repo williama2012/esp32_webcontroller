@@ -28,7 +28,6 @@
         "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\ESPmDNS\\src/**",
         "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\HTTPClient\\src/**",
         "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\NetworkClientSecure\\src/**",
-        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\SPI\\src/**",
         "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\Hash\\src/**"
       ],
       "forcedInclude": [
@@ -84,7 +83,6 @@
         "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\ESPmDNS\\src",
         "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\HTTPClient\\src",
         "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\NetworkClientSecure\\src",
-        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\SPI\\src",
         "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\Hash\\src",
         "@C:\\Users\\William\\projects\\esp32_webcontroller\\esp32_webcontroller\\build\\build_esp32_webcontroller/build_opt.h",
         "@C:\\Users\\William\\projects\\esp32_webcontroller\\esp32_webcontroller\\build\\build_esp32_webcontroller/file_opts",
