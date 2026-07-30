@@ -134,36 +134,83 @@ void loop(void) {
   #endif
 
 
-  // #ifdef ESP32_LCD_H
-  //   if (timers.CheckTimer(1)) {
-  //     httpStatus = net_get("http://192.168.0.30/data?src=dht", httpResponse);
-  //     if (httpStatus == HTTP_CODE_OK){
-  //       DeserializationError error = deserializeJson(doc, httpResponse);
-  //       if (!error) {
-  //         lcd_print(str_pad_s(String(doc["temp"]) + " F", 8), 0);
-  //         lcd_print(str_pad_s(String(doc["hum"]) + " %", 8), 1);
-  //       } else {
-  //         counters[1]++;
-  //       }
-  //     } else {
-  //       lcd_println("NetErr:" + net_status_code(httpStatus), 0);
-  //       counters[1]++;
-  //     }
+  #ifdef ESP32_LCD_H
+    if (timers.CheckTimer(1)) {
+      httpStatus = net_get("http://192.168.0.30/data?src=dht", httpResponse);
+      if (httpStatus == HTTP_CODE_OK){
+        DeserializationError error = deserializeJson(doc, httpResponse);
+        if (!error) {
+          lcd_print(str_pad_s(String(doc["temp"]) + " F", 8), 0);
+          lcd_print(str_pad_s(String(doc["hum"]) + " %", 8), 1);
+        } else {
+          counters[1]++;
+        }
+      } else {
+        lcd_print(str_pad("NetErr:" + net_status_code(httpStatus), 8), 0);
+        lcd_print(str_pad("NetErr:" + net_status_code(httpStatus), 8), 1);
+        counters[1]++;
+      }
       
-  //     httpStatus = net_get("http://192.168.0.35/data?src=onewire", httpResponse);
-  //     if (httpStatus == HTTP_CODE_OK){
-  //       DeserializationError error = deserializeJson(doc, httpResponse);
-  //       if (!error) {
-  //         lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 0);
-  //       } else {
-  //         counters[1]++;
-  //       }
-  //     } else {
-  //       lcd_println("NetErr:" + net_status_code(httpStatus), 0);
-  //       counters[1]++;
-  //     }
-  //   }
-  // #endif
+
+      httpStatus = net_get("http://192.168.0.35/data?src=onewire", httpResponse);
+      if (httpStatus == HTTP_CODE_OK){
+        DeserializationError error = deserializeJson(doc, httpResponse);
+        if (!error) {
+          lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 0);
+        } else {
+          counters[1]++;
+        }
+      } else {
+        lcd_print_r(str_pad("NetErr:" + net_status_code(httpStatus), 8), 0);
+        counters[1]++;
+      }
+
+      httpStatus = net_get("http://192.168.0.33/data?src=onewire", httpResponse);
+      if (httpStatus == HTTP_CODE_OK){
+        DeserializationError error = deserializeJson(doc, httpResponse);
+        if (!error) {
+          lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 1);
+        } else {
+          counters[1]++;
+        }
+      } else {
+        lcd_print_r(str_pad("NetErr:" + net_status_code(httpStatus), 8), 1);
+        counters[1]++;
+      }
+
+    }
+
+    // if (timers.CheckTimer(2)) {
+    //   httpStatus = net_get("http://192.168.0.35/data?src=onewire", httpResponse);
+    //   if (httpStatus == HTTP_CODE_OK){
+    //     DeserializationError error = deserializeJson(doc, httpResponse);
+    //     if (!error) {
+    //       lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 0);
+    //     } else {
+    //       counters[1]++;
+    //     }
+    //   } else {
+    //     lcd_print_r(str_pad("NetErr:" + net_status_code(httpStatus), 8), 0);
+    //     counters[1]++;
+    //   }
+    // }
+
+    // if (timers.CheckTimer(3)) {
+    //   httpStatus = net_get("http://192.168.0.33/data?src=onewire", httpResponse);
+    //   if (httpStatus == HTTP_CODE_OK){
+    //     DeserializationError error = deserializeJson(doc, httpResponse);
+    //     if (!error) {
+    //       lcd_print_r(str_pad_s(String(doc["temp"]) + " F", 12), 1);
+    //     } else {
+    //       counters[1]++;
+    //     }
+    //   } else {
+    //     lcd_print_r(str_pad("NetErr:" + net_status_code(httpStatus), 8), 1);
+    //     counters[1]++;
+    //   }
+    // }
+
+  #endif
 
 }
 
