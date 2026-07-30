@@ -1,40 +1,146 @@
 {
-    "configurations": [
-        {
-            "name": "ESP32",
-            "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/sketch/**",
-                "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32/**",
-                "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32/**",
-                "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/libraries/**/src",
-                "C:/Users/William/Documents/Arduino/libraries/**",
-                "${workspaceFolder}/build/libraries/**"
-            ],
-            "defines": [
-                "ARDUINO=10819",
-                "ARDUINO_ESP32",
-                "ARDUINO_ARCH_ESP32",
-                "ARDUINO_VARiants=\"esp32\"",
-                "ARDUINO_BOARD=\"ESP32DevModule\""
-            ],
-            "browse": {
-                "path": [
-                    "${workspaceFolder}",
-                    "${workspaceFolder}/sketch",
-                    "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32/**",
-                    "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32/**",
-                    "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/libraries/**",
-                    "C:/Users/William/Documents/Arduino/libraries/**",
-                    "${workspaceFolder}/build/libraries/**"
-                ],
-                "limitSymbolsToIncludedHeaders": true
-            },
-            "intelliSenseMode": "linux-gcc-arm",
-            "compilerPath": "C:/Users/William/AppData/Local/Arduino15/packages/esp32/tools/riscv32-esp-elf-gcc/esp-11.2.0-20220823/bin/riscv32-esp-elf-gcc.exe",
-            "cStandard": "c17",
-            "cppStandard": "c++17"
-        }
-    ],
-    "version": 4
+  "configurations": [
+    {
+      "name": "Arduino",
+      "includePath": [
+        "C:\\Users\\William\\Documents\\Arduino\\libraries/**",
+        "C:\\Users\\William\\Documents\\Arduino\\libraries\\Bonezegei_DHT11\\src/**",
+        "C:\\Users\\William\\projects\\esp32_webcontroller\\esp32_webcontroller/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32-libs_3.3.11_21e5f91f238135bf\\include/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32-libs_3.3.11_21e5f91f238135bf\\qio_qspi\\include/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\cores\\esp32/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\variants\\esp32/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\ArduinoJson_7.4.3_65bbd090d30b7927\\ArduinoJson\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\Bonezegei_DHT22_1.0.0_ec52b5b66d20cd51\\Bonezegei_DHT22\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\UrlEncode_1.0.1_12cb8248438d7918\\UrlEncode\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\Wire\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\WiFi\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\Network\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\WebServer\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\FS\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\ESPmDNS\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\HTTPClient\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\NetworkClientSecure\\src/**",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\Hash\\src/**"
+      ],
+      "forcedInclude": [
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\cores\\esp32\\Arduino.h"
+      ],
+      "compilerPath": "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp-x32_2601_97a2744abe7f8083/bin/xtensa-esp32-elf-g++",
+      "compilerArgs": [
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp-x32_2601_97a2744abe7f8083/bin/xtensa-esp32-elf-g++",
+        "-MMD",
+        "-c",
+        "@C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32-libs_3.3.11_21e5f91f238135bf/flags/cpp_flags",
+        "-w",
+        "-Os",
+        "-Werror=return-type",
+        "-DF_CPU=240000000L",
+        "-DARDUINO=10607",
+        "-DARDUINO_ESP32_DEV",
+        "-DARDUINO_ARCH_ESP32",
+        "-DARDUINO_BOARD=\"ESP32_DEV\"",
+        "-DARDUINO_VARIANT=\"esp32\"",
+        "-DARDUINO_PARTITION_default",
+        "-DARDUINO_HOST_OS=\"windows\"",
+        "-DARDUINO_FQBN=\"esp32:esp32:esp32:UploadSpeed=921600,CPUFreq=240,FlashFreq=80,FlashMode=qio,FlashSize=4M,PartitionScheme=default,DebugLevel=none,PSRAM=disabled,LoopCore=1,EventsCore=1,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default\"",
+        "-DESP32=ESP32",
+        "-DCORE_DEBUG_LEVEL=0",
+        "-DARDUINO_RUNNING_CORE=1",
+        "-DARDUINO_EVENT_RUNNING_CORE=1",
+        "-DARDUINO_USB_CDC_ON_BOOT=0",
+        "@C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32-libs_3.3.11_21e5f91f238135bf/flags/defines",
+        "-IC:\\Users\\William\\projects\\esp32_webcontroller\\esp32_webcontroller",
+        "-iprefix",
+        "C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32-libs_3.3.11_21e5f91f238135bf/include/",
+        "@C:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32-libs_3.3.11_21e5f91f238135bf/flags/includes",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32-libs_3.3.11_21e5f91f238135bf/qio_qspi/include",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\cores\\esp32",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\variants\\esp32",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\ArduinoJson_7.4.3_65bbd090d30b7927\\ArduinoJson\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\Bonezegei_DHT22_1.0.0_ec52b5b66d20cd51\\Bonezegei_DHT22\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\UrlEncode_1.0.1_12cb8248438d7918\\UrlEncode\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\Wire\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\WiFi\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\Network\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\WebServer\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\FS\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\ESPmDNS\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\HTTPClient\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\NetworkClientSecure\\src",
+        "-IC:\\Users\\William\\AppData\\Local\\Arduino15\\internal\\esp32_esp32_3.3.11_07a3ebb7e611eca1\\libraries\\Hash\\src",       
+        "@C:\\Users\\William\\projects\\esp32_webcontroller\\esp32_webcontroller\\build\\build_esp32_webcontroller/build_opt.h",
+        "@C:\\Users\\William\\projects\\esp32_webcontroller\\esp32_webcontroller\\build\\build_esp32_webcontroller/file_opts",
+        "C:\\Users\\William\\projects\\esp32_webcontroller\\esp32_webcontroller\\build\\build_esp32_webcontroller\\sketch\\esp32_webcontroller.ino.cpp",
+        "-o",
+        "C:\\Users\\William\\projects\\esp32_webcontroller\\esp32_webcontroller\\build\\build_esp32_webcontroller\\sketch\\esp32_webcontroller.ino.cpp.o"
+      ],
+      "defines": [
+        "F_CPU=240000000L",
+        "ARDUINO=10607",
+        "ARDUINO_ESP32_DEV",
+        "ARDUINO_ARCH_ESP32",
+        "ARDUINO_BOARD=ESP32_DEV",
+        "ARDUINO_VARIANT=esp32",
+        "ARDUINO_PARTITION_default",
+        "ARDUINO_HOST_OS=windows",
+        "ARDUINO_FQBN=esp32:esp32:esp32:UploadSpeed=921600,CPUFreq=240,FlashFreq=80,FlashMode=qio,FlashSize=4M,PartitionScheme=default,DebugLevel=none,PSRAM=disabled,LoopCore=1,EventsCore=1,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default",
+        "ESP32=ESP32",
+        "CORE_DEBUG_LEVEL=0",
+        "ARDUINO_RUNNING_CORE=1",
+        "ARDUINO_EVENT_RUNNING_CORE=1",
+        "ARDUINO_USB_CDC_ON_BOOT=0",
+        "ARDUINO_BOARD=\\ESP32_DEV\\",
+        "ARDUINO_VARIANT=\\esp32\\",
+        "ARDUINO_HOST_OS=\\windows\\",
+        "ARDUINO_FQBN=\\esp32:esp32:esp32:UploadSpeed=921600,CPUFreq=240,FlashFreq=80,FlashMode=qio,FlashSize=4M,PartitionScheme=default,DebugLevel=none,PSRAM=disabled,LoopCore=1,EventsCore=1,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default\\",
+        "ARDUINO_CORE_BUILD",
+        "ARDUINO_BOARD=\"ESP32_DEV",
+        "ARDUINO_VARIANT=\"esp32",
+        "ARDUINO_HOST_OS=\"windows",
+        "ARDUINO_FQBN=\"esp32:esp32:esp32:UploadSpeed=921600,CPUFreq=240,FlashFreq=80,FlashMode=qio,FlashSize=4M,PartitionScheme=default,DebugLevel=none,PSRAM=disabled,LoopCore=1,EventsCore=1,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default",
+        "USBCON"
+      ],
+      "cStandard": "c17",
+      "cppStandard": "c++17"
+    },
+    {
+      "name": "ESP32",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "${workspaceFolder}/sketch/**",
+        "C:/Users/William/Documents/Arduino/libraries/Bonezegei_DHT11/src/**",
+        "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32/**",
+        "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32/**",
+        "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/libraries/**/src",
+        "C:/Users/William/Documents/Arduino/libraries/**",
+        "${workspaceFolder}/build/libraries/**"
+      ],
+      "defines": [
+        "ARDUINO=10819",
+        "ARDUINO_ESP32",
+        "ARDUINO_ARCH_ESP32",
+        "ARDUINO_VARiants=\"esp32\"",
+        "ARDUINO_BOARD=\"ESP32DevModule\""
+      ],
+      "browse": {
+        "path": [
+          "${workspaceFolder}",
+          "${workspaceFolder}/sketch",
+          "C:/Users/William/Documents/Arduino/libraries/Bonezegei_DHT11/src/**",
+          "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32/**",
+          "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32/**",
+          "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/libraries/**",
+          "C:/Users/William/Documents/Arduino/libraries/**",
+          "${workspaceFolder}/build/libraries/**"
+        ],
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "intelliSenseMode": "linux-gcc-arm",
+      "compilerPath": "C:/Espressif/tools/riscv32-esp-elf/esp-15.2.0_20251204/riscv32-esp-elf/bin/riscv32-esp-elf-gcc.exe",
+      "cStandard": "c17",
+      "cppStandard": "c++17"
+    }
+  ],
+  "version": 4
 }
