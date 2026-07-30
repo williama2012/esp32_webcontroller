@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "name": "ESP32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/sketch/**",
+                "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32/**",
+                "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32/**",
+                "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/libraries/**/src",
+                "C:/Users/William/Documents/Arduino/libraries/**",
+                "${workspaceFolder}/build/libraries/**"
+            ],
+            "defines": [
+                "ARDUINO=10819",
+                "ARDUINO_ESP32",
+                "ARDUINO_ARCH_ESP32",
+                "ARDUINO_VARiants=\"esp32\"",
+                "ARDUINO_BOARD=\"ESP32DevModule\""
+            ],
+            "browse": {
+                "path": [
+                    "${workspaceFolder}",
+                    "${workspaceFolder}/sketch",
+                    "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32/**",
+                    "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32/**",
+                    "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/libraries/**",
+                    "C:/Users/William/Documents/Arduino/libraries/**",
+                    "${workspaceFolder}/build/libraries/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "intelliSenseMode": "linux-gcc-arm",
+            "compilerPath": "C:/Users/William/AppData/Local/Arduino15/packages/esp32/tools/riscv32-esp-elf-gcc/esp-11.2.0-20220823/bin/riscv32-esp-elf-gcc.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
