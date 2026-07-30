@@ -108,7 +108,6 @@
       "name": "ESP32",
       "includePath": [
         "${workspaceFolder}/**",
-        "${workspaceFolder}/sketch/**",
         "C:/Users/William/Documents/Arduino/libraries/Bonezegei_DHT11/src/**",
         "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32/**",
         "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32/**",
@@ -126,7 +125,6 @@
       "browse": {
         "path": [
           "${workspaceFolder}",
-          "${workspaceFolder}/sketch",
           "C:/Users/William/Documents/Arduino/libraries/Bonezegei_DHT11/src/**",
           "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/cores/esp32/**",
           "C:/Users/William/AppData/Local/Arduino15/packages/esp32/hardware/esp32/3.3.11/variants/esp32/**",
