@@ -13,6 +13,7 @@ void ds_init() {
 }
 
 float ds_temp(uint8_t idx) {
+  sensors.requestTemperatures();
   return sensors.getTempFByIndex(idx);
 }
 
