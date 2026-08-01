@@ -78,7 +78,7 @@ uint32_t motion_1 = 0;
 
 int httpStatus;
 String httpResponse;
-StaticJsonDocument<128> doc;
+StaticJsonDocument<256> doc;
 uint16_t motion;
 uint32_t mem;
 bool alert_sent = false;
@@ -133,6 +133,11 @@ void loop(void) {
     }
   #endif
 
+  #ifdef ESP32_ONEWIRE_H
+    if(timers.CheckTimer(0)) {
+      temp = ds_temp(0);
+    }
+  #endif
 
   #ifdef ESP32_LCD_H
     if (timers.CheckTimer(1)) {
