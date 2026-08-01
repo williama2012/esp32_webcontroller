@@ -15,9 +15,7 @@ String _net_response;
 
 void SetupTimers() {
   timers.AddTimer(0, 1000);
-  timers.AddTimer(1, 3000);
-  timers.AddTimer(2, 5000);
-  timers.AddTimer(3, 50);
+
 }
 
 void PreSetup() {
@@ -69,7 +67,6 @@ float GetRange(uint8_t triggerPin, uint8_t echoPin) {
 int microwave_0;
 int microwave_1;
 float* temps;
-float temp, hum;
 
 #pragma endregion Testing
 
