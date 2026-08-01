@@ -6,11 +6,11 @@
 #include "esp32_server.h"
 #include "esp32_net.h"
 #include "esp32_timer.h"
-#include "esp32_site.h"
-#include "esp32_led.h"
-#include "esp32_lcd.h"
+//#include "esp32_site.h"
+//#include "esp32_led.h"
+//#include "esp32_lcd.h"
 #include "esp32_onewire.h"
-#include "esp32_dht.h"
+//#include "esp32_dht.h"
 
 #define SERIAL_BAUDRATE 115200
 #define VERSION 20260717.01
@@ -40,18 +40,17 @@ void reset_counters() {
   }
 }
 
+float temp;
+float hum;
+
 void handleGetData() {
   PrintCore("handleGetData");
   counters[0]++;
   String src = server.arg("src");
-  float temp;
-  float hum;
   String idx = server.arg("idx");
   int idx_i = idx.toInt();
-
+  
   bool raw = server.arg("raw") == "true";
-
-
 
   if (src == "dht") {
     #ifdef ESP32_DHT_H
@@ -63,7 +62,6 @@ void handleGetData() {
 
   if (src == "onewire") {
   #ifdef ESP32_ONEWIRE_H
-    temp = ds_temp(idx_i);
     send_body(jsonField("temp", String(temp), false));
     return;
   #endif
